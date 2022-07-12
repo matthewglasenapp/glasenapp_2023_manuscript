@@ -1,0 +1,452 @@
+
+#!/bin/bash
+#SBATCH --job-name=fragilis_coverage
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=fragilis_coverage_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=72:00:00
+
+mosdepth -t 4 -x output /hb/home/mglasena/abbababa/fragilis_sorted.bam
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=qualmap_droebachiensis
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=qualmap_droebachiensis_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=50GB
+#SBATCH --time=12:00:00
+
+/hb/home/mglasena/software/qualimap_v2.2.1/qualimap bamqc -bam /hb/home/mglasena/abbababa/droebachiensis_sorted.bam \
+-sd —sdmode 0 -os -outdir /hb/home/mglasena/alignment_metrics/droebachiensis_outside/ --java-mem-size=45000M -gff new.bed
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=droebachiensis_call_variants
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=droebachiensis_call_variants_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=60GB
+#SBATCH --time=168:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk HaplotypeCaller \
+-R /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa \
+-I /hb/home/mglasena/abbababa/droebachiensis_sorted.bam \
+--native-pair-hmm-threads 24 \
+-O droebachiensis.g.vcf.gz \
+-ERC GVCF
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=droe_bcf_norm
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=droe_bcf_norm_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=48:00:00
+
+module load bcftools/bcftools-1.10.2
+
+bcftools norm -f /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -m- -Oz -o droebachiensis_norm.g.vcf.gz droebachiensis.g.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=index_vcf
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=index_vcf_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/droebachiensis/droebachiensis_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/fragilis/fragilis_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/pallidus/pallidus_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/intermedius/intermedius_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/purpuratus/purpuratus_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/pulcherrimus/pulcherrimus_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/nudus/nudus_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/franciscanus/franciscanus_norm.g.vcf.gz
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/depressus/depressus_norm.g.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=Combine_GVCFs
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=Combine_GVCFs_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=48:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk CombineGVCFs \
+-R /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa \
+-O merged.g.vcf.gz \
+-V /hb/home/mglasena/variant/fragilis/fragilis.g.vcf.gz \
+-V /hb/home/mglasena/variant/droebachiensis/droebachiensis.g.vcf.gz \
+-V /hb/home/mglasena/variant/pallidus/pal.g.vcf.gz \
+-V /hb/home/mglasena/variant/intermedius/intermedius.g.vcf.gz \
+-V /hb/home/mglasena/variant/purpuratus/purpuratus.g.vcf.gz \
+-V /hb/home/mglasena/variant/pulcherrimus/pulcherrimus.g.vcf.gz \
+-V /hb/home/mglasena/variant/franciscanus/franciscanus.g.vcf.gz \
+-V /hb/home/mglasena/variant/nudus/nudus.g.vcf.gz \
+-V /hb/home/mglasena/variant/depressus/depressus.g.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=genotype_GVCFs
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=genotype_GVCFs_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=60GB
+#SBATCH --time=168:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk GenotypeGVCFs \
+-R /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa \
+-V merged.g.vcf.gz \
+-O joint_genotype.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=bcf_norm
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=bcf_norm_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=48:00:00
+
+module load bcftools/bcftools-1.10.2
+
+bcftools norm -f /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -m- -Oz -o norm_joint_genotype.vcf.gz joint_genotype.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=index_vcf
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=index_vcf_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=20GB
+#SBATCH --time=24:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk IndexFeatureFile -I /hb/home/mglasena/variant/merge/norm_joint_genotype.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=bcf_stats
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=unfiltered_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=24:00:00
+
+module load bcftools/bcftools-1.10.2
+
+bcftools stats \
+--samples-file samples.txt \
+/hb/home/mglasena/variant/merge/joint_genotype.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=filtersnp_5bp_indel
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=filter_snp_5bp_indel_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+module load bcftools/bcftools-1.10.2
+
+bcftools filter -g 5 -O z --output 5bp_filter.vcf.gz /hb/home/mglasena/variant/merge/norm_joint_genotype.vcf.gz --threads 5
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=gatk_select_variants
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=gatk_select_variants_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+module load gatk
+
+gatk SelectVariants -V /hb/home/mglasena/variant/merge/filter/5bp_filter.vcf.gz --select-type-to-include SNP --output snps.vcf.gz
+
+gatk SelectVariants -V /hb/home/mglasena/variant/merge/filter/5bp_filter.vcf.gz --select-type-to-include INDEL --output indels.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=gatk_variant_filtration
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=gatk_variant_filtration_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+module load gatk
+
+gatk VariantFiltration --output filtered_snps.vcf.gz --variant snps.vcf.gz \
+-filter "QD < 2.0" --filter-name "QD2" \
+-filter "QUAL < 30.0" --filter-name "QUAL30" \
+-filter "SOR > 3.0" --filter-name "SOR3" \
+-filter "FS > 60.0" --filter-name "FS60" \
+-filter "MQ < 40.0" --filter-name "MQ40" \
+-filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+-filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8"
+
+gatk VariantFiltration --output filtered_indels.vcf.gz --variant indels.vcf.gz \
+-filter "QD < 2.0" --filter-name "QD2" \
+-filter "QUAL < 30.0" --filter-name "QUAL30" \
+-filter "FS > 200.0" --filter-name "FS200" \
+-filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=merge_vcfs
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=merge_vcfs_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+module load gatk
+
+gatk MergeVcfs -I filtered_snps.vcf.gz -I filtered_indels.vcf.gz -O filtered_calls.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=bcf_norm
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=bcf_norm_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=48:00:00
+
+module load bcftools/bcftools-1.10.2
+
+bcftools norm -f /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -m- -Oz -o norm_filtered_calls.vcf.gz filtered_calls.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=index_vcf
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=index_vcf_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=20GB
+#SBATCH --time=24:00:00
+
+# Load GATK
+module load gatk/gatk-4.1.8.1
+
+gatk IndexFeatureFile -I norm_filtered_calls.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=consensus_droebachiensis
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --nodes=1
+#SBATCH --output=consensus_droebachiensis_%j.out
+#SBATCH --partition=128x24
+#SBATCH --mem=25GB
+#SBATCH --time=48:00:00
+
+cat /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa | \
+bcftools consensus \
+--iupac-codes \
+--include 'FILTER="PASS" && strlen(REF)>=strlen(ALT)' \
+--mark-del - \
+-M "N" \
+-H I \
+-s QB3KMK014 \
+-o /hb/home/mglasena/consensus/droebachiensis.fa \
+/hb/home/mglasena/variant/merge/filter/filtered_calls.vcf.gz
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=iq_gcf
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --output=iq_gcf_%j.out
+#SBATCH --nodes=1
+#SBATCH --partition=128x24
+#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+
+iqtree -t /hb/home/mglasena/iqtree/species_tree/species_tree_4381/concat.treefile --gcf /hb/home/mglasena/iqtree/single_locus_trees/single_threaded_4381/loci.treefile \
+-p /hb/home/mglasena/marss/filtered_reordered_single_copy_orthologs/ --scf 100 --prefix concord -T 10
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=d_suite
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --output=d_suite_%j.out
+#SBATCH --nodes=1
+#SBATCH --partition=128x24
+#SBATCH --mem=125GB
+#SBATCH --time=24:00:00
+
+/hb/home/mglasena/software/Dsuite/Build/Dsuite Dtrios /hb/home/mglasena/variant/merge/filter/filtered_snps.vcf.gz SETS4.txt -t tree4.txt -o out4 --no-f4-ratio
+
+-----------------------------------------------------------------------------------
+
+#!/bin/bash
+#SBATCH --job-name=abbababa
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=mglasena@ucsc.edu
+#SBATCH --output=abbababa_%j.out
+#SBATCH --nodes=1
+#SBATCH --partition=128x24
+#SBATCH --mem=60GB
+#SBATCH --time=72:00:00
+
+module load angsd/gnu-930
+
+angsd -doAbbababa 1 \
+-doCounts 1 \
+-baq 1 \
+-ref /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa \
+-useLast 1 \
+-enhance 1 \
+-bam bam.filelist \
+-out out \
+-blockSize 1000000 \
+-minMapQ 20 \
+-minQ 20 \
+-only_proper_pairs 1 \
+-remove_bads 1 \
+-uniqueOnly 1 \
+
+module load R/R-3.6.1
+Rscript jackKnife.R file=out.abbababa indNames=bam.filelistnames outfile=results
+
+-----------------------------------------------------------------------------------
+# Run ANGSD by scaffold
+
+#!/usr/bin/env python
+
+import os
+
+parent_dir = "/hb/groups/pogson_group/abbababa/by_scaffold"
+scaffold_list = "/hb/groups/pogson_group/abbababa/by_scaffold/scaffold_list.txt"
+
+def run_angsd_single_scaffold(scaffold):
+        os.system("angsd -doAbbababa 1 -doCounts 1 -r " + scaffold + " -ref /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -useLast 1 -enhance 1 -bam /hb/groups/pogson_group/abbababa/by_scaffold/bam.$
+        os.system("Rscript /hb/groups/pogson_group/abbababa/by_scaffold/jackKnife.R file=out.abbababa indNames=/hb/groups/pogson_group/abbababa/by_scaffold/bam.filelistnames outfile=results")
+
+def main():
+	scaffolds = open(scaffold_list,"r").read().splitlines()
+        for scaffold in scaffolds:
+                os.mkdir(scaffold)
+                os.chdir(scaffold)
+                run_angsd_single_scaffold(scaffold)
+                os.chdir(parent_dir)
+
+if __name__ == "__main__":
+        main()
+
+-----------------------------------------------------------------------------------
+# Concatenate results after running angsd on scaffolds individually
+
+#!/usr/bin/env python
+
+import os
+import csv
+
+csv_file_name = "/hb/groups/pogson_group/abbababa/by_scaffold/results_by_scaffold.csv"
+
+def create_by_scaffold_file():
+        csv_file = open(csv_file_name,"w")
+        writer = csv.writer(csv_file)
+        header = ["Scaffold", "H1", "H2", "H3", "O", "nABBA", "nBABA", "Dstat", "jackEst", "SE", "Z"]
+        writer.writerow(header)
+
+        results_files = open("/hb/groups/pogson_group/abbababa/by_scaffold/results_files","r").read().splitlines()
+
+        for file in results_files:
+                scaffold_name = file.split("/")[6]
+                data = open(file,"r").read().splitlines()[3]
+                fields = data.split()
+                data = [scaffold_name,fields[0],fields[1],fields[2],"nudus",fields[3],fields[4],fields[5],fields[6],fields[7],fields[8]]
+                writer.writerow(data)
+
+        csv_file.close()
+
+def main():
+	os.system('find $(pwd) -name "results.txt" -type f > results_files')
+        create_by_scaffold_file()
+
+if __name__ == "__main__":
+        main()

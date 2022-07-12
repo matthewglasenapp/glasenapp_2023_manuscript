@@ -1,3 +1,12 @@
+"""
+Download multiple accession from the NCBI SRA. Consider modifying to parallelize.
+"""
+
+# species, sample_name, ncbi biosample, library_name, read_group_string (@<instrument>:<run number>:<flowcell ID>:<lane>)
+# For SRA accessions without read group information, the read group string is simply the SRA accession
+# For SRA accession without library information, the library is simply the SRA accession
+# SRR5767283 (pulcherrimus) and SRR5767280 (intermedius) are skipped because they were not uploaded to ncbi correctly. I have the raw sequencing reads for these two samples. 
+
 import os
 
 skipped_accessions = {"SRR5767283": "pulcherrimus,QB3KMK016,SAMN07269099", "SRR5767280": "intermedius,QB3KMK012,SAMN07269102"}
