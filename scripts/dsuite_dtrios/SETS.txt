@@ -1,0 +1,12 @@
+QB3KMK013	fragilis
+QB3KMK011	Outgroup
+QB3KMK010	franciscanus
+SAMD00098133	xxx
+QB3KMK015	depressus
+QB3KMK002	pallidus
+QB3KMK014	droebachiensis
+S.purpuratus#1	purpuratus
+ERS2351987	xxx
+QB3KMK016	pulcherrimus
+QB3KMK012	intermedius
+SPUR.00	purpuratus
