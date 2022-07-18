@@ -13,6 +13,12 @@ fasterq-dump is not included. This script assumes there is a directiory with the
 import os 
 from joblib import Parallel, delayed
 
+# Specify maximum number of CPU cores 
+cores = 8
+
+# Max number of threads for multi-threading
+max_threads = int(cores*2)
+
 # Root directory for output files 
 root_dir = "/hb/groups/pogson_group/dissertation/data/"
 
@@ -137,12 +143,13 @@ class Accessions:
 		if len(self.read_group_string) == 2:
 			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def align(lane):
+				threads = int(max_threads/2)
 				number_string = "_lane{}".format(lane)
 				uBAM_XT = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
 				unmapped_BAM = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
 				output_file = mapped_bam_dir + self.species + "_" + self.accession + number_string + "_aligned_reads.bam"
 				tmp = "{}{}_lane{}/".format(tmp_dir, self.accession, lane)
-				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 __INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t 8 -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
+				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 __INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
 				os.system(align)
 
 				# Clean up intermediate_files
@@ -157,7 +164,7 @@ class Accessions:
 			unmapped_BAM = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
 			output_file = mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bam"
 			tmp = "{}{}/".format(tmp_dir, self.accession)
-			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t 16 -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
+			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
 			os.system(align)
 
 			# Clean up intermediate_files
@@ -199,7 +206,7 @@ class Accessions:
 	
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads_flagstat.tsv"
-		flagstat = "samtools flagstat -@ 16 -O tsv {} > {}".format(input_file, output_file)
+		flagstat = "samtools flagstat -@ {} -O tsv {} > {}".format(max_threads, input_file, output_file)
 		os.system(flagstat)
 
 	def call_variants(self):
