@@ -24,8 +24,8 @@ dict = {
 "SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
 }
 
-def make_consensus(input_vcf, sample):
-	output_file = "{}{}.fa".format(vcf_dir, sample)
+def make_consensus(input_vcf, accession_id, sample, species):
+	output_file = "{}{}_{}.fa".format(vcf_dir, species, accession_id)
 	consensus = "cat {} | bcftools consensus --iupac-codes --include 'FILTER=\"PASS\" && strlen(REF)>=strlen(ALT)' --mark-del - -M \"N\" -H I -s {} -o {} {}".format(reference, sample, output_file, input_vcf)
 	os.system(consensus)
 
@@ -34,8 +34,9 @@ def main():
 	accession_list = list(dict)
 	accession_id = accession_list[int(array_id)]
 	sample = dict[accession_id][2]
+	species = dict[accession_id][1]
 
-	make_consensus(input_vcf, sample)
+	make_consensus(input_vcf, accession_id, sample, species)
 
 if __name__ == "__main__":
 	main()
