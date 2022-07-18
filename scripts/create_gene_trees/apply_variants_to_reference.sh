@@ -11,7 +11,6 @@
 #SBATCH --array=[0-8]
 
 module load python-3.6.5
-module load gatk
 module load bcftools/bcftools-1.14
 
 array_id=$SLURM_ARRAY_TASK_ID

@@ -1,3 +1,8 @@
+"""
+This script creates an alternate fasta reference genome for each sample in a multi-sample vcf file by applying SNPs and deletions passing filter. 
+Insertions are skipped because o the need to retain the same coordinate system.
+"""
+
 import os
 
 vcf_dir = "/hb/home/mglasena/sample_data/"
