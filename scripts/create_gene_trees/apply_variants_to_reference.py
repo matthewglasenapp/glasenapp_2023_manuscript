@@ -30,9 +30,9 @@ dict = {
 "SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
 }
 
-def make_consensus(sample):
+def make_consensus(input_vcf, sample):
 	output_file = "{}{}.fa".format(vcf_dir, sample)
-	consensus = "cat {} | bcftools consensus --iupac-codes --include 'FILTER=\"PASS\" && strlen(REF)>=strlen(ALT)' --mark-del - -M \"N\" -H I -s {} -o {} {}".format(reference, sample, output_file, input_file)
+	consensus = "cat {} | bcftools consensus --iupac-codes --include 'FILTER=\"PASS\" && strlen(REF)>=strlen(ALT)' --mark-del - -M \"N\" -H I -s {} -o {} {}".format(reference, sample, output_file, input_vcf)
 	os.system(consensus)
 
 def main():
