@@ -146,8 +146,8 @@ class Accessions:
 				os.system(align)
 
 				# Clean up intermediate_files
-				os.system("rm " + uBAM_XT)
-				os.system("rm " + unmapped_BAM)
+				#os.system("rm " + uBAM_XT)
+				#os.system("rm " + unmapped_BAM)
 
 			Parallel(n_jobs=len(lanes))(delayed(align)(lane) for lane in lanes)
 
@@ -161,8 +161,8 @@ class Accessions:
 			os.system(align)
 
 			# Clean up intermediate_files
-			os.system("rm " + uBAM_XT)
-			os.system("rm " + unmapped_BAM)
+			#os.system("rm " + uBAM_XT)
+			#os.system("rm " + unmapped_BAM)
 
 	def mark_duplicates_spark(self):
 		print("Picard MarkDuplicates. Marking Duplicate reads in BAM files.")
@@ -176,7 +176,7 @@ class Accessions:
 			input_bam_2 = mapped_bam_dir + self.species + "_" + self.accession + number_string_two + "_aligned_reads.bam"
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
-			mark_duplicates = "gatk MarkDuplicatesSpark -I {} -I {} -O {} --tmp-dir {} --spark-runner LOCAL --conf 'spark.local.dir={}'".format(input_bam_1, input_bam_2, output_file, tmp_dir, tmp_dir)
+			mark_duplicates = "gatk MarkDuplicates -I {} -I {} -O {} --tmp-dir {} -M {}'".format(input_bam_1, input_bam_2, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
@@ -188,7 +188,7 @@ class Accessions:
 			input_bam = mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bam"
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
-			mark_duplicates = "gatk MarkDuplicatesSpark -I {} -O {} --tmp-dir {} --spark-runner LOCAL --conf 'spark.local.dir={}'".format(input_bam, output_file, tmp_dir, tmp_dir)
+			mark_duplicates = "gatk MarkDuplicatesSpark -I {} -O {} --tmp-dir {} -M {}'".format(input_bam, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
