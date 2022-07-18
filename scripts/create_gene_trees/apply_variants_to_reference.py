@@ -4,17 +4,6 @@ vcf_dir = "/hb/home/mglasena/sample_data/"
 input_vcf = "/hb/home/mglasena/sample_data/norm_filtered_calls.vcf.gz"
 reference = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
-#cat /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa | \
-#bcftools consensus \
-#--iupac-codes \
-#--include 'FILTER="PASS" && strlen(REF)>=strlen(ALT)' \
-#--mark-del - \
-#-M "N" \
-#-H I \
-#-s QB3KMK014 \
-#-o /hb/home/mglasena/consensus/droebachiensis.fa \
-#/hb/home/mglasena/variant/merge/filter/filtered_calls.vcf.gz
-
 dict = {
 "SRR5767279" : ["SRR5767279","fragilis","QB3KMK013","SAMN07269103","VJCQB3KMK013","HS3:147:d0gnlacxx:3","d0gnlacxx:3"],
 "SRR5767281" : ["SRR5767281","nudus","QB3KMK011","SAMN07269101","VJCQB3KMK011","HS2:148:C0EN2ACXX:4","C0EN2ACXX:4"],
