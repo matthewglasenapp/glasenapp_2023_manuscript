@@ -240,10 +240,10 @@ def main():
 	accession_id = accession_list[int(array_id)]
 	accession = Accessions(accession_id,dict[accession_id][1],dict[accession_id][2],dict[accession_id][3],dict[accession_id][4],dict[accession_id][5],dict[accession_id][6])
 
-	#accession.convert_fastq_to_unmapped_bam()
+	accession.convert_fastq_to_unmapped_bam()
 	
-	#accession.mark_illumina_adapters()
-	#accession.align_to_reference()
+	accession.mark_illumina_adapters()
+	accession.align_to_reference()
 	accession.mark_duplicates()
 	accession.get_alignment_stats()
 	accession.call_variants()
