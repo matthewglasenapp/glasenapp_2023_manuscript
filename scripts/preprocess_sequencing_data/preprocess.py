@@ -151,7 +151,7 @@ class Accessions:
 				unmapped_BAM = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
 				output_file = mapped_bam_dir + self.species + "_" + self.accession + number_string + "_aligned_reads.bam"
 				tmp = "{}{}_lane{}/".format(tmp_dir, self.accession, lane)
-				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 __INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
+				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
 				os.system(align)
 
 				# Clean up intermediate_files
