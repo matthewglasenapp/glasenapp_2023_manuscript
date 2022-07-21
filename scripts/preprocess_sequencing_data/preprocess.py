@@ -28,7 +28,7 @@ root_dir = "/hb/groups/pogson_group/dissertation/data/"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # Temporary directory for intermediate files
-tmp_dir = "/hb/scratch/mglasena/"
+temporary_directory = "/hb/groups/pogson_group/temp/"
 
 # Directory containing raw fastq read files
 raw_fastq_dir = root_dir + "do_not_delete/raw_sequencing_reads/"
@@ -94,6 +94,7 @@ class Accessions:
 
 		# Multiplex
 		if len(self.read_group_string) == 2:
+			print("This accession was sequenced across more than one lane. Converting fastq files from different lanes separately!")
 			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def convert_lane(lane):
 				number_string = "_lane{}".format(lane)
@@ -101,6 +102,7 @@ class Accessions:
 				file1 = raw_fastq_dir + self.accession + number_string + "_1.fastq.gz"
 				file2 = raw_fastq_dir + self.accession + number_string + "_2.fastq.gz"
 				output_file = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
+				tmp_dir = temporary_directory + self.accession + number_string + "/convert_fastq_to_unmapped_bam/"
 				fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, platform_unit, self.sample, self.library, platform_unit, tmp_dir)
 				os.system(fastq_to_sam)
 
@@ -111,6 +113,7 @@ class Accessions:
 			file1 = raw_fastq_dir + self.accession + "_1.fastq.gz"
 			file2 = raw_fastq_dir + self.accession + "_2.fastq.gz"
 			output_file = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
+			tmp_dir = temporary_directory + self.accession + "/convert_fastq_to_unmapped_bam/"
 			fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, self.platform_unit, self.sample, self.library, self.platform_unit, tmp_dir)
 			os.system(fastq_to_sam)
 
@@ -119,12 +122,14 @@ class Accessions:
 
 		# Multiplex
 		if len(self.read_group_string) == 2:
+			print("This accession was sequenced across more than one lane. Marking adapters from different lanes separately!")
 			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def mark_adapters(lane):
 				number_string = "_lane{}".format(lane)
 				ubam_file = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
 				metrics_file = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_adapter_metrics.txt"
 				output_file = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
+				tmp_dir = temporary_directory + self.accession + number_string + "/mark_illumina_adapters/"
 				mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
 				os.system(mark_adapters)
 
@@ -135,6 +140,7 @@ class Accessions:
 			ubam_file = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
 			metrics_file = uBAM_XT_dir + self.species + "_" + self.accession + "_adapter_metrics.txt"
 			output_file = uBAM_XT_dir + self.species + "_" + self.accession + "_unaligned_reads_XT.bam"
+			tmp_dir = temporary_directory + self.accession + "/mark_illumina_adapters/"
 			mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
 			os.system(mark_adapters)
 
@@ -143,6 +149,7 @@ class Accessions:
 	
 		# Multiplex
 		if len(self.read_group_string) == 2:
+			print("This accession was sequenced across more than one lane. Aligning reads from different lanes separately!")
 			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def align(lane):
 				threads = int(max_threads/2)
@@ -150,8 +157,9 @@ class Accessions:
 				uBAM_XT = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
 				unmapped_BAM = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
 				output_file = mapped_bam_dir + self.species + "_" + self.accession + number_string + "_aligned_reads.bam"
-				tmp = "{}{}_lane{}/".format(tmp_dir, self.accession, lane)
-				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
+				tmp_dir = temporary_directory + self.accession + number_string + "/align_to_reference"
+				tmp_dir_2 = temporary_directory + self.accession + number_string + "/merge_bam_alignment/"
+				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
 				os.system(align)
 
 				# Clean up intermediate_files
@@ -165,8 +173,9 @@ class Accessions:
 			uBAM_XT = uBAM_XT_dir + self.species + "_" + self.accession + "_unaligned_reads_XT.bam"
 			unmapped_BAM = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
 			output_file = mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bam"
-			tmp = "{}{}/".format(tmp_dir, self.accession)
-			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp)
+			tmp_dir = temporary_directory + self.accession + "/align_to_reference/"
+			tmp_dir_2 = temporary_directory + self.accession + "/merge_bam_alignment/"
+			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
 			os.system(align)
 
 			# Clean up intermediate_files
@@ -185,6 +194,7 @@ class Accessions:
 			input_bam_2 = mapped_bam_dir + self.species + "_" + self.accession + number_string_two + "_aligned_reads.bam"
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
+			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			mark_duplicates = "gatk MarkDuplicates -I {} -I {} -O {} --TMP_DIR {} -M {}".format(input_bam_1, input_bam_2, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
@@ -197,6 +207,7 @@ class Accessions:
 			input_bam = mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bam"
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
+			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			mark_duplicates = "gatk MarkDuplicates -I {} -O {} --TMP_DIR {} -M {}".format(input_bam, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
