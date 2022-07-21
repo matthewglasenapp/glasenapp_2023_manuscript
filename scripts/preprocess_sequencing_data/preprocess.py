@@ -16,7 +16,7 @@ from joblib import Parallel, delayed
 # Specify maximum number of CPU cores.
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
-cores = 8
+cores = 12
 
 # Max number of threads for multi-threading
 max_threads = int(cores*2)
