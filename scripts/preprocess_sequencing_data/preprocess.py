@@ -69,11 +69,11 @@ dict = {
 #"SRR5767284" : ["SRR5767284","depressus","QB3KMK015","SAMN07269098","VJCQB3KMK015","HS3:171:d0le4acxx:2","d0le4acxx:2"],
 #"SRR5767285" : ["SRR5767285","pallidus","QB3KMK002","SAMN07269097","VJCQB3KMK002","HS1_0066:8","HS1_0066:8"],
 #"SRR5767286" : ["SRR5767286","droebachiensis","QB3KMK014","SAMN07269096","VJCQB3KMK014","HS3:171:d0le4acxx:1","d0le4acxx:1"],
-"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
+#"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
 #"ERR5671699" : ["ERR5671699","lividus","4","ERS2351987","4089_HiC_PI_3","ERR5671699","ERR5671699"],
-"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
-"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
-"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
+#"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
+#"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
+#"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
 }
 
 class Accessions:
@@ -166,8 +166,8 @@ class Accessions:
 				os.system(align)
 
 				# Clean up intermediate_files
-				#os.system("rm " + uBAM_XT)
-				#os.system("rm " + unmapped_BAM)
+				os.system("rm " + uBAM_XT)
+				os.system("rm " + unmapped_BAM)
 
 			Parallel(n_jobs=len(lanes))(delayed(align)(lane) for lane in lanes)
 
@@ -202,8 +202,8 @@ class Accessions:
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
-			#os.system("rm " + input_bam_1)
-			#os.system("rm " + input_bam_2)
+			os.system("rm " + input_bam_1)
+			os.system("rm " + input_bam_2)
 
 		# No multiplex
 		else:
@@ -215,7 +215,7 @@ class Accessions:
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
-			#os.system("rm " + input_bam)
+			os.system("rm " + input_bam)
 
 	def get_alignment_stats(self):
 		print("Samtools flagstat. Getting alignment metrics from clean BAM files.")
