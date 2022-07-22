@@ -182,8 +182,8 @@ class Accessions:
 			os.system(align)
 
 			# Clean up intermediate_files
-			#os.system("rm " + uBAM_XT)
-			#os.system("rm " + unmapped_BAM)
+			os.system("rm " + uBAM_XT)
+			os.system("rm " + unmapped_BAM)
 
 	def mark_duplicates(self):
 		print("Picard MarkDuplicates. Marking Duplicate reads in BAM files.")
