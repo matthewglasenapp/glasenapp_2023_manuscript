@@ -120,6 +120,8 @@ class Accessions:
 			fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, self.platform_unit, self.sample, self.library, self.platform_unit, tmp_dir)
 			os.system(fastq_to_sam)
 
+		print("Done converting files to unmapped BAM!")
+
 	def mark_illumina_adapters(self):
 		print("Picard MarkIlluminaAdapters. Marking adapter sequences in unmapped BAM file.")
 
@@ -146,6 +148,8 @@ class Accessions:
 			tmp_dir = temporary_directory + self.accession + "/mark_illumina_adapters/"
 			mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
 			os.system(mark_adapters)
+
+		print("Done marking adaptor sequences!")
 
 	def align_to_reference(self):
 		print("gatk SamToFastq | bwa mem | gatk MergeBamAlingment. Aligning reads to reference genome.")
@@ -185,6 +189,8 @@ class Accessions:
 			os.system("rm " + uBAM_XT)
 			os.system("rm " + unmapped_BAM)
 
+		print("Done mapping reads!")
+
 	def mark_duplicates(self):
 		print("Picard MarkDuplicates. Marking Duplicate reads in BAM files.")
 
@@ -217,6 +223,8 @@ class Accessions:
 			# Clean up intermediate_files
 			os.system("rm " + input_bam)
 
+		print("Done marking duplicates!")
+
 	def get_alignment_stats(self):
 		print("Samtools flagstat. Getting alignment metrics from clean BAM files.")
 	
@@ -237,6 +245,8 @@ class Accessions:
 		#os.system("rm " + input_file)
 		#os.system("rm " + input_file + ".bai")
 		#os.system("rm " + input_file + ".sbi")
+
+		print("Done calling variants!")
 
 	def normalize_indels(self):
 		print("bcftools norm. Left-align and normalize indels.")
