@@ -8,7 +8,7 @@ fasta_alignment_directory = ""
 fasta_alignment_file_list = os.listdir(fasta_alignment_directory)
 
 def iqtree(file):
-    run_iqtree = "iqtree -s {} -m MFP".format(file)
+    run_iqtree = "iqtree -s {}{} -m MFP".format(fasta_alignment_directory,file)
     os.system(run_iqtree)
 
 main():
