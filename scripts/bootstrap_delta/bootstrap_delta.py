@@ -87,6 +87,7 @@ def create_delta_value_list(stat_files):
 def generate_output(delta_value_list):
 	z_score = str((raw_delta_value)/(statistics.stdev(delta_value_list)))
 	result_file = open("bootstrap_delta_results.txt","a")
+	result_file.write("Raw Delta: " + str(raw_delta_value))
 	result_file.write("Number of bootstrap replicates: " + str(len(delta_value_list)))
 	result_file.write("Mean Delta: " + str(statistics.mean(delta_value_list)))
 	result_file.write("Standard Deviation Delta: " + str(statistics.stdev(delta_value_list)))
