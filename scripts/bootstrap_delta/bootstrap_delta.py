@@ -30,10 +30,6 @@ bootstrap_dir = root_dir + "bootstrap/"
 make_bootstrap_dir = "mkdir -p {}".format(bootstrap_dir)
 os.system(make_bootstrap_dir)
 
-gcf_dir = root_dir = "bootstrap_gcf/"
-make_gcf_dir = "mkdir -p {}".format(gcf_dir)
-os.system(make_gcf_dir)
-
 def get_tree_list():
 	tree_list = open(single_locus_trees_file,"r").read().splitlines()
 	return tree_list
@@ -51,8 +47,9 @@ def create_pseudoreplicate(number, tree_list):
 	resampled_single_locus_trees_file.close()
 
 def get_replicate_file_paths():
-	os.system('find /Users/matt/desktop -type f -name "*replicate*" > replicate_file_names')
-	replicate_files = open("replicate_file_names","r").read().splitlines()
+	os.system('find $PWD -type f -name "*replicate*" > file_paths')
+	replicate_files = open("file_paths","r").read().splitlines()
+	os.system("rm file_paths")
 	return replicate_files
 
 def run_gcf(single_locus_trees_file):
@@ -60,19 +57,15 @@ def run_gcf(single_locus_trees_file):
 	os.system(run_gcf)
 
 def clean_up_gcf_output():
-	os.system("mv *.cf.stat " + gcf_dir)
 	os.system("rm *.cf.branch")
 	os.system("rm *.cf.tree")
 	os.system("rm *.cf.tree.nex")
 	os.system("rm *.log")
-	os.system("rm replicate_files")
-	os.system("rm replicate_file_names")
 	
 def get_stat_files_paths():
 	os.system('find "$(pwd)" -name "*.cf.stat" -type f > stat_paths_file')
-	os.system("mv stat_paths_file " + root_dir)
-	os.chdir(root_dir)
 	stat_files_paths = open("stat_paths_file","r").read().splitlines()
+	os.system("rm stat_paths_file")
 	return stat_files_paths
 
 def parse_gcf(stat_file):
@@ -93,8 +86,8 @@ def create_delta_value_list(stat_files):
 
 def generate_output(delta_value_list):
 	z_score = str((raw_delta_value)/(statistics.stdev(delta_value_list)))
-	result_file = open("bootstrap_delta_results","a")
-	result_file.write(len(delta_value_list))
+	result_file = open("bootstrap_delta_results.txt","a")
+	result_file.write("Number of bootstrap replicates: " + str(len(delta_value_list)))
 	result_file.write("Mean Delta: " + str(statistics.mean(delta_value_list)))
 	result_file.write("Standard Deviation Delta: " + str(statistics.stdev(delta_value_list)))
 	result_file.write("Z score for Delta: " + z_score)
@@ -106,10 +99,10 @@ def main():
 	Parallel(n_jobs=num_cores)(delayed(create_pseudoreplicate)(i,tree_list) for i in range(1, num_replicates + 1))
 
 	replicate_files_list = get_replicate_file_paths()
-	Parallel(n_jobs=num_cores)(delayed(run_gcf)(single_locus_trees_file) for single_locus_trees_file in replicate_files_list)
+	Parallel(n_jobs=num_cores)(delayed(run_gcf)(replicate_single_locus_trees_file) for replicate_single_locus_trees_file in replicate_files_list)
+	
 	clean_up_gcf_output()
 
-	os.chdir(gcf_dir)
 	stat_files = get_stat_files_paths()
 
 	delta_value_list = create_delta_value_list(stat_files)
