@@ -235,9 +235,13 @@ class Accessions:
 
 	def call_variants(self):
 		print("gatk HaplotypeCaller. Calling variants.")
-	
+
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
+		
+		index_input_bam = "samtools index {}".format(input_file)
+		os.system(index_input_bam)
+
 		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 10 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
@@ -273,12 +277,12 @@ def main():
 	accession_id = accession_list[int(array_id)]
 	accession = Accessions(accession_id,dict[accession_id][1],dict[accession_id][2],dict[accession_id][3],dict[accession_id][4],dict[accession_id][5],dict[accession_id][6])
 
-	accession.convert_fastq_to_unmapped_bam()
+	#accession.convert_fastq_to_unmapped_bam()
 	
-	accession.mark_illumina_adapters()
-	accession.align_to_reference()
-	accession.mark_duplicates()
-	accession.get_alignment_stats()
+	#accession.mark_illumina_adapters()
+	#accession.align_to_reference()
+	#accession.mark_duplicates()
+	#accession.get_alignment_stats()
 	accession.call_variants()
 	accession.normalize_indels()
 	accession.index_vcf()
