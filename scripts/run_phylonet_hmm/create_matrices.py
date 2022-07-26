@@ -1,75 +1,76 @@
 import os
+import multiprocessing
+from joblib import Parallel, delayed
+
+num_cores = multiprocessing.cpu_count()
 
 # File containing paths to scaffold alignments produced by vcf2phylip. Can create this file using find "$(pwd)" -name "*.nexus" -type f
-scaffold_alignments = "scaffold_alignments.txt"
-nexus_dir = "/hb/groups/pogson_group/vcf2phylip_4way/prepare_hmm_100_runs/hmm_nexus/"
+scaffold_alignment_paths_file = ""
 
-def add_lines(scaffold_file):
-    scaffold_file = str(scaffold_file)
-    with open(scaffold_file,'r') as f2:
-        inputs = f2.read().splitlines()
-        seq = inputs[6]
-        length_int = len(seq.split()[1])
-        length = str(length_int)
-        outdir = "\"" + scaffold_file.split("/")[6] + "\""
-        line1 = "#NEXUS"
-        line2 = "BEGIN NETWORKS;"
-        line3 = "Network net = (intermedius:0.2358047382668817,((fragilis:0.947834903226071,(droebachiensis:0.20102859349321878)#H1:1.0144626112368627::0.578093455107686):0.6877223535737972,(#H1:1.859606432191539::0.42190654489231405,pallidus:1.0045273614964096):0.11154011939943985):4.676738730180861);"
-        line4 = "END;"
-        line5 = "Begin DATA;"
-        line6 = "dimensions ntax=4 nchar=" + length + ";"
-        line7 = 'format datatype=dna symbols="ACTG" missing=? gap=-;'
-        line8 = "matrix"
-        line9 = ";"
-        line10 = "END;"
-        line11 = "BEGIN PHYLONET;"
-        line12 = 'HmmCommand net -gtr -allelemap <intermedius:QB3KMK012; pallidus:QB3KMK002; droebachiensis:QB3KMK014; fragilis:QB3KMK013> -outputdirectory ' + outdir + ' -numberofruns 100 -iterations 1000 -noplots;'
-        line13 = "END;"
-        with open(scaffold_file.split("/")[6] + ".nexus",'w') as f2: 
-            f2.write(line1)
-            f2.write("\n")
-            f2.write(line2)
-            f2.write("\n")
-            f2.write(line3)
-            f2.write("\n")
-            f2.write(line4)
-            f2.write("\n")
-            f2.write(line5)
-            f2.write("\n")
-            f2.write(line6)
-            f2.write("\n")
-            f2.write("\t")
-            f2.write(line7)
-            f2.write("\n")
-            f2.write("\t")
-            f2.write(line8)
-            f2.write("\n")
-            f2.write(inputs[6])
-            f2.write("\n")
-            f2.write(inputs[7])
-            f2.write("\n")
-            f2.write(inputs[8])
-            f2.write("\n")
-            f2.write(inputs[9])
-            f2.write("\n")
-            f2.write(line9)
-            f2.write("\n")
-            f2.write(line10)
-            f2.write("\n")
-            f2.write(line11)
-            f2.write("\n")
-            f2.write(line12)
-            f2.write("\n")
-            f2.write(line13)
-            f2.write("\n")
+# Directory for phylonet_hmm scaffold input files 
+output_dir = ""
+make_output_dir = "mkdir -p {}".format(output_dir)
+os.system(make_output_dir)
+
+# Copy/paste from phylonet InferNetwork_ML run with 1 retiulcation age
+phylogenetic_network = "Network net = (intermedius:0.2358047382668817,((fragilis:0.947834903226071,(droebachiensis:0.20102859349321878)#H1:1.0144626112368627::0.578093455107686):0.6877223535737972,(#H1:1.859606432191539::0.42190654489231405,pallidus:1.0045273614964096):0.11154011939943985):4.676738730180861);"
+allele_map = "<intermedius:QB3KMK012; pallidus:QB3KMK002; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
+
+number_taxa = 4 
+number_runs = 100
+number_iterations = 1000
+
+def get_scaffold_file_paths():
+    f = open(scaffold_alignment_paths_file, "r")
+    scaffold_alignment_file_path_list = f.read().splitlines()
+    return scaffold_alignment_file_path_list
+
+def create_hmm_input_file(scaffold_file):
+    with open(str(scaffold_file),'r') as f:
+        inputs = f.read().splitlines()
+    seq = inputs[6]
+    length = str(len(seq.split()[1]))
+    scaffold_name = scaffold_file.split("/")[-1].split(".min4")[0]
+    outdir = "\"" + scaffold_name + "\""
+    line1 = "#NEXUS"
+    line2 = "BEGIN NETWORKS;"
+    line3 = phylogenetic_network
+    line4 = "END;"
+    line5 = "Begin DATA;"
+    line6 = "dimensions ntax={} nchar={};".format(number_taxa,length)
+    line7 = 'format datatype=dna symbols="ACTG" missing=? gap=-;'
+    line8 = "matrix"
+    line9 = ";"
+    line10 = "END;"
+    line11 = "BEGIN PHYLONET;"
+    line12 = "HmmCommand net -gtr -allelemap {} -outputdirectory {} -numberofruns {} -iterations {} -noplots;".format(allele_map, outdir, number_runs, number_iterations)
+    line13 = "END;"
+    
+
+    with open(output_dir + scaffold_name + ".nexus",'w') as f2: 
+        f2.write(line1 + "\n")
+        f2.write(line2 + "\n")
+        f2.write(line3 + "\n")
+        f2.write(line4 + "\n")
+        f2.write(line5 + "\n")
+        f2.write(line6 + "\n" + "\t")
+        f2.write(line7 + "\n" + "\t")
+        f2.write(line8 + "\n")
+        f2.write(inputs[6] + "\n")
+        f2.write(inputs[7] + "\n")
+        f2.write(inputs[8] + "\n")
+        f2.write(inputs[9] + "\n")
+        f2.write(line9 + "\n")
+        f2.write(line10 + "\n")
+        f2.write(line11 + "\n")
+        f2.write(line12 + "\n")
+        f2.write(line13 + "\n")
 
 def main():
-        f = open(scaffold_alignments, "r")
-        inputs = f.read().splitlines()
-        os.mkdir(nexus_dir)
-        os.chdir(nexus_dir)
-        for scaffold_file in inputs:
-                add_lines(scaffold_file)
+        scaffold_alignment_file_path_list = get_scaffold_file_paths()
+
+        Parallel(n_jobs=num_cores)(delayed(create_hmm_input_file)(scaffold_alignment_file) for scaffold_alignment_file in scaffold_alignment_file_path_list)
 
 if __name__ == "__main__":
         main()
+        
