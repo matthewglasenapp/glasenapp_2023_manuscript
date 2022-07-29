@@ -9,17 +9,8 @@ Process_single_scaffold appends results to a bunch of lists defined at the top o
 # Chunk this out further 
 process_single_scaffold calls:
 
-	find_tracts() - returns index_tract_list - list of lists of tracts in format of  [[start_index,stop_index,length in base pairs], []]
+	find_tracts() - returns index_tract_list and coordinate_tract_list - lists of lists of tracts in format of  [[start_index,stop_index,length in base pairs], []] and [[start_coordinate,stop_coordinate,length], []]
 
-	get_coordinate_tract_list_and_tract_lengths() - returns coordinate_tract_list - list of lists of tracts in format of [[start_coordinate,stop_coordinate,length], []]
+	sort_tract_list() - Sorts a tract list in descending order of length in base pairs
 
-	sort_index_tract_list() - Sorts index_tract_list in descending order of length in base pairs
-
-	sorted_coordinate_tract_list() - sorts coordinate_tract_list in descending order of length in base pairs 
-
-	get_tract_length_dist() - get list of all tract lengths for
-
-
-
-
-Notes: I think process single scaffold should only call on helper functions. Chunk stuff out into helper functions. 
+	get_tract_length_dist() - get list of all tract lengths for a tract list

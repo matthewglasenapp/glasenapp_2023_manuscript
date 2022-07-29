@@ -58,6 +58,23 @@ def get_file_paths_pairs_list():
 	
 	return sorted_zipped_list
 
+#Get list of chromosomal coordinates from SNV alignments. Each coordinate has a corresponding posterior probability of introgression in "introgression_probabilites" list
+def get_coordinate_list(coordinate_file_path):
+	coordinate_list = []
+	with open(coordinate_file_path,"r") as coordinate_file:
+		coordinates = coordinate_file.read().splitlines()
+	[coordinate_list.append(coordinate)for coordinate in coordinates]
+
+	return coordinate_list
+
+#Get list of introgression probabilities. Save to "introgression_probabilites" variable
+def get_introgression_probabilities_list(json_file_path):
+	with open(json_file_path,"r") as probability_file:
+		introgression_probabilities = json.load(probability_file).get("posteriorProbabilityOfSpeciesTrees")[1]
+	introgression_probabilities = [probability * 100 for probability in introgression_probabilities]
+
+	return introgression_probabilities 
+
 def find_tracts(introgression_probabilities,coordinates):
 	# Create list of lists of introgression tracts in format [[start_index,stop_index,length], [start_index,stop_index,length]]
 	index_tract_list = []
@@ -97,21 +114,12 @@ def get_tract_length_dist(tract_list):
 	return tract_length_dist
 
 def process_single_scaffold(json_file_path,coordinate_file_path):
-	coordinate_list = []
-
-	#Get list of chromosomal coordinates from SNV alignments. Each coordinate has a corresponding posterior probability of introgression in "introgression_probabilites" list
-	with open(coordinate_file_path,"r") as coordinate_file:
-		coordinates = coordinate_file.read().splitlines()
-	[coordinate_list.append(coordinate)for coordinate in coordinates]
+	coordinate_list = get_coordinate_list(coordinate_file_path)
 
 	# Get name of scaffold
 	scaffold_name = str(coordinate_list[0].split(":")[0])
-
-	#Get list of introgression probabilities. Save to "introgression_probabilites" variable
-	with open(json_file_path,"r") as probability_file:
-		introgression_probabilities = json.load(probability_file).get("posteriorProbabilityOfSpeciesTrees")[1]
 	
-	introgression_probabilities = [probability * 100 for probability in introgression_probabilities]
+	introgression_probabilities = get_introgression_probabilities_list(json_file_path)
 
 	find_tracts_results = find_tracts(introgression_probabilities,coordinate_list)
 	index_tract_list = find_tracts_results[0]
