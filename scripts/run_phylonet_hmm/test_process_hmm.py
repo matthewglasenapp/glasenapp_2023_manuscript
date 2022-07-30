@@ -75,7 +75,7 @@ def get_introgression_probabilities_list(json_file_path):
 
 	return introgression_probabilities 
 
-def find_tracts(introgression_probabilities,coordinates):
+def get_tracts(introgression_probabilities,coordinates):
 	# Create list of lists of introgression tracts in format [[start_index,stop_index,length], [start_index,stop_index,length]]
 	index_tract_list = []
 	coordinate_tract_list = []
@@ -113,17 +113,18 @@ def get_tract_length_dist(tract_list):
 	tract_length_dist = [n[2] for n in tract_list]
 	return tract_length_dist
 
+def get_number_sites_introgressed(probability_lst):
+	number_sites_introgressed = len([probability for probability in probability_lst if probability >= posterior_probability_threshold])
+	return number_sites_introgressed
+
 def process_single_scaffold(json_file_path,coordinate_file_path):
 	coordinate_list = get_coordinate_list(coordinate_file_path)
-
-	# Get name of scaffold
+	introgression_probabilities = get_introgression_probabilities_list(json_file_path)
 	scaffold_name = str(coordinate_list[0].split(":")[0])
 	
-	introgression_probabilities = get_introgression_probabilities_list(json_file_path)
-
-	find_tracts_results = find_tracts(introgression_probabilities,coordinate_list)
-	index_tract_list = find_tracts_results[0]
-	coordinate_tract_list = find_tracts_results[1]
+	tracts = get_tracts(introgression_probabilities,coordinate_list)
+	index_tract_list = tracts[0]
+	coordinate_tract_list = tracts[1]
 	
 	# Sort index_tract_list and coordinate_tract_list by index 2 of each list (length in bp) in order of highest to lowest 
 	sorted_index_tract_list = sort_tract_list(index_tract_list)
@@ -133,7 +134,9 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	tract_length_dist = get_tract_length_dist(sorted_coordinate_tract_list)
 
 	# Get number of base pair sites that were declared introgressed at given threshold and append to total_number_sites list. 
-	number_sites_introgressed = len([probability for probability in introgression_probabilities if probability >= posterior_probability_threshold])
+	number_sites_introgressed = get_number_sites_introgressed(introgression_probabilities)
+	total_number_sites.append(number_sites_introgressed)
+
 	#print(number_sites_introgressed)
 	total_number_sites.append(number_sites_introgressed)
 	
