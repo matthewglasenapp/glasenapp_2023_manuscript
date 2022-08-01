@@ -16,6 +16,9 @@ original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
 #Root directory where phylonet_hmm was run
 root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
 
+# Tsv file with scaffold names and length in base pairs
+scaffold_info_file = "scaffolds.tsv"
+
 posterior_probability_threshold = 90
 
 # Return list of 
@@ -215,7 +218,7 @@ def main():
 	global scaffold_dict
 	scaffold_dict = {}
 
-	with open("scaffolds.txt","r") as f:
+	with open(scaffold_info_file,"r") as f:
 		scaffolds = f.read().splitlines()
 
 	for scaffold in scaffolds:
