@@ -17,24 +17,6 @@ root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
 
 posterior_probability_threshold = 90
 
-# List of lists of results for each scaffold in format of [[scaffold_name,sorted_coordinate_tract_list,sorted_index_tract_list,tract_length_dist]]
-results_by_scaffold = []
-
-# List of coordinate_tract_lists for each scaffold in format of [[start_coordinate, stop_coordinate, length in bp], []]
-combined_results = []
-
-# List of total number of tracts for each scaffold analyzed. 
-total_number_tracts = []
-
-# List of number of sites introgressed on each scaffold 
-total_number_sites = []
-
-# List of total number of variant sites on each scaffold alignment 
-total_sites_nexus_alignments = []
-
-# List of the total length of each scaffold analyzed. Accounts for fact that the first site in the alignment is not necessarily the first site on the physical scaffold (same goes for last site/base)
-total_length_nexus_alignments = []
-
 # Return list of 
 def get_file_paths_pairs_list():
 	
@@ -103,11 +85,6 @@ def get_tracts(introgression_probabilities,coordinates):
 	
 	return index_tract_list, coordinate_tract_list
 
-# Sort index_tract_list by index 2 of each list (length in bp) in order of highest to lowest 
-def sort_tract_list(tract_list):
-	sorted_tract_list = (sorted(tract_list, key=itemgetter(2), reverse=True))
-	return sorted_tract_list
-
 # Get list of all tract lengths 
 def get_tract_length_dist(tract_list):
 	tract_length_dist = [n[2] for n in tract_list]
@@ -127,50 +104,86 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	coordinate_tract_list = tracts[1]
 	
 	# Sort index_tract_list and coordinate_tract_list by index 2 of each list (length in bp) in order of highest to lowest 
-	sorted_index_tract_list = sort_tract_list(index_tract_list)
-	sorted_coordinate_tract_list = sort_tract_list(coordinate_tract_list)
-	
-	# Get list of all tract lengths 
-	tract_length_dist = get_tract_length_dist(sorted_coordinate_tract_list)
+	index_tract_list.sort(reverse=True, key=itemgetter(2))
+	coordinate_tract_list.sort(reverse=True, key=itemgetter(2))
 
-	# Get number of base pair sites that were declared introgressed at given threshold and append to total_number_sites list. 
+	# Get total sites on scaffold alignment
+	number_sites_nexus_scaffold = len(introgression_probabilities)
+	total_sites_nexus_alignments.append(number_sites_nexus_scaffold)
+
+	# Get number of base pair sites that were declared introgressed at given threshold and append to total_snv_introgressed list. 
 	number_sites_introgressed = get_number_sites_introgressed(introgression_probabilities)
-	total_number_sites.append(number_sites_introgressed)
-
-	#print(number_sites_introgressed)
-	total_number_sites.append(number_sites_introgressed)
-	
-	# Get sum of tract_length_dist list, which is a list of all tract lengths on scaffold
-	sum_tract_length_dist = sum(tract_length_dist)
+	total_snv_introgressed.append(number_sites_introgressed)
 	
 	# Calculate percentage of sites that were declared introgressed 
 	percent_sites_introgressed = ((len([probability for probability in introgression_probabilities if probability >= posterior_probability_threshold]))/len(introgression_probabilities))*100
 	
-	# Calculate percentage of the scaffold that was introgressed. 
-	percent_scaffold_alignment_introgressed = ((sum(tract_length_dist))/((int(coordinate_list[len(coordinate_list)-1].split(":")[1])) - (int(coordinate_list[0].split(":")[1]))))*100
-	
-	# Get total sites on scaffold alignment
-	number_sites_nexus_scaffold = len(introgression_probabilities)
-	total_sites_nexus_alignments.append(number_sites_nexus_scaffold)
-	
-	# Get total length in bases of nexus scaffold alignment based of genomic coordinates
+	# Total length of scaffold analyzed in bases 
 	total_length_scaffold_analyzed = ((int(coordinate_list[len(coordinate_list)-1].split(":")[1])) - (int(coordinate_list[0].split(":")[1])))
 	total_length_nexus_alignments.append(total_length_scaffold_analyzed)
 
+	# Get tract length distribution 
+	tract_length_dist = get_tract_length_dist(coordinate_tract_list)
+
+	# Total number of tracts for scaffold 
+	number_of_tracts = len(tract_length_dist)
+
+	# Append total number of tracts to total_number_tracts list 
+	total_number_tracts.append(number_of_tracts)
+
+	# Get combined length of all tracts
+	combined_length_tracts = sum(tract_length_dist)
+
+	# Calculate percentage of the scaffold that was introgressed. 
+	percent_scaffold_alignment_introgressed = (combined_length_tracts/total_length_scaffold_analyzed)*100
+	
 	#print(scaffold_name)
 	#print(percent_sites_introgressed)
 	#print(percent_scaffold_alignment_introgressed)
 	#print(scaffold_name,percent_scaffold_alignment_introgressed,percent_sites_introgressed,percent_scaffold_alignment_introgressed - percent_sites_introgressed)
 
-	results_by_scaffold.append([scaffold_name,sorted_coordinate_tract_list,sorted_index_tract_list,tract_length_dist])
+	results_by_scaffold.append([scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist])
 
 	combined_results.append(coordinate_tract_list)
 
-	# Calculate total number of tracts for scaffold 
-	number_of_tracts = len(tract_length_dist)
+def write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combined_ten_kb_tract_length_distribution):
+	# Get total number of sites in concatenated scaffold alignments
+	total_nexus_sites = sum(total_sites_nexus_alignments)
+	print("Total nexus sites tested: {}".format(total_nexus_sites))
+
+	# Get total length of concatenated scaffolds analyzed (The first SNV is not necesarily the first position on the scaffold)
+	total_nexus_length = sum(total_length_nexus_alignments)
+	print("Total nexus length tested: {}".format(total_nexus_length))
+
+	total_number_sites_introgressed = sum(total_snv_introgressed)
+	print("Total number Sites Introgressed: {}".format(total_number_sites_introgressed))
+
+	total_bases_introgressed = sum(combined_tract_length_distribution)
+	print("Total bases introgressed: {}".format(total_bases_introgressed))
+
+	print("Total number of tracts: {}".format(sum(total_number_tracts)))
+
+	# Calculate median length of all tracts
+	median_tract_length = statistics.median(combined_tract_length_distribution)
+	print("Median tract length: {}".format(median_tract_length))
+
+	# Calculate mean length of all tracts
+	mean_tract_length = statistics.mean(combined_tract_length_distribution)
+	print("Mean tract length: {}".format(mean_tract_length))
+
+	# Calculate standard deviation of all tracts
+	stdev_tract_length = statistics.stdev(combined_tract_length_distribution)
+	print("Standard Deviation of all tracts: {}".format(stdev_tract_length))
+
+	num_ten_kb_tracts = len(ten_kb_tracts)
+	print("Number of 10kb tracts: {}".format(num_ten_kb_tracts))
+
+	# Calculate median length of tracts larger than 10kb
+	print("Mean tract length of tracts greater than 10 kb: {}".format(statistics.mean(combined_ten_kb_tract_length_distribution)))
+	print("Median tract length of tracts longer than 10 kb: {}".format(statistics.median(combined_ten_kb_tract_length_distribution)))
+	print("Standard deviation of tracts greater than 10kb: {}".format(statistics.stdev(combined_ten_kb_tract_length_distribution)))
 	
-	# Append total number of tracts to total_number_tracts list 
-	total_number_tracts.append(number_of_tracts)
+
 
 # Write sorted_flattened_combined_results to combined_coordinate_tract_list.bed in format chr start stop
 def write_tracts_to_bed(tract_list):
@@ -188,6 +201,30 @@ def write_tract_dist_to_csv(tract_dist):
 			hist_csv.write(str(tract) + ",")
 
 def main():
+	# List of lists of results for each scaffold in format of [[scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist]]
+	global results_by_scaffold
+	results_by_scaffold = []
+
+	# List of coordinate_tract_lists for each scaffold in format of [[start_coordinate, stop_coordinate, length in bp], []]
+	global combined_results
+	combined_results = []
+
+	# List of total number of tracts for each scaffold analyzed. 
+	global total_number_tracts
+	total_number_tracts = []
+
+	# List of number of sites introgressed (prob>=90) on each scaffold 
+	global total_snv_introgressed
+	total_snv_introgressed = []
+
+	# List of total number of variant sites on each scaffold alignment 
+	global total_sites_nexus_alignments
+	total_sites_nexus_alignments = []
+
+	# List of the total length of each scaffold analyzed. Accounts for fact that the first site in the alignment is not necessarily the first site on the physical scaffold (same goes for last site/base)
+	global total_length_nexus_alignments
+	total_length_nexus_alignments = []
+
 	#Get a list of lists of [output_file,coordinate_file]
 	files_by_scaffold_list = get_file_paths_pairs_list()
 
@@ -198,71 +235,26 @@ def main():
 		process_single_scaffold(json_file_path,coordinate_file_path)
 
 	# Flatten the combined_results list of lists into a single list in format of [[start_coordinate, stop_coordinate, length in bp],[]]
-	flat_combined_results = [item for sublist in combined_results for item in sublist]
+	combined_results = [item for sublist in combined_results for item in sublist]
 	
 	# Sort flat_combined_results list of all introgression tracts by tract length in base pairs in descending order. 
-	sorted_flattened_combined_results = sort_tract_list(flat_combined_results)
-	
-	# Get total number of sites in all nexus scaffolds analzyed
-	total_nexus_sites = sum(total_sites_nexus_alignments)
-	#print("Total nexus sites tested: {}".format(total_nexus_sites))
-	
-	# Get total length of scaffolds analyzed
-	total_nexus_length = sum(total_length_nexus_alignments)
-	#print("Total nexus length tested: {}".format(total_nexus_length))
+	combined_results.sort(reverse=True, key=itemgetter(2))
 
-	#print(sorted_flattened_combined_results[0:10])
-
-	print("Total Number Sites Introgressed: {}".format(sum(total_number_sites)))
-	
-	num_ten_kb_tracts = len([n for n in sorted_flattened_combined_results if int(n[2]) >= 10000])
-	#print("Number of ten kb tracts: {}".format(num_ten_kb_tracts))
-	
-	#print("Total Number of tracts: {}".format(len(sorted_flattened_combined_results)))
-
-	#print(sorted_flattened_combined_results[0:10])
+	ten_kb_tracts = [n for n in combined_results if int(n[2]) >= 10000]
 	
 	# Get list of all tract lengths
-	combined_tract_length_distribution = get_tract_length_dist(sorted_flattened_combined_results)
-	
-	# Print combined tract length distribution
-	print("Total bases introgressed: {}".format(sum(combined_tract_length_distribution)))
+	combined_tract_length_distribution = get_tract_length_dist(combined_results)
 
-	combined_ten_kb_or_greater_tract_length_distribution = [n for n in combined_tract_length_distribution if n>= 10000]
-	
-	#print("Number of ten kb tracts: {}".format(len(combined_ten_kb_or_greater_tract_length_distribution)))
-	
+	combined_ten_kb_tract_length_distribution = [n for n in combined_tract_length_distribution if n>= 10000]
+		
 	# Get list of all tracts > 10kb in length sorted in descending order of tract length 
-	sorted_combined_ten_kb_or_greater_tract_length_distribution = sorted(combined_ten_kb_or_greater_tract_length_distribution,reverse=True)
-	
-	# Calculate median length of tracts larger than 10kb
-	#print("Mean tract length for tracts greater than 10 kb: {}".format(statistics.mean(sorted_combined_ten_kb_or_greater_tract_length_distribution)))
-	
-	#print("Median tract length for tracts longer than 10 kb: {}".format(statistics.median(sorted_combined_ten_kb_or_greater_tract_length_distribution)))
-	
-	#print("Standard deviation for tracts greater than 10kb: {}".format(statistics.stdev(sorted_combined_ten_kb_or_greater_tract_length_distribution)))
-	
-	# Calculate median length of all tracts
-	median_tract_length = statistics.median(combined_tract_length_distribution)
-	#print("median length of all tracts: {}".format(median_tract_length))
+	combined_ten_kb_tract_length_distribution.sort(reverse=True)
 
-	# Calculate mean length of all tracts
-	mean_tract_length = statistics.mean(combined_tract_length_distribution)
-	#print("Mean length of all tracts: {}".format(mean_tract_length))
+	write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combined_ten_kb_tract_length_distribution)
 
-	# Calculate standard deviation of all tracts
-	#print("Standard Deviation of all tracts: {}".format(statistics.stdev(combined_tract_length_distribution)))
+	write_tracts_to_bed(combined_results)
 
-	#print(combined_tract_length_distribution)
-	
-	# Total number of tracts
-	#print("Total number of tracts: {}".format(sum(totoal_number_tracts)))
-
-	write_tracts_to_bed(sorted_flattened_combined_results)
-
-	write_tract_dist_to_csv(sorted_combined_ten_kb_or_greater_tract_length_distribution)
-
-	# Write results_by_scaffold to json file object???
+	write_tract_dist_to_csv(combined_ten_kb_tract_length_distribution)
 
 if __name__ == "__main__":
         main()
