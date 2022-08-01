@@ -81,7 +81,8 @@ def get_tracts(introgression_probabilities,coordinates):
 		stop_coordinate = coordinates[tract[1]]
 		length = int(stop_coordinate.split(":")[1]) - int(start_coordinate.split(":")[1]) + 1
 		tract.append(length)
-		coordinate_tract_list.append([start_coordinate, stop_coordinate, length])
+		if length > 1:
+			coordinate_tract_list.append([start_coordinate, stop_coordinate, length])
 	
 	return index_tract_list, coordinate_tract_list
 
