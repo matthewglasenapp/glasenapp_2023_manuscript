@@ -5,6 +5,7 @@ import json
 import operator
 from operator import itemgetter
 import statistics
+import csv
 #import multiprocessing
 #from joblib import Parallel, delayed
 #num_cores = multiprocessing.cpu_count()
@@ -123,6 +124,9 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	total_length_scaffold_analyzed = ((int(coordinate_list[len(coordinate_list)-1].split(":")[1])) - (int(coordinate_list[0].split(":")[1])))
 	total_length_nexus_alignments.append(total_length_scaffold_analyzed)
 
+	# Actual length of scaffold
+	actual_length_scaffold = int(scaffold_dict[scaffold_name])
+
 	# Get tract length distribution 
 	tract_length_dist = get_tract_length_dist(coordinate_tract_list)
 
@@ -137,6 +141,8 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 
 	# Calculate percentage of the scaffold that was introgressed. 
 	percent_scaffold_alignment_introgressed = (combined_length_tracts/total_length_scaffold_analyzed)*100
+
+	percent_scaffold_introgressed = (combined_length_tracts/actual_length_scaffold) * 100 
 	
 	#print(scaffold_name)
 	#print(percent_sites_introgressed)
@@ -146,6 +152,10 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	results_by_scaffold.append([scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist])
 
 	combined_results.append(coordinate_tract_list)
+
+	results = [scaffold_name, number_sites_nexus_scaffold, number_sites_introgressed, percent_sites_introgressed, total_length_scaffold_analyzed, actual_length_scaffold, number_of_tracts, combined_length_tracts, percent_scaffold_alignment_introgressed, percent_scaffold_introgressed]
+
+	return results
 
 def write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combined_ten_kb_tract_length_distribution):
 	# Get total number of sites in concatenated scaffold alignments
@@ -202,6 +212,16 @@ def write_tract_dist_to_csv(tract_dist):
 			hist_csv.write(str(tract) + ",")
 
 def main():
+	global scaffold_dict
+	scaffold_dict = {}
+
+	with open("scaffolds.txt","r") as f:
+		scaffolds = f.read().splitlines()
+
+	for scaffold in scaffolds:
+		scaffold, length = scaffold.split("\t")
+		scaffold_dict[scaffold] = length
+
 	# List of lists of results for each scaffold in format of [[scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist]]
 	global results_by_scaffold
 	results_by_scaffold = []
@@ -229,11 +249,19 @@ def main():
 	#Get a list of lists of [output_file,coordinate_file]
 	files_by_scaffold_list = get_file_paths_pairs_list()
 
+	# Results by scaffold
+	csv_file = open("results_by_scaffold.csv","w")
+	writer = csv.writer(csv_file)	
+	header = ["scaffold", "SNV sites", "SNV sites introgressed", "percent sites introgressed", "scaffold length tested", "scaffold actual length", "number of introgression tracts", "combined tract length", "percent scaffold (analyzed) introgressed", "percent scaffold (actual) introgressed"]
+	writer.writerow(header)
+
 	# Process each scaffold and append results to aggregated result arrays
 	for scaffold_file_pair in files_by_scaffold_list:
 		json_file_path = scaffold_file_pair[0]
 		coordinate_file_path = scaffold_file_pair[1]
-		process_single_scaffold(json_file_path,coordinate_file_path)
+		writer.writerow(process_single_scaffold(json_file_path,coordinate_file_path))
+
+	csv_file.close()
 
 	# Flatten the combined_results list of lists into a single list in format of [[start_coordinate, stop_coordinate, length in bp],[]]
 	combined_results = [item for sublist in combined_results for item in sublist]
