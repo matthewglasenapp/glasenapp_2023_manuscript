@@ -1,3 +1,13 @@
+At the beginning of the script, you must specify the following variables:
+	
+	original_vcf2phylip_dir: Directory where vcf2phylip was run. This script assumes that in the original_vcf2phylip_dir there is a directory for each scaffold that contains a file called "coordinates" with the applied coordinates in the scaffold alignment in the format of scaffold:pos.
+	
+	root_dir: Root directory where phylonet_hmm was run
+
+	scaffold_info_file: Tsv file with scaffold names and length in base pairs
+
+	posterior_probability_threshold: Threshold cutoff to use for declaring sites introgressed (default=90)
+
 main():
 
 	1) Instantiate several global list variables. These list will be continuously updated as each scaffold is processed and will be used to calculate aggregate statistics for all scaffolds at the end. 
