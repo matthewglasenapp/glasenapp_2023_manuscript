@@ -197,10 +197,10 @@ def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_trac
 	print("Percent genome (analyzed) introgressed: {}".format(percent_genome_analyzed_introgressed))
 
 	percent_genome_analyzed = (total_nexus_length / total_actual_length) * 100
-	print("Percent genome analyzed by Phylonet HMM: {}".format(percent_genome_analyzed))
+	print("Percent scaffolds analyzed by Phylonet HMM: {}".format(percent_genome_analyzed))
 
 	percent_genome_actual_introgressed = (total_length_introgression_tracts/total_actual_length) * 100
-	print("Percent genome (actual) introgressed: {}".format(percent_genome_actual_introgressed))
+	print("Percent scaffolds (actual) introgressed: {}".format(percent_genome_actual_introgressed))
 
 	# Calculate median length of all tracts
 	median_tract_length = statistics.median(combined_tract_length_distribution)
