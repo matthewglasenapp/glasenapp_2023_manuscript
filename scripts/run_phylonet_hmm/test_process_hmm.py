@@ -174,13 +174,33 @@ def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_trac
 	total_nexus_length = sum(total_length_nexus_alignments)
 	print("Total nexus length tested: {}".format(total_nexus_length))
 
+	total_actual_length = 0
+	for value in scaffold_dict.values():
+		total_actual_length += int(value)
+	print("Total actual length of scaffolds analyzed: {}".format(total_actual_length))
+
 	total_number_sites_introgressed = sum(total_snv_introgressed)
 	print("Total number Sites Introgressed: {}".format(total_number_sites_introgressed))
+
+	percent_snv_introgressed = (total_number_sites_introgressed/total_nexus_sites) * 100
+	print("Percent SNV sites introgressed: {}".format(percent_snv_introgressed))
 
 	total_bases_introgressed = sum(combined_tract_length_distribution)
 	print("Total bases introgressed: {}".format(total_bases_introgressed))
 
 	print("Total number of tracts: {}".format(sum(total_number_tracts)))
+
+	total_length_introgression_tracts = sum(combined_tract_length_distribution)
+	print("Total length of all introgression tracts: {}".format(total_length_introgression_tracts))
+
+	percent_genome_analyzed_introgressed = (total_length_introgression_tracts/total_nexus_length) * 100
+	print("Percent genome (analyzed) introgressed: {}".format(percent_genome_analyzed_introgressed))
+
+	percent_genome_analyzed = (total_nexus_length / total_actual_length) * 100
+	print("Percent genome analyzed by Phylonet HMM: {}".format(percent_genome_analyzed))
+
+	percent_genome_actual_introgressed = (total_length_introgression_tracts/total_actual_length) * 100
+	print("Percent genome (actual) introgressed: {}".format(percent_genome_actual_introgressed))
 
 	# Calculate median length of all tracts
 	median_tract_length = statistics.median(combined_tract_length_distribution)
@@ -196,6 +216,9 @@ def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_trac
 
 	num_ten_kb_tracts = len(combined_ten_kb_tract_length_distribution)
 	print("Number of 10kb tracts: {}".format(num_ten_kb_tracts))
+
+	total_length_ten_kb_introgression_tracts = sum(combined_ten_kb_tract_length_distribution)
+	print("Total length of 10kb introgression tracts: {}".format(total_length_ten_kb_introgression_tracts))
 
 	# Calculate mean, median, stdev of tracts larger than 10kb
 	print("Mean tract length of tracts greater than 10 kb: {}".format(statistics.mean(combined_ten_kb_tract_length_distribution)))
