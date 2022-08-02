@@ -10,10 +10,10 @@ import csv
 #from joblib import Parallel, delayed
 #num_cores = multiprocessing.cpu_count()
 
-#Directory where vcf2phylip was run
+# Directory where vcf2phylip was run
 original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
 
-#Root directory where phylonet_hmm was run
+# Root directory where phylonet_hmm was run
 root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
 
 # Tsv file with scaffold names and length in base pairs
@@ -21,16 +21,26 @@ scaffold_info_file = "scaffolds.tsv"
 
 posterior_probability_threshold = 90
 
-# Return list of 
+# Create dictionary containing scaffold names and their lengths in base pairs 
+def create_scaffold_dict():
+	with open(scaffold_info_file,"r") as f:
+		scaffold_list = f.read().splitlines()
+
+	for scaffold in scaffold_list:
+		scaffold, length = scaffold.split("\t")
+		scaffold_dict[scaffold] = length
+
+
+# Return list of phylonet_hmm output files matched with their respective coordinate files from the scaffold alignments
 def get_file_paths_pairs_list():
 	
-	#Create file of paths of global coordinate files for each scaffold. Save this file as "coorindate_file list" 
+	# Create file of paths of global coordinate files for each scaffold. Save this file as "coorindate_file list" 
 	os.system('find ' + original_vcf2phylip_dir + ' "$(pwd)" -name "coordinates" -type f > coordinate_file_list')
 		
-	#Create file of paths of rawOutput.json files for each scaffold produced by phylonet_hmm. We only want the rawOutput.json file from the "bestrun" folder. Save this file as output_file_list in hmm directory
+	# Create file of paths of rawOutput.json files for each scaffold produced by phylonet_hmm. We only want the rawOutput.json file from the "bestrun" folder. Save this file as output_file_list in hmm directory
 	os.system('find ' + root_dir + ' "$(pwd)" -name "rawOutput.json" -type f | grep "best" > output_file_list')
 	
-	#Get zipped list matching rawOutput.json file path to global coordinate file path for each scaffold. [[Scaffold_1_rawOutput.json path, Scaffold_1_coordinates], []]
+	# Get zipped list matching rawOutput.json file path to global coordinate file path for each scaffold. [[Scaffold_1_rawOutput.json path, Scaffold_1_coordinates], []]
 	with open("output_file_list","r") as f1:
 		output_file_path_list = f1.read().splitlines()
 	
@@ -44,14 +54,15 @@ def get_file_paths_pairs_list():
 	
 	return sorted_zipped_list
 
+### Helper Functions for process_single_scaffold() function ###
+
 #Get list of chromosomal coordinates from SNV alignments. Each coordinate has a corresponding posterior probability of introgression in "introgression_probabilites" list
 def get_coordinate_list(coordinate_file_path):
 	coordinate_list = []
 	with open(coordinate_file_path,"r") as coordinate_file:
 		coordinates = coordinate_file.read().splitlines()
-	[coordinate_list.append(coordinate)for coordinate in coordinates]
 
-	return coordinate_list
+	return coordinates
 
 #Get list of introgression probabilities. Save to "introgression_probabilites" variable
 def get_introgression_probabilities_list(json_file_path):
@@ -79,16 +90,18 @@ def get_tracts(introgression_probabilities,coordinates):
 			index_tract_list.append([start, stop])
 		i=i+1
 	
-	# Append length in base pairs to each tract in index_tract_list (indexes of introgression tracts)
+	# Append each introgression tract from index_tract_list to coordinate_tract_list in format of [start_coordinate, stop_coordinate, length in base pairs] 
 	for tract in index_tract_list:
 		start_coordinate = coordinates[tract[0]]
 		stop_coordinate = coordinates[tract[1]]
 		length = int(stop_coordinate.split(":")[1]) - int(start_coordinate.split(":")[1]) + 1
-		tract.append(length)
 		if length > 1:
 			coordinate_tract_list.append([start_coordinate, stop_coordinate, length])
 	
-	return index_tract_list, coordinate_tract_list
+	# Sort coordinate_tract_list by index 2 of each list (length in bp) in order of highest to lowest 
+	coordinate_tract_list.sort(reverse=True, key=itemgetter(2))
+
+	return coordinate_tract_list
 
 # Get list of all tract lengths 
 def get_tract_length_dist(tract_list):
@@ -99,19 +112,15 @@ def get_number_sites_introgressed(probability_lst):
 	number_sites_introgressed = len([probability for probability in probability_lst if probability >= posterior_probability_threshold])
 	return number_sites_introgressed
 
+#### Process phylonet_hmm output for each scaffold ###
+
 def process_single_scaffold(json_file_path,coordinate_file_path):
 	coordinate_list = get_coordinate_list(coordinate_file_path)
 	introgression_probabilities = get_introgression_probabilities_list(json_file_path)
 	scaffold_name = str(coordinate_list[0].split(":")[0])
 	
-	tracts = get_tracts(introgression_probabilities,coordinate_list)
-	index_tract_list = tracts[0]
-	coordinate_tract_list = tracts[1]
+	coordinate_tract_list = get_tracts(introgression_probabilities,coordinate_list)
 	
-	# Sort index_tract_list and coordinate_tract_list by index 2 of each list (length in bp) in order of highest to lowest 
-	index_tract_list.sort(reverse=True, key=itemgetter(2))
-	coordinate_tract_list.sort(reverse=True, key=itemgetter(2))
-
 	# Get total sites on scaffold alignment
 	number_sites_nexus_scaffold = len(introgression_probabilities)
 	total_sites_nexus_alignments.append(number_sites_nexus_scaffold)
@@ -136,6 +145,9 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	# Total number of tracts for scaffold 
 	number_of_tracts = len(tract_length_dist)
 
+	# Number of tracts on scaffold >= 10kb in length
+	number_ten_kb_tracts = len([n for n in tract_length_dist if n >= 10000])
+
 	# Append total number of tracts to total_number_tracts list 
 	total_number_tracts.append(number_of_tracts)
 
@@ -146,21 +158,14 @@ def process_single_scaffold(json_file_path,coordinate_file_path):
 	percent_scaffold_alignment_introgressed = (combined_length_tracts/total_length_scaffold_analyzed)*100
 
 	percent_scaffold_introgressed = (combined_length_tracts/actual_length_scaffold) * 100 
-	
-	#print(scaffold_name)
-	#print(percent_sites_introgressed)
-	#print(percent_scaffold_alignment_introgressed)
-	#print(scaffold_name,percent_scaffold_alignment_introgressed,percent_sites_introgressed,percent_scaffold_alignment_introgressed - percent_sites_introgressed)
-
-	results_by_scaffold.append([scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist])
 
 	combined_results.append(coordinate_tract_list)
 
-	results = [scaffold_name, number_sites_nexus_scaffold, number_sites_introgressed, percent_sites_introgressed, total_length_scaffold_analyzed, actual_length_scaffold, number_of_tracts, combined_length_tracts, percent_scaffold_alignment_introgressed, percent_scaffold_introgressed]
+	results = [scaffold_name, number_sites_nexus_scaffold, number_sites_introgressed, percent_sites_introgressed, total_length_scaffold_analyzed, actual_length_scaffold, number_of_tracts, number_ten_kb_tracts, combined_length_tracts, percent_scaffold_alignment_introgressed, percent_scaffold_introgressed]
 
 	return results
 
-def write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combined_ten_kb_tract_length_distribution):
+def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_tract_length_distribution):
 	# Get total number of sites in concatenated scaffold alignments
 	total_nexus_sites = sum(total_sites_nexus_alignments)
 	print("Total nexus sites tested: {}".format(total_nexus_sites))
@@ -189,46 +194,32 @@ def write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combi
 	stdev_tract_length = statistics.stdev(combined_tract_length_distribution)
 	print("Standard Deviation of all tracts: {}".format(stdev_tract_length))
 
-	num_ten_kb_tracts = len(ten_kb_tracts)
-	print("Number of 10kb tracts: {}".format(num_ten_kb_tracts))
+	num_ten_kb_tracts = len(combined_ten_kb_tract_length_distribution)
+	print("Number of 10kb tracts: {}".format(combined_ten_kb_tract_length_distribution))
 
-	# Calculate median length of tracts larger than 10kb
+	# Calculate mean, median, stdev of tracts larger than 10kb
 	print("Mean tract length of tracts greater than 10 kb: {}".format(statistics.mean(combined_ten_kb_tract_length_distribution)))
 	print("Median tract length of tracts longer than 10 kb: {}".format(statistics.median(combined_ten_kb_tract_length_distribution)))
 	print("Standard deviation of tracts greater than 10kb: {}".format(statistics.stdev(combined_ten_kb_tract_length_distribution)))
 	
+### Helper functions to write introgression tracts and tract length distributions to bed and csv files ###
 
-
-# Write sorted_flattened_combined_results to combined_coordinate_tract_list.bed in format chr start stop
-def write_tracts_to_bed(tract_list):
-	with open("tracts.bed","w") as bed_file:
+# Write tract_list in format chr start stop
+def write_tracts_to_bed(file_name, tract_list):
+	with open(file_name,"w") as bed_file:
 		for tract in tract_list:
 			scaffold = str(tract).split(":")[0].split("'")[1]
 			start = str(tract).split(":")[1].split("'")[0]
 			stop = str(tract[1]).split(":")[1].split("'")[0]
 			bed_file.write(scaffold + "\t" + start + "\t" + stop + "\t" + scaffold + ":" + start + "_" + stop + "\n")
 
-# Write combined_tract_length_distribution to csv
-def write_tract_dist_to_csv(tract_dist):
-	with open("tract_dist.csv","a") as hist_csv:
-		for tract in tract_dist:
-			hist_csv.write(str(tract) + ",")
+# Write tract legnth distribution to csv
+def write_tract_dist_to_csv(file_name, tract_dist):
+	with open(file_name,"a") as hist_csv:
+		csv_string = ','.join([str(tract_length) for tract_length in tract_dist])
+		hist_csv.write(csv_string)
 
 def main():
-	global scaffold_dict
-	scaffold_dict = {}
-
-	with open(scaffold_info_file,"r") as f:
-		scaffolds = f.read().splitlines()
-
-	for scaffold in scaffolds:
-		scaffold, length = scaffold.split("\t")
-		scaffold_dict[scaffold] = length
-
-	# List of lists of results for each scaffold in format of [[scaffold_name,coordinate_tract_list,index_tract_list,tract_length_dist]]
-	global results_by_scaffold
-	results_by_scaffold = []
-
 	# List of coordinate_tract_lists for each scaffold in format of [[start_coordinate, stop_coordinate, length in bp], []]
 	global combined_results
 	combined_results = []
@@ -249,16 +240,23 @@ def main():
 	global total_length_nexus_alignments
 	total_length_nexus_alignments = []
 
-	#Get a list of lists of [output_file,coordinate_file]
+	# Dictionary containing scaffold names and their lengths in base pairs 
+	global scaffold_dict
+	scaffold_dict = {}
+
+	# Create scaffold_dict in format of {"scaffold_name": length} using scaffold_info_file specified at the top
+	create_scaffold_dict()
+
+	# Get a list of lists of [phylonet_hmm output file, scaffold coordinate file]
 	files_by_scaffold_list = get_file_paths_pairs_list()
 
-	# Results by scaffold
+	# Initialize a csv that will contain the phylonet_hmm results separated by scaffold analyzed
 	csv_file = open("results_by_scaffold.csv","w")
 	writer = csv.writer(csv_file)	
-	header = ["scaffold", "SNV sites", "SNV sites introgressed", "percent sites introgressed", "scaffold length tested", "scaffold actual length", "number of introgression tracts", "combined tract length", "percent scaffold (analyzed) introgressed", "percent scaffold (actual) introgressed"]
+	header = ["scaffold", "SNV sites", "SNV sites introgressed", "percent sites introgressed", "scaffold length tested", "scaffold actual length", "number of introgression tracts", "number of introgression tracts >= 10kb", "combined tract length", "percent scaffold (analyzed) introgressed", "percent scaffold (actual) introgressed"]
 	writer.writerow(header)
 
-	# Process each scaffold and append results to aggregated result arrays
+	# Process phylonet_hmm output from each scaffold, write the results to the results_by_scaffold.csv file, and append results to aggregated result arrays for further manipulation.
 	for scaffold_file_pair in files_by_scaffold_list:
 		json_file_path = scaffold_file_pair[0]
 		coordinate_file_path = scaffold_file_pair[1]
@@ -272,21 +270,21 @@ def main():
 	# Sort flat_combined_results list of all introgression tracts by tract length in base pairs in descending order. 
 	combined_results.sort(reverse=True, key=itemgetter(2))
 
+	# Get list of introgression tracts that are larger than 10kb
 	ten_kb_tracts = [n for n in combined_results if int(n[2]) >= 10000]
 	
 	# Get list of all tract lengths
 	combined_tract_length_distribution = get_tract_length_dist(combined_results)
 
+	# Get list of all tract lengths greater than 10kb in length
 	combined_ten_kb_tract_length_distribution = [n for n in combined_tract_length_distribution if n>= 10000]
-		
-	# Get list of all tracts > 10kb in length sorted in descending order of tract length 
-	combined_ten_kb_tract_length_distribution.sort(reverse=True)
 
-	write_summary_stats(combined_tract_length_distribution, ten_kb_tracts, combined_ten_kb_tract_length_distribution)
+	write_summary_stats(combined_tract_length_distribution, combined_ten_kb_tract_length_distribution)
 
-	write_tracts_to_bed(combined_results)
+	write_tracts_to_bed("tracts.bed", combined_results)
+	write_tracts_to_bed("ten_kb_tracts.bed", combined_results)
 
-	write_tract_dist_to_csv(combined_ten_kb_tract_length_distribution)
+	write_tract_dist_to_csv("tract_dist.csv", combined_ten_kb_tract_length_distribution)
 
 if __name__ == "__main__":
         main()
