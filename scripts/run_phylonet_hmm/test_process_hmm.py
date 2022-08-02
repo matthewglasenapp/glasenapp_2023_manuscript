@@ -195,7 +195,7 @@ def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_trac
 	print("Standard Deviation of all tracts: {}".format(stdev_tract_length))
 
 	num_ten_kb_tracts = len(combined_ten_kb_tract_length_distribution)
-	print("Number of 10kb tracts: {}".format(combined_ten_kb_tract_length_distribution))
+	print("Number of 10kb tracts: {}".format(num_ten_kb_tracts))
 
 	# Calculate mean, median, stdev of tracts larger than 10kb
 	print("Mean tract length of tracts greater than 10 kb: {}".format(statistics.mean(combined_ten_kb_tract_length_distribution)))
@@ -282,7 +282,7 @@ def main():
 	write_summary_stats(combined_tract_length_distribution, combined_ten_kb_tract_length_distribution)
 
 	write_tracts_to_bed("tracts.bed", combined_results)
-	write_tracts_to_bed("ten_kb_tracts.bed", combined_results)
+	write_tracts_to_bed("ten_kb_tracts.bed", ten_kb_tracts)
 
 	write_tract_dist_to_csv("tract_dist.csv", combined_ten_kb_tract_length_distribution)
 
