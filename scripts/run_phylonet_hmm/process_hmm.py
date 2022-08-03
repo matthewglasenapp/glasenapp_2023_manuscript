@@ -6,15 +6,14 @@ import operator
 from operator import itemgetter
 import statistics
 import csv
-#import multiprocessing
-#from joblib import Parallel, delayed
-#num_cores = multiprocessing.cpu_count()
 
 # Directory where vcf2phylip was run
-original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
+#original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
+original_vcf2phylip_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
 
 # Root directory where phylonet_hmm was run
-root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
+#root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm/"
 
 # Tsv file with scaffold names and length in base pairs
 scaffold_info_file = "scaffolds.tsv"

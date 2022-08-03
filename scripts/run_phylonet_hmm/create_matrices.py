@@ -4,11 +4,10 @@ from joblib import Parallel, delayed
 
 num_cores = multiprocessing.cpu_count()
 
-# File containing paths to scaffold alignments produced by vcf2phylip. Can create this file using find "$(pwd)" -name "*.nexus" -type f
-scaffold_alignment_paths_file = ""
+root_dir = "/hb/scratch/mglasena/phylonet_hmm_input/"
 
 # Directory for phylonet_hmm scaffold input files 
-output_dir = ""
+output_dir = root_dir + "/hmm_nexus_files/"
 make_output_dir = "mkdir -p {}".format(output_dir)
 os.system(make_output_dir)
 
@@ -21,8 +20,14 @@ number_runs = 100
 number_iterations = 1000
 
 def get_scaffold_file_paths():
-    f = open(scaffold_alignment_paths_file, "r")
-    scaffold_alignment_file_path_list = f.read().splitlines()
+    # Create file containing paths to scaffold alignments produced by vcf2phylip.
+    create_scaffold_alignment_paths_file = 'find {} "$(pwd)" -name "*.nexus" -type f > scaffold_alignment_paths_file'.format(root_dir)
+    os.system(create_scaffold_alignment_paths_file)
+
+    with open("scaffold_alignment_paths_file", "r") as f:
+        scaffold_alignment_file_path_list = f.read().splitlines()
+
+    os.system("rm scaffold_alignment_paths_file")
     return scaffold_alignment_file_path_list
 
 def create_hmm_input_file(scaffold_file):
@@ -73,4 +78,3 @@ def main():
 
 if __name__ == "__main__":
         main()
-        

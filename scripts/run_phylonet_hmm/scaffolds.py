@@ -9,17 +9,17 @@ num_cores = multiprocessing.cpu_count()
 
 # Need to manually input the samples to exlcude from the multisample vcf file in the subset_vcf_by_scaffold() function.  
 
-reference_genome = ""
+reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # File with scaffold names, one per line
-scaffold_list_file = ""
+scaffold_list_file = "scaffold_list.txt"
 
-filtered_vcf = ""
+filtered_vcf = "/hb/groups/pogson_group/dissertation/data/combined_vcf/filtered_genotype_calls.g.vcf.gz"
 
 # Path to vcf2phylip program
 vcf2phylip_path = "/hb/home/mglasena/software/vcf2phylip/"
 
-root_dir = "/hb/scratch/mglasena/vcf2phylip_4way/"
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
 
 outgroup_sample_name = "QB3KMK012"
 number_species = "4"
