@@ -8,6 +8,8 @@ import os
 
 fasterq_dump = "/hb/groups/pogson_group/dissertation/software/sratoolkit.2.11.2-centos_linux64/bin/fasterq-dump"
 
+threads = 8
+
 output_directory = "/hb/scratch/mglasena/short_read_data/"
 make_output_dir = "mkdir -p {}".format(output_directory)
 os.system(make_output_dir)
@@ -34,7 +36,7 @@ urchin_sra_accessions = {
 
 def download_accession(accession_number):
 	temp_dir = temporary_directory + accession_number 
-	download = "{} --outdir {} --split-3 -t {} -e 48 {}".format(fasterq_dump, output_directory, temp_dir, accession_number)
+	download = "{} --outdir {} --split-3 -t {} -e {} {}".format(fasterq_dump, output_directory, temp_dir, threads, accession_number)
 
 	os.system(download)
 
