@@ -4,14 +4,16 @@ Check that sequencing reads in fastq files come from a single flowcell lane.
 
 from joblib import Parallel, delayed
 
-# ERR5671699 and SRR6281818 were skipped because they do not inlcude any metadata, only read number and length. 
-skipped_file_list = ["ERR5671699_1.fastq", "ERR5671699_2.fastq", "SRR6281818_1.fastq", "SRR6281818_2.fastq"]
+fastq_dir = "/hb/scratch/mglasena/short_read_data/"
 
-#file_list = ["DRR107786_1.fastq", "DRR107786_2.fastq", "SRR2583947.fastq", "SRR5767279_1.fastq", "SRR5767279_2.fastq", "SRR5767280_1.fastq", "SRR5767280_2.fastq", "SRR5767281_1.fastq", "SRR5767281_2.fastq", "SRR5767282_1.fastq", "SRR5767282_2.fastq", "SRR5767283_1.fastq", "SRR5767283_2.fastq", "SRR5767284_1.fastq", "SRR5767284_2.fastq", "SRR5767285_1.fastq", "SRR5767285_2.fastq", "SRR5767286_1.fastq", "SRR5767286_2.fastq", "SRR7211988_1.fastq", "SRR7211988_2.fastq"]
-file_list = ["SRR7211988_lane1_1.fastq","SRR7211988_lane2_1.fastq","SRR7211988_lane1_2.fastq","SRR7211988_lane2_2.fastq"]
+# ERR5621404_1 and SRR6281818 were skipped because they do not inlcude any metadata, only read number and length. 
+skipped_file_list = ["ERR5621404_1.fastq", "ERR5621404_1_2.fastq", "SRR6281818_1.fastq", "SRR6281818_2.fastq"]
+
+#file_list = ["DRR107784_1.fastq", "DRR107784_2.fastq", "SRR2583947.fastq", "SRR5767279_1.fastq", "SRR5767279_2.fastq", "SRR5767280_1.fastq", "SRR5767280_2.fastq", "SRR5767281_1.fastq", "SRR5767281_2.fastq", "SRR5767282_1.fastq", "SRR5767282_2.fastq", "SRR5767283_1.fastq", "SRR5767283_2.fastq", "SRR5767284_1.fastq", "SRR5767284_2.fastq", "SRR5767285_1.fastq", "SRR5767285_2.fastq", "SRR5767286_1.fastq", "SRR5767286_2.fastq", "SRR7211988_1.fastq", "SRR7211988_2.fastq"]
+file_list = ["DRR107784_1.fastq", "DRR107784_2.fastq"]
 
 def check_fastq_file(file):
-	file = "/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/" + file
+	file = fastq_dir + file
 	print("Checking " + file.split("/")[7])
 	split_char = ":"
 	
@@ -34,7 +36,7 @@ def check_fastq_file(file):
 			read_group_string = split_char.join(tmp[:K])
 			print("The read group string is " + read_group_string)
 	
-	# Edge case for pulcherrimus (SRR5767283) and intermedius (SRR5767280) fastq files. T
+	# Edge case for pulcherrimus (SRR5767283) and intermedius (SRR5767280) fastq files.
 	# There are only two fields in header line: @HS2:148:C0EN2ACXX:3:1101:1327:2227 2:Y:0:
 	elif len(open(file,"r").readline().split()) == 2:
 		K = 4
