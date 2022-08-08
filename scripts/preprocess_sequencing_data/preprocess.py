@@ -243,7 +243,7 @@ class Accessions:
 		index_input_bam = "samtools index {}".format(input_file)
 		os.system(index_input_bam)
 
-		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 10 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
+		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
 		# Delete unnecesary BAM file. If need to retain BAM file, comment out this line
