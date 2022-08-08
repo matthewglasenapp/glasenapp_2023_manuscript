@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 
 num_cores = multiprocessing.cpu_count()
 
-root_dir = "/hb/scratch/mglasena/phylonet_hmm_input/"
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
 
 # Directory for phylonet_hmm scaffold input files 
 output_dir = root_dir + "/hmm_nexus_files/"
