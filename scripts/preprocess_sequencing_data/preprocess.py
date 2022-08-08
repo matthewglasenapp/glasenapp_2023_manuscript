@@ -235,13 +235,16 @@ class Accessions:
 		os.system(flagstat)
 
 	def call_variants(self):
-		print("gatk HaplotypeCaller. Calling variants.")
+		
+		print("Indexing BAM files.")
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
 		index_input_bam = "samtools index {}".format(input_file)
 		os.system(index_input_bam)
+
+		print("gatk HaplotypeCaller. Calling variants.")
 
 		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
