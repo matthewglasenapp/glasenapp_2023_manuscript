@@ -11,12 +11,13 @@ import os
 # Raw fasta input file 
 input_fasta_file = "raw_mitochondrial_sequences.fasta"
 threads = 6
+bootstrap_replicates = 10000
 
 # Create new header line for fasta sequence 
 def get_new_accession_string(line):
 	accession = line.split()[0].split(">")[1]
 	species_name = line.split()[2]
-	new_accession_name = accession + "_" + species_name
+	new_accession_name = species_name + "_" + accession
 	separator = " "
 	new_line = ">" + new_accession_name + " " + separator.join(line.split()[1:])
 	return new_line
@@ -43,7 +44,6 @@ def align_fasta_sequences():
 def create_tree():
 	input_file = "aligned_reformatted_" + input_fasta_file
 	threads = "AUTO"
-	bootstrap_replicates = 10000
 	run_iqtree = "iqtree -s {} -m MFP -B {} -T {}".format(input_file, bootstrap_replicates, threads)
 	os.system(run_iqtree)
 
