@@ -10,11 +10,13 @@ fasterq_dump = "/hb/groups/pogson_group/dissertation/software/sratoolkit.2.11.2-
 
 threads = 8
 
-output_directory = "/hb/scratch/mglasena/short_read_data/"
+output_directory = "/hb/home/mglasena/short_read_data/"
 make_output_dir = "mkdir -p {}".format(output_directory)
 os.system(make_output_dir)
 
 temporary_directory = "/hb/scratch/mglasena/"
+
+prefetch_dir = "/hb/scratch/mglasena/"
 
 skipped_accessions = {"SRR5767283": "pulcherrimus,QB3KMK016,SAMN07269099", "SRR5767280": "intermedius,QB3KMK012,SAMN07269102"}
 
@@ -36,7 +38,7 @@ urchin_sra_accessions = {
 
 def download_accession(accession_number):
 	temp_dir = temporary_directory + accession_number 
-	download = "{} --outdir {} --split-3 -t {} -e {} {}".format(fasterq_dump, output_directory, temp_dir, threads, accession_number)
+	download = "{} --outdir {} --split-3 -t {} -e {} {}{}".format(fasterq_dump, output_directory, temp_dir, threads, prefetch_dir, accession)
 
 	os.system(download)
 
