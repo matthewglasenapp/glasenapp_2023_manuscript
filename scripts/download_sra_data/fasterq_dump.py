@@ -14,7 +14,7 @@ output_directory = "/hb/home/mglasena/short_read_data/"
 make_output_dir = "mkdir -p {}".format(output_directory)
 os.system(make_output_dir)
 
-temporary_directory = "/hb/scratch/mglasena/"
+temporary_directory = "/hb/scratch/mglasena/SRA/"
 
 prefetch_dir = "/hb/scratch/mglasena/"
 
@@ -37,8 +37,9 @@ urchin_sra_accessions = {
 }
 
 def download_accession(accession_number):
+	os.chdir(prefetch_dir + accession_number)
 	temp_dir = temporary_directory + accession_number 
-	download = "{} --outdir {} --split-3 -t {} -e {} {}{}".format(fasterq_dump, output_directory, temp_dir, threads, prefetch_dir, accession)
+	download = "{} {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads, prefetch_dir)
 
 	os.system(download)
 

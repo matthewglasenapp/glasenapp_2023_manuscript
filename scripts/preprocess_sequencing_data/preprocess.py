@@ -13,7 +13,7 @@ fasterq-dump is not included. This script assumes there is a directiory with the
 import os 
 from joblib import Parallel, delayed
 
-# Specify maximum number of CPU cores.
+# Specify maximum number of CPU cores (is this per simultaneously running job???).
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
 cores = 24
