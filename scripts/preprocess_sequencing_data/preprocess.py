@@ -242,8 +242,8 @@ class Accessions:
 		
 		#print("Indexing BAM files.")
 
-		#input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
-		#output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
+		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
+		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
 		#index_input_bam = "samtools index {}".format(input_file)
 		#os.system(index_input_bam)
