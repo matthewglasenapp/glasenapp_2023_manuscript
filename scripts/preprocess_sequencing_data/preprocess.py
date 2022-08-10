@@ -13,10 +13,10 @@ fasterq-dump is not included. This script assumes there is a directiory with the
 import os 
 from joblib import Parallel, delayed
 
-# Specify maximum number of CPU cores (is this per simultaneously running job???).
+# Specify maximum number of CPU cores available per task. 
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
-cores = 24
+cores = 3
 
 # Max number of threads for multi-threading
 max_threads = int(cores*2)
@@ -67,18 +67,18 @@ os.system(make_vcf_dir)
 # For SRA accession without library information, the library is simply the SRA accession
 
 dict = {
-#"SRR5767279" : ["SRR5767279","fragilis","QB3KMK013","SAMN07269103","VJCQB3KMK013","HS3:147:d0gnlacxx:3","d0gnlacxx:3"],
-#"SRR5767281" : ["SRR5767281","nudus","QB3KMK011","SAMN07269101","VJCQB3KMK011","HS2:148:C0EN2ACXX:4","C0EN2ACXX:4"],
-#"SRR5767282" : ["SRR5767282","franciscanus","QB3KMK010","SAMN07269100","VJCQB3KMK010","HS2:148:C0EN2ACXX:5","C0EN2ACXX:5"],
-"DRR107784" : ["DRR107784","pulcherrimus","SAMD00098133","SAMD00098133","DRR107784","HWI-1KL134:197:C1JJYACXX:4","C1JJYACXX:4"],
+"SRR5767279" : ["SRR5767279","fragilis","QB3KMK013","SAMN07269103","VJCQB3KMK013","HS3:147:d0gnlacxx:3","d0gnlacxx:3"],
+"SRR5767281" : ["SRR5767281","nudus","QB3KMK011","SAMN07269101","VJCQB3KMK011","HS2:148:C0EN2ACXX:4","C0EN2ACXX:4"],
+"SRR5767282" : ["SRR5767282","franciscanus","QB3KMK010","SAMN07269100","VJCQB3KMK010","HS2:148:C0EN2ACXX:5","C0EN2ACXX:5"],
+#"DRR107784" : ["DRR107784","pulcherrimus","SAMD00098133","SAMD00098133","DRR107784","HWI-1KL134:197:C1JJYACXX:4","C1JJYACXX:4"],
 #"SRR5767284" : ["SRR5767284","depressus","QB3KMK015","SAMN07269098","VJCQB3KMK015","HS3:171:d0le4acxx:2","d0le4acxx:2"],
 #"SRR5767285" : ["SRR5767285","pallidus","QB3KMK002","SAMN07269097","VJCQB3KMK002","HS1_0066:8","HS1_0066:8"],
 #"SRR5767286" : ["SRR5767286","droebachiensis","QB3KMK014","SAMN07269096","VJCQB3KMK014","HS3:171:d0le4acxx:1","d0le4acxx:1"],
-#"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
-"ERR5621404" : ["ERR5621404","lividus","4","ERS2351987","AMZ_AOSF_1_A9Y40","ERR5621404","ERR5621404"],
-#"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
-#"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
-#"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
+"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
+#"ERR5621404" : ["ERR5621404","lividus","4","ERS2351987","AMZ_AOSF_1_A9Y40","ERR5621404","ERR5621404"],
+"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
+"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
+"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]]
 }
 
 class Accessions:
@@ -164,7 +164,7 @@ class Accessions:
 			print("This accession was sequenced across more than one lane. Aligning reads from different lanes separately!")
 			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def align(lane):
-				threads = int(max_threads/2)
+				threads = int(max_threads//2)
 				number_string = "_lane{}".format(lane)
 				uBAM_XT = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
 				unmapped_BAM = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
@@ -240,13 +240,13 @@ class Accessions:
 
 	def call_variants(self):
 		
-		print("Indexing BAM files.")
+		#print("Indexing BAM files.")
 
-		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
-		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
+		#input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
+		#output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
-		index_input_bam = "samtools index {}".format(input_file)
-		os.system(index_input_bam)
+		#index_input_bam = "samtools index {}".format(input_file)
+		#os.system(index_input_bam)
 
 		print("gatk HaplotypeCaller. Calling variants.")
 
