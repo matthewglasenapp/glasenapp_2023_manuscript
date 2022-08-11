@@ -1,4 +1,8 @@
-output_file = "/Users/matt/desktop/test.txt"
+# Create a partition file for window based tree building with iqtree. 
+
+window_size = 50
+
+output_file = "partition_file.txt"
 
 def write_partition_file(output_file, length):
 	with open(output_file,"a") as f:
@@ -6,17 +10,17 @@ def write_partition_file(output_file, length):
 		f.write("begin sets;" + "\n")
 
 		counter = 0
-		intervals = length // 51
+		intervals = length // (window_size + 1)
 		window_counter = 0 
 		start_int = 1
 
 		for i in range(1,intervals+1):
 			counter += 1
 			window_counter += 1
-			stop_interval = start_int + 50 
+			stop_interval = start_int + window_size
 			string = "charset window_{} = {}-{};".format(counter, start_int, stop_interval, stop_interval-start_int)
 			f.write("\t" + string + "\n") 
-			start_int += 51
+			start_int += (window_size + 1)
 
 		f.write("end;" + "\n")
 
