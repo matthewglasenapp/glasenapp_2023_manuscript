@@ -35,7 +35,7 @@ temporary_directory = "/hb/scratch/mglasena/"
 # Directory containing raw fastq read files
 #raw_fastq_dir = root_dir + "do_not_delete/raw_sequencing_reads/"
 #raw_fastq_dir = "/hb/groups/pogson_group/dissertation/data/do_not_delete/raw_sequencing_reads/"
-raw_fastq_dir = "/hb/home/mglasena/short_read_data/"
+raw_fastq_dir = "/hb/scratch/mglasena/short_read_data/"
 
 # Directory for unmapped bam files
 ubam_dir = root_dir + "unmapped_bam_files/"
@@ -111,7 +111,7 @@ class Accessions:
 				fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, platform_unit, self.sample, self.library, platform_unit, tmp_dir)
 				os.system(fastq_to_sam)
 
-			Parallel(n_jobs=len(lanes))(delayed(convert_lane)(platform_unit) for platform_unit in self.platform_unit)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(convert_lane)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
@@ -130,7 +130,6 @@ class Accessions:
 		# Multiplex
 		if len(self.read_group_string) >= 2:
 			print("This accession was sequenced across more than one run or lane. Marking adapters from different lanes separately!")
-			lanes = [item.split(":")[-1] for item in self.read_group_string]
 			def mark_adapters(platform_unit):
 				ubam_file = "{}{}_{}_{}_unaligned_reads.bam".format(ubam_dir, self.species, self.accession, platform_unit)
 				metrics_file = "{}{}_{}_{}_adapter_metrics.txt".format(uBAM_XT_dir, self.species, self.accession, platform_unit)
@@ -139,7 +138,7 @@ class Accessions:
 				mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
 				os.system(mark_adapters)
 
-			Parallel(n_jobs=len(lanes))(delayed(mark_adapters)(platform_unit) for platform_unit in self.platform_unit)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(mark_adapters)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
@@ -173,7 +172,7 @@ class Accessions:
 				os.system("rm " + uBAM_XT)
 				os.system("rm " + unmapped_BAM)
 
-			Parallel(n_jobs=len(lanes))(delayed(align)(platform_unit) for platform_unit in self.platform_unit)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(align)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
