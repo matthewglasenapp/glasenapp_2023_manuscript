@@ -1,0 +1,1 @@
+mosdepth --by regions.bed --no-per-base -t 4 --fast-mode --thresholds 10,20,30,50,100 franc /hb/scratch/mglasena/data/dedup_mapped_bam_files/franciscanus_SRR5767282_dedup_aligned_reads.bam
