@@ -16,14 +16,14 @@ from joblib import Parallel, delayed
 # Specify maximum number of CPU cores available per task. 
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
-cores = 3
+cores = 12
 
 # Max number of threads for multi-threading
 max_threads = int(cores*2)
 
 # Root directory for output files 
 #root_dir = "/hb/groups/pogson_group/dissertation/data/"
-root_dir = "/hb/scratch/mglasena/data/"
+root_dir = "/hb/scratch/mglasena/test_data/"
 
 # Path to S. purpuratus reference genome file
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
@@ -35,7 +35,7 @@ temporary_directory = "/hb/scratch/mglasena/"
 # Directory containing raw fastq read files
 #raw_fastq_dir = root_dir + "do_not_delete/raw_sequencing_reads/"
 #raw_fastq_dir = "/hb/groups/pogson_group/dissertation/data/do_not_delete/raw_sequencing_reads/"
-raw_fastq_dir = "/hb/home/mglasena/short_read_data/"
+raw_fastq_dir = "/hb/home/mglasena/test_short_read_data/"
 
 # Directory for unmapped bam files
 ubam_dir = root_dir + "unmapped_bam_files/"
@@ -67,17 +67,17 @@ os.system(make_vcf_dir)
 # For SRA accession without library information, the library is simply the SRA accession
 
 dict = {
-"SRR5767279" : ["SRR5767279","fragilis","QB3KMK013","SAMN07269103","VJCQB3KMK013","HS3:147:d0gnlacxx:3","d0gnlacxx:3"],
-"SRR5767281" : ["SRR5767281","nudus","QB3KMK011","SAMN07269101","VJCQB3KMK011","HS2:148:C0EN2ACXX:4","C0EN2ACXX:4"],
-"SRR5767282" : ["SRR5767282","franciscanus","QB3KMK010","SAMN07269100","VJCQB3KMK010","HS2:148:C0EN2ACXX:5","C0EN2ACXX:5"],
+#"SRR5767279" : ["SRR5767279","fragilis","QB3KMK013","SAMN07269103","VJCQB3KMK013","HS3:147:d0gnlacxx:3","d0gnlacxx:3"],
+#"SRR5767281" : ["SRR5767281","nudus","QB3KMK011","SAMN07269101","VJCQB3KMK011","HS2:148:C0EN2ACXX:4","C0EN2ACXX:4"],
+#"SRR5767282" : ["SRR5767282","franciscanus","QB3KMK010","SAMN07269100","VJCQB3KMK010","HS2:148:C0EN2ACXX:5","C0EN2ACXX:5"],
 #"SRR5767284" : ["SRR5767284","depressus","QB3KMK015","SAMN07269098","VJCQB3KMK015","HS3:171:d0le4acxx:2","d0le4acxx:2"],
 #"SRR5767285" : ["SRR5767285","pallidus","QB3KMK002","SAMN07269097","VJCQB3KMK002","HS1_0066:8","HS1_0066:8"],
 #"SRR5767286" : ["SRR5767286","droebachiensis","QB3KMK014","SAMN07269096","VJCQB3KMK014","HS3:171:d0le4acxx:1","d0le4acxx:1"],
-"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
-#"ERR5621404" : ["ERR5621404","lividus","4","ERS2351987","AMZ_AOSF_1_A9Y40","ERR5621404","ERR5621404"],
-"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
-"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
-"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]],
+#"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
+"ERR5621404" : ["ERR5621404","lividus","4","ERS2351987","AMZ_AOSF_1_A9Y40","ERR5621404","ERR5621404"],
+#"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
+#"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
+#"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]],
 "DRR107784" : ["DRR107784", "pulcherrimus", "SAMD00098133","SAMD00098133","DRR107784", ["HWI-ST462R:262:C1J2AACXX:5", "HWI-1KL134:197:C1JJYACXX:4", "HWI-ST462R:262:C1J2AACXX:4", "HWI-1KL134:198:C1MA0ACXX:8"], ["C1J2AACXX:5", "C1JJYACXX:4", "C1J2AACXX:4", "C1MA0ACXX:8"]]
 }
 
@@ -112,6 +112,7 @@ class Accessions:
 				output_file = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
 				tmp_dir = temporary_directory + self.accession + number_string + "/convert_fastq_to_unmapped_bam/"
 				fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, platform_unit, self.sample, self.library, platform_unit, tmp_dir)
+				print(fastq_to_Sam)
 				os.system(fastq_to_sam)
 
 			Parallel(n_jobs=len(lanes))(delayed(convert_lane)(lane) for lane in lanes)
@@ -123,6 +124,7 @@ class Accessions:
 			output_file = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
 			tmp_dir = temporary_directory + self.accession + "/convert_fastq_to_unmapped_bam/"
 			fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, self.platform_unit, self.sample, self.library, self.platform_unit, tmp_dir)
+			print(fastq_to_sam)
 			os.system(fastq_to_sam)
 
 		print("Done converting files to unmapped BAM!")
@@ -141,6 +143,7 @@ class Accessions:
 				output_file = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
 				tmp_dir = temporary_directory + self.accession + number_string + "/mark_illumina_adapters/"
 				mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
+				print(mark_adapters)
 				os.system(mark_adapters)
 
 			Parallel(n_jobs=len(lanes))(delayed(mark_adapters)(lane) for lane in lanes)
@@ -152,6 +155,7 @@ class Accessions:
 			output_file = uBAM_XT_dir + self.species + "_" + self.accession + "_unaligned_reads_XT.bam"
 			tmp_dir = temporary_directory + self.accession + "/mark_illumina_adapters/"
 			mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
+			print(mark_adapters)
 			os.system(mark_adapters)
 
 		print("Done marking adaptor sequences!")
@@ -172,6 +176,7 @@ class Accessions:
 				tmp_dir = temporary_directory + self.accession + number_string + "/align_to_reference"
 				tmp_dir_2 = temporary_directory + self.accession + number_string + "/merge_bam_alignment/"
 				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
+				print(align)
 				os.system(align)
 
 				# Clean up intermediate_files
@@ -188,6 +193,7 @@ class Accessions:
 			tmp_dir = temporary_directory + self.accession + "/align_to_reference/"
 			tmp_dir_2 = temporary_directory + self.accession + "/merge_bam_alignment/"
 			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
+			print(align)
 			os.system(align)
 
 			# Clean up intermediate_files
@@ -210,6 +216,7 @@ class Accessions:
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			mark_duplicates = "gatk MarkDuplicates -I {} -I {} -O {} --TMP_DIR {} -M {}".format(input_bam_1, input_bam_2, output_file, tmp_dir, metrics_file)
+			print(mark_duplicates)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
@@ -223,6 +230,7 @@ class Accessions:
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			mark_duplicates = "gatk MarkDuplicates -I {} -O {} --TMP_DIR {} -M {}".format(input_bam, output_file, tmp_dir, metrics_file)
+			print(mark_duplicates)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
@@ -236,21 +244,24 @@ class Accessions:
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads_flagstat.tsv"
 		flagstat = "samtools flagstat -@ {} -O tsv {} > {}".format(max_threads, input_file, output_file)
+		print(flagstat)
 		os.system(flagstat)
 
 	def call_variants(self):
 		
-		#print("Indexing BAM files.")
+		print("Indexing BAM files.")
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
-		#index_input_bam = "samtools index {}".format(input_file)
-		#os.system(index_input_bam)
+		index_input_bam = "samtools index {}".format(input_file)
+		print(index_input_bam)
+		os.system(index_input_bam)
 
 		print("gatk HaplotypeCaller. Calling variants.")
 
 		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
+		print(haplotype_caller)
 		os.system(haplotype_caller)
 
 		# Delete unnecesary BAM file. If need to retain BAM file, comment out this line
@@ -266,6 +277,7 @@ class Accessions:
 		input_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		output_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
 		norm = "bcftools norm -f {} -m- -Oz -o {} {}".format(reference_genome, output_file, input_file)
+		print(norm)
 		os.system(norm)
 
 		#Remove the original vcf file and index
@@ -277,6 +289,7 @@ class Accessions:
 	
 		input_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
 		index = "gatk IndexFeatureFile -I {}".format(input_file)
+		print(index)
 		os.system(index)
 
 def main():
@@ -286,12 +299,12 @@ def main():
 	accession_id = accession_list[int(array_id)]
 	accession = Accessions(accession_id,dict[accession_id][1],dict[accession_id][2],dict[accession_id][3],dict[accession_id][4],dict[accession_id][5],dict[accession_id][6])
 
-	#accession.convert_fastq_to_unmapped_bam()
+	accession.convert_fastq_to_unmapped_bam()
 	
-	#accession.mark_illumina_adapters()
-	#accession.align_to_reference()
-	#accession.mark_duplicates()
-	#accession.get_alignment_stats()
+	accession.mark_illumina_adapters()
+	accession.align_to_reference()
+	accession.mark_duplicates()
+	accession.get_alignment_stats()
 	accession.call_variants()
 	accession.normalize_indels()
 	accession.index_vcf()
