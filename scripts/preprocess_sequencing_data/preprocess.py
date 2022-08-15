@@ -13,7 +13,7 @@ fasterq-dump is not included. This script assumes there is a directiory with the
 import os 
 from joblib import Parallel, delayed
 
-# Specify maximum number of CPU cores available per task. 
+# Specify maximum number of CPU cores available per task (ie per sample, per job in the array job). 
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
 cores = 12
@@ -22,27 +22,25 @@ cores = 12
 max_threads = int(cores*2)
 
 # Root directory for output files 
-#root_dir = "/hb/groups/pogson_group/dissertation/data/"
-root_dir = "/hb/scratch/mglasena/test_data/"
+root_dir = "/hb/scratch/mglasena/data/"
 
 # Path to S. purpuratus reference genome file
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # Temporary directory for intermediate files
-#temporary_directory = "/hb/groups/pogson_group/temp/"
-temporary_directory = "/hb/scratch/mglasena/"
+temporary_directory = "/hb/scratch/mglasena/temp/"
 
 # Directory containing raw fastq read files
 #raw_fastq_dir = root_dir + "do_not_delete/raw_sequencing_reads/"
 #raw_fastq_dir = "/hb/groups/pogson_group/dissertation/data/do_not_delete/raw_sequencing_reads/"
-raw_fastq_dir = "/hb/home/mglasena/test_short_read_data/"
+raw_fastq_dir = "/hb/scratch/mglasena/short_read_data/"
 
 # Directory for unmapped bam files
 ubam_dir = root_dir + "unmapped_bam_files/"
 make_ubam_dir = "mkdir -p {}".format(ubam_dir)
 os.system(make_ubam_dir)
 
-# Directory for unampped bam files with adapters marked
+# Directory for unmapped bam files with adapters marked
 uBAM_XT_dir = root_dir + "uBAM_XT/"
 make_uBAM_XT_dir = "mkdir -p {}".format(uBAM_XT_dir)
 os.system(make_uBAM_XT_dir)
@@ -98,24 +96,20 @@ class Accessions:
 		return self.acceession
 
 	def convert_fastq_to_unmapped_bam(self):
-		print("Picard FastqToSam. Converting fastq files to unampped BAM format.")
+		print("Picard FastqToSam. Converting fastq files to unmapped BAM format.")
 
 		# Multiplex
-		if len(self.read_group_string) == 2:
-			print("This accession was sequenced across more than one lane. Converting fastq files from different lanes separately!")
-			lanes = [item.split(":")[-1] for item in self.read_group_string]
-			def convert_lane(lane):
-				number_string = "_lane{}".format(lane)
-				platform_unit = self.platform_unit[lanes.index(lane)]
-				file1 = raw_fastq_dir + self.accession + number_string + "_1.fastq.gz"
-				file2 = raw_fastq_dir + self.accession + number_string + "_2.fastq.gz"
-				output_file = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
-				tmp_dir = temporary_directory + self.accession + number_string + "/convert_fastq_to_unmapped_bam/"
+		if isinstance(self.read_group_string, list):
+			print("This accession was sequenced across more than one run or lane. Converting fastq files from different lanes separately!")
+			def convert_lane(platform_unit):
+				file1 = "{}{}_{}_1.fastq.gz".format(raw_fastq_dir, self.accession, platform_unit)
+				file2 = "{}{}_{}_2.fastq.gz".format(raw_fastq_dir, self.accession, platform_unit)
+				output_file = "{}{}_{}_{}_unaligned_reads.bam".format(ubam_dir, self.species, self.accession, platform_unit)
+				tmp_dir = "{}{}_{}/convert_fastq_to_unmapped_bam/".format(temporary_directory, self.accession, platform_unit)
 				fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, platform_unit, self.sample, self.library, platform_unit, tmp_dir)
-				print(fastq_to_Sam)
 				os.system(fastq_to_sam)
 
-			Parallel(n_jobs=len(lanes))(delayed(convert_lane)(lane) for lane in lanes)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(convert_lane)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
@@ -124,7 +118,6 @@ class Accessions:
 			output_file = ubam_dir + self.species + "_" + self.accession + "_unaligned_reads.bam"
 			tmp_dir = temporary_directory + self.accession + "/convert_fastq_to_unmapped_bam/"
 			fastq_to_sam = "gatk FastqToSam -F1 {} -F2 {} -O {} -PL ILLUMINA -RG {} -SM {} -LB {} -PU {} -SO queryname --TMP_DIR {}".format(file1, file2, output_file, self.platform_unit, self.sample, self.library, self.platform_unit, tmp_dir)
-			print(fastq_to_sam)
 			os.system(fastq_to_sam)
 
 		print("Done converting files to unmapped BAM!")
@@ -133,20 +126,17 @@ class Accessions:
 		print("Picard MarkIlluminaAdapters. Marking adapter sequences in unmapped BAM file.")
 
 		# Multiplex
-		if len(self.read_group_string) == 2:
-			print("This accession was sequenced across more than one lane. Marking adapters from different lanes separately!")
-			lanes = [item.split(":")[-1] for item in self.read_group_string]
-			def mark_adapters(lane):
-				number_string = "_lane{}".format(lane)
-				ubam_file = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
-				metrics_file = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_adapter_metrics.txt"
-				output_file = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
-				tmp_dir = temporary_directory + self.accession + number_string + "/mark_illumina_adapters/"
+		if isinstance(self.read_group_string, list):
+			print("This accession was sequenced across more than one run or lane. Marking adapters from different lanes separately!")
+			def mark_adapters(platform_unit):
+				ubam_file = "{}{}_{}_{}_unaligned_reads.bam".format(ubam_dir, self.species, self.accession, platform_unit)
+				metrics_file = "{}{}_{}_{}_adapter_metrics.txt".format(uBAM_XT_dir, self.species, self.accession, platform_unit)
+				output_file = "{}{}_{}_{}_unaligned_reads_XT.bam".format(uBAM_XT_dir, self.species, self.accession, platform_unit)
+				tmp_dir = "{}{}_{}/mark_illumina_adapters/".format(temporary_directory, self.accession, platform_unit)
 				mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
-				print(mark_adapters)
 				os.system(mark_adapters)
 
-			Parallel(n_jobs=len(lanes))(delayed(mark_adapters)(lane) for lane in lanes)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(mark_adapters)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
@@ -155,7 +145,6 @@ class Accessions:
 			output_file = uBAM_XT_dir + self.species + "_" + self.accession + "_unaligned_reads_XT.bam"
 			tmp_dir = temporary_directory + self.accession + "/mark_illumina_adapters/"
 			mark_adapters = "gatk MarkIlluminaAdapters -I {} -M {} -O {} --TMP_DIR {}".format(ubam_file, metrics_file, output_file, tmp_dir)
-			print(mark_adapters)
 			os.system(mark_adapters)
 
 		print("Done marking adaptor sequences!")
@@ -164,26 +153,24 @@ class Accessions:
 		print("gatk SamToFastq | bwa mem | gatk MergeBamAlingment. Aligning reads to reference genome.")
 	
 		# Multiplex
-		if len(self.read_group_string) == 2:
-			print("This accession was sequenced across more than one lane. Aligning reads from different lanes separately!")
-			lanes = [item.split(":")[-1] for item in self.read_group_string]
-			def align(lane):
-				threads = int(max_threads//2)
-				number_string = "_lane{}".format(lane)
-				uBAM_XT = uBAM_XT_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads_XT.bam"
-				unmapped_BAM = ubam_dir + self.species + "_" + self.accession + number_string + "_unaligned_reads.bam"
-				output_file = mapped_bam_dir + self.species + "_" + self.accession + number_string + "_aligned_reads.bam"
-				tmp_dir = temporary_directory + self.accession + number_string + "/align_to_reference"
-				tmp_dir_2 = temporary_directory + self.accession + number_string + "/merge_bam_alignment/"
-				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
-				print(align)
+		if isinstance(self.read_group_string, list):
+			print("This accession was sequenced across more than one run or lane. Aligning reads from different lanes separately!")
+			
+			def align(platform_unit):
+				threads = int(max_threads//len(self.platform_unit))
+				uBAM_XT = "{}{}_{}_{}_unaligned_reads_XT.bam".format(uBAM_XT_dir, self.species, self.accession, platform_unit)
+				unmapped_BAM = "{}{}_{}_{}_unaligned_reads.bam".format(ubam_dir, self.species, self.accession, platform_unit)
+				output_file = "{}{}_{}_{}_aligned_reads.bam".format(mapped_bam_dir, self.species, self.accession, platform_unit)
+				tmp_dir = "{}{}_{}/align_to_reference".format(temporary_directory, self.accession, platform_unit)
+				tmp_dir_2 = "{}{}_{}/merge_bam_alignment/".format(temporary_directory, self.accession, platform_unit)
+				align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true --NON_PF true --TMP_DIR {} | bwa-mem2 mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
 				os.system(align)
 
 				# Clean up intermediate_files
 				os.system("rm " + uBAM_XT)
 				os.system("rm " + unmapped_BAM)
 
-			Parallel(n_jobs=len(lanes))(delayed(align)(lane) for lane in lanes)
+			Parallel(n_jobs=len(self.platform_unit))(delayed(align)(platform_unit) for platform_unit in self.platform_unit)
 
 		# No multiplex
 		else:
@@ -192,8 +179,7 @@ class Accessions:
 			output_file = mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bam"
 			tmp_dir = temporary_directory + self.accession + "/align_to_reference/"
 			tmp_dir_2 = temporary_directory + self.accession + "/merge_bam_alignment/"
-			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
-			print(align)
+			align = "gatk SamToFastq -I {} --FASTQ /dev/stdout --CLIPPING_ATTRIBUTE XT --CLIPPING_ACTION 2 --INTERLEAVE true -NON_PF true --TMP_DIR {} | bwa-mem2 mem -M -t {} -p {} /dev/stdin | gatk MergeBamAlignment --ALIGNED_BAM /dev/stdin --UNMAPPED_BAM {} -R {} -O {} --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS --SORT_ORDER coordinate --CREATE_INDEX --TMP_DIR {}".format(uBAM_XT, tmp_dir, max_threads, reference_genome, unmapped_BAM, reference_genome, output_file, tmp_dir_2)
 			os.system(align)
 
 			# Clean up intermediate_files
@@ -206,22 +192,26 @@ class Accessions:
 		print("Picard MarkDuplicates. Marking Duplicate reads in BAM files.")
 
 		# Multiplex
-		if len(self.read_group_string) == 2:
-			lanes = [item.split(":")[-1] for item in self.read_group_string]
-			number_string_one = "_lane{}".format(lanes[0])
-			number_string_two = "_lane{}".format(lanes[1])
-			input_bam_1 = mapped_bam_dir + self.species + "_" + self.accession + number_string_one + "_aligned_reads.bam"
-			input_bam_2 = mapped_bam_dir + self.species + "_" + self.accession + number_string_two + "_aligned_reads.bam"
+		if isinstance(self.read_group_string, list):
+
+			input_sample_string = ""
+			for platform_unit in self.platform_unit:
+				input_sample_string += "-I " + "{}{}_{}_{}_aligned_reads.bam ".format(mapped_bam_dir, self.species, self.accession, platform_unit)
+
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
-			mark_duplicates = "gatk MarkDuplicates -I {} -I {} -O {} --TMP_DIR {} -M {}".format(input_bam_1, input_bam_2, output_file, tmp_dir, metrics_file)
-			print(mark_duplicates)
+			
+			mark_duplicates = "gatk MarkDuplicates {}-O {} --TMP_DIR {} -M {}".format(input_sample_string, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
-			os.system("rm " + input_bam_1)
-			os.system("rm " + input_bam_2)
+			# Need to adapt below for new multiplex code 
+			for platform_unit in self.platform_unit:
+				remove_bam = "rm {}{}_{}_{}_aligned_reads.bam".format(mapped_bam_dir, self.species, self.accession, platform_unit)
+				remove_bai = "rm {}{}_{}_{}_aligned_reads.bai".format(mapped_bam_dir, self.species, self.accession, platform_unit)
+				os.system(remove_bam)
+				os.system(remove_bai)
 
 		# No multiplex
 		else:
@@ -230,11 +220,11 @@ class Accessions:
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			mark_duplicates = "gatk MarkDuplicates -I {} -O {} --TMP_DIR {} -M {}".format(input_bam, output_file, tmp_dir, metrics_file)
-			print(mark_duplicates)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
 			os.system("rm " + input_bam)
+			os.system("rm " + mapped_bam_dir + self.species + "_" + self.accession + "_aligned_reads.bai")
 
 		print("Done marking duplicates!")
 
@@ -244,24 +234,21 @@ class Accessions:
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads_flagstat.tsv"
 		flagstat = "samtools flagstat -@ {} -O tsv {} > {}".format(max_threads, input_file, output_file)
-		print(flagstat)
 		os.system(flagstat)
 
 	def call_variants(self):
 		
-		print("Indexing BAM files.")
+		#print("Indexing BAM files.")
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
 		index_input_bam = "samtools index {}".format(input_file)
-		print(index_input_bam)
 		os.system(index_input_bam)
 
 		print("gatk HaplotypeCaller. Calling variants.")
 
 		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
-		print(haplotype_caller)
 		os.system(haplotype_caller)
 
 		# Delete unnecesary BAM file. If need to retain BAM file, comment out this line
@@ -277,7 +264,6 @@ class Accessions:
 		input_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		output_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
 		norm = "bcftools norm -f {} -m- -Oz -o {} {}".format(reference_genome, output_file, input_file)
-		print(norm)
 		os.system(norm)
 
 		#Remove the original vcf file and index
@@ -289,7 +275,6 @@ class Accessions:
 	
 		input_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
 		index = "gatk IndexFeatureFile -I {}".format(input_file)
-		print(index)
 		os.system(index)
 
 def main():
