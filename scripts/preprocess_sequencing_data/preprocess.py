@@ -236,6 +236,17 @@ class Accessions:
 		flagstat = "samtools flagstat -@ {} -O tsv {} > {}".format(max_threads, input_file, output_file)
 		os.system(flagstat)
 
+		#threads = 4
+		#regions_file = "regions.bed"
+		#prefix = self.species + "_" + self.accession
+		#mosdepth = "mosdepth --by {} --no-per-base -t {} --fast-mode {} {}".format(regions_file, threads, prefix, input_file)
+		#os.system(mosdepth)
+
+		#infile = prefix + ".mosdepth.global.dist.txt"
+		#outfile = prefix + ".dist.html"
+		#plot_dist = "python3 plot-dist.py --output {} {}".format(outfile, infile)
+		#os.system(plot_dist)
+
 	def call_variants(self):
 		
 		#print("Indexing BAM files.")
