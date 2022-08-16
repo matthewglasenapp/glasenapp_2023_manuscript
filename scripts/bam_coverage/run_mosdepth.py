@@ -1,11 +1,14 @@
+import os
+from joblib import Parallel, delayed
+
 regions_file = "protein_coding_genes.bed"
 threads = 4
 
 def get_bam_file_paths():
-	get_files = 'find /hb/scratch/mglasena/data/dedup_mapped_bam_files/ -type f -name "*.bam*" | grep -v "bai" > bam_file_paths.txt'
+	get_files = 'find /hb/scratch/mglasena/data/dedup_mapped_bam_files/ -type f -name "*.bam*" | grep -v "bai" | grep -v "sbi" > bam_file_paths.txt'
 	os.system(get_files)
 
-	with open("bam_file_paths.txt",r) as f:
+	with open("bam_file_paths.txt","r") as f:
 		bam_file_paths_list = f.read().splitlines()
 
 	#remove_bam_file_paths_file = "rm bam_file_paths.txt"
@@ -23,5 +26,8 @@ def run_mosdepth(bam_file):
 
 def main():
 	bam_file_paths_list = get_bam_file_paths()
-	for bam_file in bam_file_paths_list:
-		run_mosdepth(bam_file)
+
+	Parallel(n_jobs=len(bam_file_paths_list))(delayed(run_mosdepth)(bam_file) for bam_file in bam_file_paths_list)
+
+if __name__ == "__main__":
+	main()
