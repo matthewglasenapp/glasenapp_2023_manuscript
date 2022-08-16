@@ -1,4 +1,4 @@
-regions_file = "regions.bed"
+regions_file = "protein_coding_genes.bed"
 threads = 4
 
 def get_bam_file_paths():
@@ -8,6 +8,7 @@ def get_bam_file_paths():
 	with open("bam_file_paths.txt",r) as f:
 		bam_file_paths_list = f.read().splitlines()
 
+	#remove_bam_file_paths_file = "rm bam_file_paths.txt"
 	return bam_file_paths_list
 
 def run_mosdepth(bam_file):
