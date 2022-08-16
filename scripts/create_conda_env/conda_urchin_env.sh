@@ -9,6 +9,7 @@ conda activate urchin
 conda install -c bioconda gatk4
 conda install -c bioconda bwa-mem2
 conda install -c bioconda bcftools
+conda install -c bioconda mosdepth
 
 # Common conda commands
 # conda info --envs
