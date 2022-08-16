@@ -1,2 +1,0 @@
-NW_022145610.1	575234	631367	gene-ebr1	.	-	BestRefSeq	gene	.	ID=gene-ebr1;Dbxref=GeneID:577775;Name=ebr1;description=egg bindin receptor 1;end_range=631367,.;gbkey=Gene;gene=ebr1;gene_biotype=protein_coding;partial=true
-NW_022145604.1	6501389	6512873	gene-BND	.	-	BestRefSeq	gene	.	ID=gene-BND;Dbxref=GeneID:373276;Name=BND;description=bindin;gbkey=Gene;gene=BND;gene_biotype=protein_coding;partial=true;start_range=.,6501390
