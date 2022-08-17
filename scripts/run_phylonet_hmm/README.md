@@ -8,7 +8,7 @@ Before running run_phylonet_hmm.sh, must update each python script with relevant
 
 4) process_hmm.py processes the output files of Phylonet HMM into useful stats. scaffolds.tsv - a tsv file with scaffold names and length in base pairs, must be in the directory where run_phylonet_hmm.sh is launched. 
 
-### process_hmm.py
+process_hmm.py
 
 At the beginning of the script, you must specify the following variables:
 	
