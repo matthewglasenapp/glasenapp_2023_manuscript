@@ -53,6 +53,7 @@ At the beginning of the script, you must specify the following variables:
       e) get_tract_length_dist() returns an array of the tract lengths contained in the coordinate_tract_list returned by get_tracts()
 
     process_single_scaffold() also calculates numerous values and appends them to aggregate lists containing data for each scaffold:
+      
       a) Calculates and appends the total number of SNV sites included in the scaffold to the total_sites_nexus_alignments list
     
       b) Calculates and appends the number of SNV sites that were declared introgressed the given probability threshold to the total_snv_introgressed list.
