@@ -28,7 +28,7 @@ At the beginning of the script, you must specify the following variables:
 
 4) posterior_probability_threshold: Threshold cutoff to use for declaring sites introgressed (default=90)
 
-## Walktrhough of main() in process_hmm.py
+## Walkthrough of main() in process_hmm.py
 
 1) Instantiate several global list variables. These list will be continuously updated as each scaffold is processed and will be used to calculate aggregate statistics for all scaffolds at the end. 
 
@@ -40,23 +40,36 @@ At the beginning of the script, you must specify the following variables:
 
 5) process_single_scaffold() is called to process the phylonet_hmm output for each scaffold. The function returns a list of variables calculated while processing the phylonet_hmm output - [scaffold_name, number_sites_nexus_scaffold, number_sites_introgressed, percent_sites_introgressed, total_length_scaffold_analyzed, actual_length_scaffold, number_of_tracts, number_ten_kb_tracts, combined_length_tracts, percent_scaffold_alignment_introgressed, percent_scaffold_introgressed]. This list is written to the "results_by_scaffold.csv" file.
 
-  process_single_scaffold() calls several other helper functions:
-    a) get_coordinate_list() returns a list of all coordinates applied to scaffold SNV alignment 
-    b) get_introgression_probabilities_list() returns a list the probability each site in the scaffold SNV alignment is introgressed
-    c) get_tracts() finds introgression tracts, stretches of consecutive SNV sites with posterior probabilities of introgression exceeding the posterior_probability_threshold at the beginning of the script (default=90). This function returns a list of tracts > 1 SNV site in length
-    d) get_number_sites_introgressed() calculates the number of SNV sites that exceeded the probability threshold for being declared introgressed
-    e) get_tract_length_dist() returns an array of the tract lengths contained in the coordinate_tract_list returned by get_tracts()
+      process_single_scaffold() calls several other helper functions:
+  
+      a) get_coordinate_list() returns a list of all coordinates applied to scaffold SNV alignment 
+    
+      b) get_introgression_probabilities_list() returns a list the probability each site in the scaffold SNV alignment is introgressed
+    
+      c) get_tracts() finds introgression tracts, stretches of consecutive SNV sites with posterior probabilities of introgression exceeding the posterior_probability_threshold at the beginning of the script (default=90). This function returns a list of tracts > 1 SNV site in length
+    
+      d) get_number_sites_introgressed() calculates the number of SNV sites that exceeded the probability threshold for being declared introgressed
+    
+      e) get_tract_length_dist() returns an array of the tract lengths contained in the coordinate_tract_list returned by get_tracts()
 
-  process_single_scaffold() also calculates numerous values and appends them to aggregate lists containing data for each scaffold:
-    a) Calculates and appends the total number of SNV sites included in the scaffold to the total_sites_nexus_alignments list
-    b) Calculates and appends the number of SNV sites that were declared introgressed the given probability threshold to the total_snv_introgressed list.
-    c) Calculates the percent of SNV sites on the scaffold alignment that were declared introgressed
-    d) Calculates and appends the total length of the analyzed scaffold alignment to the total_length_nexus_alignments list.
-    e) Reports the actual length of the scaffold analyzed based on the current genome assembly
-    f) Calculates and appends the total number of introgression tracts to the total_number_tracts list.
-    g) Calculates the number of introgression tracts >= 10kb in length
-    h) Calculates the combined length of all tracts, the percent of the analyzed scaffold declared introgressed, 
-    i) Appends the sorted coordinate_tract_list returned by get_tracts() to the combined_results list
+    process_single_scaffold() also calculates numerous values and appends them to aggregate lists containing data for each scaffold:
+      a) Calculates and appends the total number of SNV sites included in the scaffold to the total_sites_nexus_alignments list
+    
+      b) Calculates and appends the number of SNV sites that were declared introgressed the given probability threshold to the total_snv_introgressed list.
+    
+      c) Calculates the percent of SNV sites on the scaffold alignment that were declared introgressed
+    
+      d) Calculates and appends the total length of the analyzed scaffold alignment to the total_length_nexus_alignments list.
+      
+      e) Reports the actual length of the scaffold analyzed based on the current genome assembly
+    
+      f) Calculates and appends the total number of introgression tracts to the total_number_tracts list.
+      
+      g) Calculates the number of introgression tracts >= 10kb in length
+      
+      h) Calculates the combined length of all tracts, the percent of the analyzed scaffold declared introgressed, 
+      
+      i) Appends the sorted coordinate_tract_list returned by get_tracts() to the combined_results list
 
 6) Flatten and sort the list of lists of introgression tracts by scaffold
 
