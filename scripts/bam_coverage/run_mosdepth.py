@@ -16,8 +16,8 @@ def get_bam_file_paths():
 
 def run_mosdepth(bam_file):
 	prefix = bam_file.split("/")[-1].split("_dedup")[0]
-	mosdepth = "mosdepth --by {} --no-per-base --thresholds 1,10,20,30,100 -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
-	os.system(mosdepth)
+	#mosdepth = "mosdepth --by {} --no-per-base --thresholds 1,10,20,30,100 -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
+	#os.system(mosdepth)
 
 	global_dist_file = prefix + ".mosdepth.global.dist.txt"
 	dist_outfile = prefix + ".dist.html"
