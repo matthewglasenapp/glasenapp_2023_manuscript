@@ -79,11 +79,14 @@ def gzip_output(accession_number):
 
 def main():
 	for key in urchin_sra_accessions:
-		print("prefetching {}".format(key))
+		print("Prefetching {}".format(key))
 		prefetch(key)
-		print("downloading {}".format(key))
+		print("{} prefetch complete".format(key))
+		
+		print("Downloading {}".format(key))
 		download_accession(key)
 		print("{} complete".format(key))
+		
 		print("Compressing {}".format(key))
 		gzip_output(key)
 
