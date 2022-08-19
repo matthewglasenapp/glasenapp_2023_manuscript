@@ -72,7 +72,7 @@ def download_accession(accession_number):
 
 	# Remove prefetch dir
 	remove_prefetch = "rm -r {}".format(prefetch_dir)
-	os.sytem(remove_prefetch)
+	os.system(remove_prefetch)
 
 	# Remove temp_dir
 	remove_temp = "rm -r {}".format(temp_dir)
