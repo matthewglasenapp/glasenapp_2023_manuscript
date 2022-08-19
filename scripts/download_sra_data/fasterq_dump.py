@@ -61,11 +61,21 @@ def prefetch(accession_number):
 	"{} {} -O {} --max-size u".format(prefetch, accession_number, output_dir)
 
 def download_accession(accession_number):
-	os.chdir(prefetch_directory + accession_number)
+	prefetch_dir = prefetch_directory + accession_number
+	os.chdir(prefetch_dir)
 	temp_dir = temporary_directory + accession_number 
 	download = "{} {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
 
 	os.system(download)
+
+	# Remove prefetch dir
+	remove_prefetch = "rm -r {}".format(prefetch_dir)
+
+def gzip_output(accession_number):
+	output_file_1 = output_directory + accession_number + "_1.fastq"
+	output_file_2 = output_directory + accession_number + "_2.fastq"
+	gzip_1 = "gzip {}".format(output_file_1)
+	gzip_2 = "gzip {}".format(output_file_1) 
 
 def main():
 	for key in urchin_sra_accessions:
@@ -74,6 +84,8 @@ def main():
 		print("downloading {}".format(key))
 		download_accession(key)
 		print("{} complete".format(key))
+		print("Compressing {}".format(key))
+		gzip_output(key)
 
 if __name__ == "__main__":
 	main()
