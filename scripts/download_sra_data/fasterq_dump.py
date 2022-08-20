@@ -56,7 +56,7 @@ urchin_sra_accessions = {
 	"ERR5621418": "lividus,4,ERS2351987",
 }
 
-def prefetch(accession_number):
+def prefetch_accession(accession_number):
 	output_dir = prefetch_directory + str(accession_number)
 	run_prefetch = "{} {} -O {} --max-size u".format(prefetch, accession_number, output_dir)
 	os.system(run_prefetch)
@@ -65,7 +65,7 @@ def download_accession(accession_number):
 	prefetch_dir = prefetch_directory + accession_number
 	os.chdir(prefetch_dir)
 	temp_dir = temporary_directory + accession_number 
-	download = "{} {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
+	download = " {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
 
 	os.system(download)
 
@@ -89,7 +89,7 @@ def download_accession(accession_number):
 def main():
 	for key in urchin_sra_accessions:
 		print("Prefetching {}".format(key))
-		prefetch(key)
+		prefetch_accession(key)
 		print("{} prefetch complete".format(key))
 		
 		print("Downloading {}".format(key))
