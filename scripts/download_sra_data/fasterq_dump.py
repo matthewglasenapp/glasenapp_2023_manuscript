@@ -40,10 +40,10 @@ temporary_directory = "/hb/scratch/mglasena/SRA/"
 
 urchin_sra_accessions = {
 	#"ERR5621404": "lividus", "4", "ERS2351987",
-	"ERR5621405": "lividus,4,ERS2351987",
-	"ERR5621406": "lividus,4,ERS2351987",
-	"ERR5621407": "lividus,4,ERS2351987",
-	"ERR5621408": "lividus,4,ERS2351987",
+	#"ERR5621405": "lividus,4,ERS2351987",
+	#"ERR5621406": "lividus,4,ERS2351987",
+	#"ERR5621407": "lividus,4,ERS2351987",
+	#"ERR5621408": "lividus,4,ERS2351987",
 	"ERR5621409": "lividus,4,ERS2351987",
 	"ERR5621410": "lividus,4,ERS2351987",
 	"ERR5621411": "lividus,4,ERS2351987",
