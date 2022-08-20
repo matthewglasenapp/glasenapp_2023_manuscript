@@ -202,7 +202,7 @@ class Accessions:
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
 			
-			mark_duplicates = "gatk MarkDuplicates {}-O {} --TMP_DIR {} -M {}".format(input_sample_string, output_file, tmp_dir, metrics_file)
+			mark_duplicates = "gatk MarkDuplicates {}-O {} --TMP_DIR {} -M {} --CREATE_INDEX".format(input_sample_string, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
@@ -219,7 +219,7 @@ class Accessions:
 			output_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 			metrics_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_metrics.txt"
 			tmp_dir = temporary_directory + self.accession + "/mark_duplicates/"
-			mark_duplicates = "gatk MarkDuplicates -I {} -O {} --TMP_DIR {} -M {}".format(input_bam, output_file, tmp_dir, metrics_file)
+			mark_duplicates = "gatk MarkDuplicates -I {} -O {} --TMP_DIR {} -M {} --CREATE_INDEX".format(input_bam, output_file, tmp_dir, metrics_file)
 			os.system(mark_duplicates)
 
 			# Clean up intermediate_files
@@ -248,16 +248,10 @@ class Accessions:
 		#os.system(plot_dist)
 
 	def call_variants(self):
-		
-		#print("Indexing BAM files.")
+		print("gatk HaplotypeCaller. Calling variants.")
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
-		
-		index_input_bam = "samtools index {}".format(input_file)
-		os.system(index_input_bam)
-
-		print("gatk HaplotypeCaller. Calling variants.")
 
 		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
