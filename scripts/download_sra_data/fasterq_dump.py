@@ -65,7 +65,7 @@ def download_accession(accession_number):
 	prefetch_dir = prefetch_directory + accession_number
 	os.chdir(prefetch_dir)
 	temp_dir = temporary_directory + accession_number 
-	download = " {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
+	download = "{} {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
 
 	os.system(download)
 
@@ -82,7 +82,7 @@ def download_accession(accession_number):
 	output_file_1 = accession_number + "_1.fastq"
 	output_file_2 = accession_number + "_2.fastq"
 	gzip_1 = "gzip {}".format(output_file_1)
-	gzip_2 = "gzip {}".format(output_file_1)
+	gzip_2 = "gzip {}".format(output_file_2)
 	os.system(gzip_1)
 	os.system(gzip_2)	
 
