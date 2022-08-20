@@ -15,7 +15,7 @@ prefetch_directory = "/hb/scratch/mglasena/prefetch/"
 make_prefetch_dir = "mkdir -p {}".format(prefetch_directory)
 os.system(make_prefetch_dir)
 
-output_directory = "/hb/home/mglasena/short_read_data/"
+output_directory = "/hb/scratch/mglasena/short_read_data/"
 make_output_dir = "mkdir -p {}".format(output_directory)
 os.system(make_output_dir)
 
