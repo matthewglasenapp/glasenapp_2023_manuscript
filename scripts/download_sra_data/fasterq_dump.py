@@ -57,7 +57,7 @@ urchin_sra_accessions = {
 }
 
 def prefetch(accession_number):
-	output_dir = prefetch_directory + accession_number
+	output_dir = prefetch_directory + str(accession_number)
 	run_prefetch = "{} {} -O {} --max-size u".format(prefetch, accession_number, output_dir)
 	os.system(run_prefetch)
 
