@@ -8,7 +8,7 @@
 #SBATCH --mem=60GB
 #SBATCH --time=72:00:00
 
-module load angsd/gnu-937
+module load R/R-3.6.1
 
 reference="/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
@@ -17,7 +17,6 @@ angsd -doAbbababa 1 \
 -baq 1 \
 -ref $reference \
 -useLast 1 \
--enhance 1 \
 -bam bam.filelist \
 -out out \
 -blockSize 1000000 \
@@ -27,7 +26,7 @@ angsd -doAbbababa 1 \
 -remove_bads 1 \
 -uniqueOnly 1 \
 
-module load R/R-3.6.1
+
 Rscript jackKnife.R file=out.abbababa indNames=bam.filelistnames outfile=results
 
 ######
