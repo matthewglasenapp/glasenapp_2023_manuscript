@@ -8,7 +8,9 @@ bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
 min_cov_threshold = 10
-max_cov_threshold = 150
+max_cov_threshold = 100
+purpuratus_7211988_max = 150
+prop_1x_threshold = 0.5
 
 gene_dict = dict()
 
@@ -26,13 +28,13 @@ def get_zipped_bed_file_list():
 
 	return list(file_list)
 
-def create_gene_dict():
+def initialize_gene_dict():
 	with open(bed_file,"r") as f:
 		for line in f:
 			gene = line.split("\t")[3]
 			gene_dict[gene] = [],[]
 
-def gather_metrics(regions_file, thresholds_file):
+def fill_gene_dict(regions_file, thresholds_file):
 	with gzip.open(regions_file, "rt") as file1, gzip.open(thresholds_file, "rt") as file2:
 		for line_file1, line_file2 in zip(file1, islice(file2, 1, None)):
 			gene_id = line_file1.split("\t")[-2]
@@ -49,9 +51,9 @@ def gather_metrics(regions_file, thresholds_file):
 
 			gene_dict[gene_id][1].append(prop_1x)
 
-def filter():
+def filter_gene_dict():
 	for key, value in gene_dict.items():
-		if min(value[0]) > min_cov_threshold and max(value[0]) < max_cov_threshold and min(value[1]) > 0.5:
+		if min(value[0]) >= min_cov_threshold and max(value[0]) < max_cov_threshold and min(value[1]) >= prop_1x_threshold:
 			passed_genes_dict[key] = value
 
 	print("{} genes passed filter".format(len(passed_genes_dict)))
@@ -93,12 +95,12 @@ def write_passed_genes_dict_csv():
 def main():
 	bed_file_list = get_zipped_bed_file_list()
 	
-	create_gene_dict()
+	initialize_gene_dict()
 
 	for regions_file, thresholds_file in bed_file_list:
-		gather_metrics(regions_file, thresholds_file)
+		fill_gene_dict(regions_file, thresholds_file)
 
-	filter()
+	filter_gene_dict()
 
 	write_genes_passed_filter_bed()
 
