@@ -1,3 +1,5 @@
+## URGENT: MAKE the following line more dynamic: purpuratus_7211988_mean = mean_depth_lst.pop(10)
+
 import os
 import gzip
 from itertools import islice
@@ -10,6 +12,7 @@ bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 min_cov_threshold = 10
 max_cov_threshold = 100
 purpuratus_7211988_max = 150
+pulcherrimus_DRR107784_max = 150
 prop_1x_threshold = 0.5
 
 gene_dict = dict()
@@ -53,7 +56,18 @@ def fill_gene_dict(regions_file, thresholds_file):
 
 def filter_gene_dict():
 	for key, value in gene_dict.items():
-		if min(value[0]) >= min_cov_threshold and max(value[0]) < max_cov_threshold and min(value[1]) >= prop_1x_threshold:
+		mean_depth_lst = [item for item in value[0]]
+		one_x_lst = [item for item in value[1]]
+		
+		purpuratus_7211988_mean = mean_depth_lst.pop(10)
+		purpuratus_7211988_1x = one_x_lst.pop(10)
+
+		pulcherrimus_DRR107784_mean = mean_depth_lst.pop(7)
+		pulcherrimus_DRR107784_1x = one_x_lst.pop(7)
+
+		
+		if min(mean_depth_lst) >= min_cov_threshold and max(mean_depth_lst) < max_cov_threshold and min(one_x_lst) >= prop_1x_threshold and purpuratus_7211988_mean >= min_cov_threshold and purpuratus_7211988_mean < purpuratus_7211988_max and purpuratus_7211988_1x >= prop_1x_threshold and pulcherrimus_DRR107784_mean >= min_cov_threshold and pulcherrimus_DRR107784_mean < pulcherrimus_DRR107784_max and pulcherrimus_DRR107784_1x >= prop_1x_threshold:
+			
 			passed_genes_dict[key] = value
 
 	print("{} genes passed filter".format(len(passed_genes_dict)))
