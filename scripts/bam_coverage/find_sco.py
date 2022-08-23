@@ -12,7 +12,7 @@ max_cov_threshold = 150
 
 gene_dict = dict()
 
-new_dict = dict()
+passed_genes_dict = dict()
 
 def get_zipped_bed_file_list():
 	#get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
@@ -52,23 +52,43 @@ def gather_metrics(regions_file, thresholds_file):
 def filter():
 	for key, value in gene_dict.items():
 		if min(value[0]) > min_cov_threshold and max(value[0]) < max_cov_threshold and min(value[1]) > 0.5:
-			new_dict[key] = value
+			passed_genes_dict[key] = value
 
-	print("{} genes passed filter".format(len(new_dict)))
+	print("{} genes passed filter".format(len(passed_genes_dict)))
 
 
 def write_genes_passed_filter_bed():
-	with open("genes_pass_filter.txt", "a") as f1, open(bed_file,"r") as f2:
-		genes_pass_filter_list = list(new_dict.keys())
+	with open("genes_pass_filter.bed", "a") as f1, open(bed_file,"r") as f2:
+		genes_pass_filter_list = list(passed_genes_dict.keys())
 		all_gene_dict = {line.split("\t")[3]:line for line in f2.read().splitlines()}
 
 		for gene in genes_pass_filter_list:
 			if gene in all_gene_dict.keys():
 				f1.write(all_gene_dict[gene] + "\n")
 
-def write_gene_dict_csv():
+def write_all_gene_dict_csv():
+	csv_file = open("all_genes.csv","w")
+	writer = csv.writer(csv_file)	
+	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	writer.writerow(header)
 
-	
+	for key,value in gene_dict.items():
+		row = [key] + value[0] + value[1]
+		writer.writerow(row)
+
+	csv_file.close()
+
+def write_passed_genes_dict_csv():
+	csv_file = open("passed_genes.csv","w")
+	writer = csv.writer(csv_file)	
+	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	writer.writerow(header)
+
+	for key,value in passed_genes_dict.items():
+		row = [key] + value[0] + value[1]
+		writer.writerow(row)
+
+	csv_file.close()
 
 def main():
 	bed_file_list = get_zipped_bed_file_list()
@@ -81,6 +101,10 @@ def main():
 	filter()
 
 	write_genes_passed_filter_bed()
+
+	write_all_gene_dict_csv()
+
+	write_passed_genes_dict_csv()
 
 if __name__ == "__main__":
 	main()
