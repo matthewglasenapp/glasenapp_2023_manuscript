@@ -11,6 +11,7 @@
 #SBATCH --array=[0-5]
 
 module load python-3.6.5
+module load R
 
 array_id=$SLURM_ARRAY_TASK_ID
 export array_id
