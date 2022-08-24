@@ -1,5 +1,4 @@
 import os
-from joblib import Parallel, delayed
 
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 threads = 8
@@ -30,6 +29,8 @@ def main():
 	print("Working in {}".format(dir))
 
 	run_abba_baba(dir)
+
+	print("Analysis Finished!")
 
 if __name__ == "__main__":
 	main()
