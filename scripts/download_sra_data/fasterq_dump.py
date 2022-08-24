@@ -45,15 +45,15 @@ urchin_sra_accessions = {
 	#"ERR5621407": "lividus,4,ERS2351987",
 	#"ERR5621408": "lividus,4,ERS2351987",
 	"ERR5621409": "lividus,4,ERS2351987",
-	"ERR5621410": "lividus,4,ERS2351987",
-	"ERR5621411": "lividus,4,ERS2351987",
-	"ERR5621412": "lividus,4,ERS2351987",
-	"ERR5621413": "lividus,4,ERS2351987",
-	"ERR5621414": "lividus,4,ERS2351987",
-	"ERR5621415": "lividus,4,ERS2351987",
-	"ERR5621416": "lividus,4,ERS2351987",
-	"ERR5621417": "lividus,4,ERS2351987",
-	"ERR5621418": "lividus,4,ERS2351987",
+	#"ERR5621410": "lividus,4,ERS2351987",
+	#"ERR5621411": "lividus,4,ERS2351987",
+	#"ERR5621412": "lividus,4,ERS2351987",
+	#"ERR5621413": "lividus,4,ERS2351987",
+	#"ERR5621414": "lividus,4,ERS2351987",
+	#"ERR5621415": "lividus,4,ERS2351987",
+	#"ERR5621416": "lividus,4,ERS2351987",
+	#"ERR5621417": "lividus,4,ERS2351987",
+	#"ERR5621418": "lividus,4,ERS2351987",
 }
 
 def prefetch_accession(accession_number):
@@ -65,7 +65,7 @@ def download_accession(accession_number):
 	prefetch_dir = prefetch_directory + accession_number
 	os.chdir(prefetch_dir)
 	temp_dir = temporary_directory + accession_number 
-	download = "{} {} --outdir {} --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
+	download = "{} {} --outdir {} --split-spot --split-3 -t {} -e {}".format(fasterq_dump, accession_number, output_directory, temp_dir, threads)
 
 	os.system(download)
 
