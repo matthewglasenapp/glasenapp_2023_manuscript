@@ -1,15 +1,14 @@
 # Skip with xxx
 # Specify outgroup with "Outgroup"
-# Outgroup can be multiple samples
 
 QB3KMK014	droebachiensis
 QB3KMK013	fragilis
 QB3KMK002	pallidus
 QB3KMK012	intermedius
-S.purpuratus#1	purpuratus
-SPUR.00	purpuratus
-SAMD00098133	pulcherrimus
-QB3KMK016	pulcherrimus
+S.purpuratus#1	purpuratus_SRR6281818
+SPUR.00	purpuratus_SRR7211988
+SAMD00098133	pulcherrimus_DRR107784
+QB3KMK016	pulcherrimus_SRR5767283
 QB3KMK011	nudus
 QB3KMK010	franciscanus
 QB3KMK015	depressus
