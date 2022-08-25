@@ -10,10 +10,10 @@
 
 # --JKnum sets the number of JackKnife blocks. A block size of 1Mb would require 922 blocks. 
 
-Dtrios="/hb/groups/pogson_group/dissertation/software/Dsuite/BuildDsuite"
+Dsuite="/hb/groups/pogson_group/dissertation/software/Dsuite/Build/Dsuite"
 filtered_vcf="/hb/scratch/mglasena/data/combined_vcf/filtered_genotype_calls.g.vcf.gz"
 
-$Dtrios $filtered_vcf SETS.txt -t tree.nwk -o out --no-f4-ratio --JKnum 922
+$Dsuite Dtrios $filtered_vcf SETS.txt -t tree.nwk -o out --no-f4-ratio --JKnum 922
 
 # Parallel option
 #DtriosParallel="/hb/groups/pogson_group/dissertation/software/Dsuite/utils/DtriosParallel"
@@ -21,4 +21,9 @@ $Dtrios $filtered_vcf SETS.txt -t tree.nwk -o out --no-f4-ratio --JKnum 922
 #cores=24
 
 #DtriosParallel --cores $cores -k 922 -t tree.nwk $filtered_vcf SETS.txt
+
+#################
+
+# Dquartets
+# $Dsuite Dquartets $filtered_vcf SETS.txt --JKnum 922 --no-f4-ratio -o out
 
