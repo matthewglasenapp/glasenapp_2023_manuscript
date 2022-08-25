@@ -3,7 +3,9 @@ import os
 # Do I need to normalize after the first time?
 #bcftools norm -f /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -m- -Oz -o norm_joint_genotype.vcf.gz joint_genotype.vcf.gz
 
-root_dir = "/hb/groups/pogson_group/dissertation/data/"
+threads = 48
+
+root_dir = "/hb/scratch/mglasena/data/"
 
 # Path to S. purpuratus reference genome file
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
@@ -17,7 +19,7 @@ make_multisample_vcf_dir = "mkdir -p {}".format(multisample_vcf_dir)
 os.system(make_multisample_vcf_dir)
 
 def combine_GVCFs():
-	get_file_paths = "find {} -type f -name '*.gz' > single_sample_vcf_file_paths.txt".format(vcf_dir)
+	get_file_paths = "find {} -type f -name '*.gz' | grep -v 'tbi' > single_sample_vcf_file_paths.txt".format(vcf_dir)
 	os.system(get_file_paths)
 	file_paths_string = file_path_string = " ".join(["-V " + path for path in open("single_sample_vcf_file_paths.txt","r").read().splitlines()])
 	os.system("rm single_sample_vcf_file_paths.txt")
@@ -34,7 +36,6 @@ def genotype_GVCFs():
 def bcftools_3bp_filter():
 	input_file = multisample_vcf_dir + "genotype_calls.g.vcf.gz"
 	output_file = multisample_vcf_dir + "3bp_filter_genotype_calls.g.vcf.gz"
-	threads = 48
 	filter = "bcftools filter -g 3 -O z --output {} {} --threads {}".format(output_file, input_file, threads)
 	os.system(bcftools_filter)
 
@@ -44,8 +45,8 @@ def separate_SNP_INDEL():
 	output_indel = multisample_vcf_dir + "3bp_filter_indel.g.vcf.gz"
 	get_snp = "gatk SelectVariants -V {} --select-type-to-include SNP --output {}".format(input_file, output_snp)
 	get_indel = "gatk SelectVariants -V {} --select-type-to-include INDEL --output {}".format(input_file, output_indel)
-	os.system(get_snps)
-	os.system(get_indels)
+	os.system(get_snp)
+	os.system(get_indel)
 	os.system("rm " + input_file)
 
 def filter_variants():
@@ -71,7 +72,7 @@ def merge_vcfs():
 	merge_vcfs = "gatk MergeVcfs -I {} -I {} -O {}".format(input_snp, input_indel, output_file)
 	os.system(merge_vcfs)
 	os.system("rm " + input_snp)
-	os.system("rm " + output_snp)
+	os.system("rm " + input_indel)
 
 def index_vcf(input_file):
 	index = "gatk IndexFeatureFile -I {}".format(input_file)
