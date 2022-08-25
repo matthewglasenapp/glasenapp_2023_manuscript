@@ -1,12 +1,16 @@
-QB3KMK013	fragilis
-QB3KMK011	Outgroup
-QB3KMK010	franciscanus
-SAMD00098133	xxx
-QB3KMK015	depressus
-QB3KMK002	pallidus
+# Skip with xxx
+# Specify outgroup with "Outgroup"
+
 QB3KMK014	droebachiensis
-S.purpuratus#1	purpuratus
-ERS2351987	xxx
-QB3KMK016	pulcherrimus
+QB3KMK013	fragilis
+QB3KMK002	pallidus
 QB3KMK012	intermedius
+S.purpuratus#1	purpuratus
 SPUR.00	purpuratus
+SAMD00098133	pulcherrimus
+QB3KMK016	pulcherrimus
+QB3KMK011	nudus
+QB3KMK010	franciscanus
+QB3KMK015	depressus
+4	lividus
+
