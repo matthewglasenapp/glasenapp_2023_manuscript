@@ -8,5 +8,17 @@
 #SBATCH --mem=125GB
 #SBATCH --time=24:00:00
 
-filtered_vcf="/hb/groups/pogson_group/dissertation/data/combined_vcf/genotype_calls.g.vcf.gz"
-/hb/home/mglasena/software/Dsuite/Build/Dsuite Dtrios $filtered_vcf SETS.txt -t tree.txt -o out --no-f4-ratio
+# --JKnum sets the number of JackKnife blocks. A block size of 1Mb would require 922 blocks. 
+
+Dtrios="/hb/groups/pogson_group/dissertation/software/Dsuite/BuildDsuite"
+filtered_vcf="/hb/scratch/mglasena/data/combined_vcf/filtered_genotype_calls.g.vcf.gz"
+
+$Dtrios $filtered_vcf SETS.txt -t tree.nwk -o out --no-f4-ratio --JKnum 922
+
+# Parallel option
+#DtriosParallel="/hb/groups/pogson_group/dissertation/software/Dsuite/utils/DtriosParallel"
+#filtered_vcf="/hb/scratch/mglasena/data/combined_vcf/filtered_genotype_calls.g.vcf.gz"
+#cores=24
+
+#DtriosParallel --cores $cores -k 922 -t tree.nwk $filtered_vcf SETS.txt
+
