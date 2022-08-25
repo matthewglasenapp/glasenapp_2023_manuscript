@@ -1,5 +1,6 @@
 # Skip with xxx
 # Specify outgroup with "Outgroup"
+# Outgroup can be multiple samples
 
 QB3KMK014	droebachiensis
 QB3KMK013	fragilis
