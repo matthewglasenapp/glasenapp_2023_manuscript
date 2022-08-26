@@ -97,7 +97,7 @@ def write_genes_passed_filter_bed():
 def write_all_gene_dict_csv():
 	csv_file = open("all_genes.csv","w")
 	writer = csv.writer(csv_file)	
-	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
 	writer.writerow(header)
 
 	for key,value in gene_dict.items():
@@ -109,7 +109,7 @@ def write_all_gene_dict_csv():
 def write_passed_genes_dict_csv():
 	csv_file = open("passed_genes.csv","w")
 	writer = csv.writer(csv_file)	
-	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
 	writer.writerow(header)
 
 	for key,value in passed_genes_dict.items():
