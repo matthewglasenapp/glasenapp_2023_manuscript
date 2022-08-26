@@ -12,7 +12,7 @@ max_cov_threshold = 100
 prop_1x_threshold = 0.5
 
 lividus_min = 5
-lividus_prop_1x = 0.33
+lividus_prop_1x_threshold = 0.33
 
 purpuratus_7211988_max = 150
 pulcherrimus_DRR107784_max = 150
