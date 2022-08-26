@@ -12,6 +12,8 @@ max_cov_threshold = 100
 prop_1x_threshold = 0.5
 
 lividus_min = 5
+lividus_prop_1x = 0.33
+
 purpuratus_7211988_max = 150
 pulcherrimus_DRR107784_max = 150
 
@@ -77,8 +79,9 @@ def filter_gene_dict():
 		pulcherrimus_DRR107784_1x = one_x_lst.pop(pulcherrimus_DRR107784_index)
 		
 		lividus_mean = mean_depth_lst.pop(lividus_index)
+		lividus_prop_1x = one_x_lst.pop(lividus_index)
 		
-		if min(mean_depth_lst) >= min_cov_threshold and max(mean_depth_lst) < max_cov_threshold and min(one_x_lst) >= prop_1x_threshold and purpuratus_7211988_mean >= min_cov_threshold and purpuratus_7211988_mean < purpuratus_7211988_max and purpuratus_7211988_1x >= prop_1x_threshold and pulcherrimus_DRR107784_mean >= min_cov_threshold and pulcherrimus_DRR107784_mean < pulcherrimus_DRR107784_max and pulcherrimus_DRR107784_1x >= prop_1x_threshold and lividus_mean >= lividus_min:
+		if min(mean_depth_lst) >= min_cov_threshold and max(mean_depth_lst) < max_cov_threshold and min(one_x_lst) >= prop_1x_threshold and purpuratus_7211988_mean >= min_cov_threshold and purpuratus_7211988_mean < purpuratus_7211988_max and purpuratus_7211988_1x >= prop_1x_threshold and pulcherrimus_DRR107784_mean >= min_cov_threshold and pulcherrimus_DRR107784_mean < pulcherrimus_DRR107784_max and pulcherrimus_DRR107784_1x >= prop_1x_threshold and lividus_mean >= lividus_min and lividus_prop_1x >= lividus_prop_1x_threshold:
 			
 			passed_genes_dict[key] = value
 
