@@ -2,14 +2,15 @@
 
 module load miniconda3.9
 
-conda create -y -n urchin
+conda create -y -n analysis
 
-conda activate urchin
+conda activate analysis
 
-conda install -c bioconda gatk4
-conda install -c bioconda bwa-mem2
 conda install -c bioconda bcftools
+conda install -c bioconda bwa-mem2
 conda install -c bioconda mosdepth
+conda install -c bioconda gatk4
+
 
 # Common conda commands
 # conda info --envs
