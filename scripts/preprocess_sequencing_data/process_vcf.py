@@ -19,7 +19,7 @@ make_multisample_vcf_dir = "mkdir -p {}".format(multisample_vcf_dir)
 os.system(make_multisample_vcf_dir)
 
 def combine_GVCFs():
-	get_file_paths = "find {} -type f -name '*.gz' | grep -v 'tbi' | grep 'try_2' > single_sample_vcf_file_paths.txt".format(vcf_dir)
+	get_file_paths = "find {} -type f -name '*.gz' | grep -v 'tbi' > single_sample_vcf_file_paths.txt".format(vcf_dir)
 	os.system(get_file_paths)
 	file_paths_string = " ".join(["-V " + path for path in open("single_sample_vcf_file_paths.txt","r").read().splitlines()])
 	os.system("rm single_sample_vcf_file_paths.txt")
