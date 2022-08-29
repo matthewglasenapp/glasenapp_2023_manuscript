@@ -3,7 +3,7 @@ import os
 # Do I need to normalize after the first time?
 #bcftools norm -f /hb/home/mglasena/reference/sp5_0_GCF_genomic.fa -m- -Oz -o norm_joint_genotype.vcf.gz joint_genotype.vcf.gz
 
-threads = 48
+threads = 20
 
 root_dir = "/hb/scratch/mglasena/data/"
 
@@ -19,9 +19,9 @@ make_multisample_vcf_dir = "mkdir -p {}".format(multisample_vcf_dir)
 os.system(make_multisample_vcf_dir)
 
 def combine_GVCFs():
-	get_file_paths = "find {} -type f -name '*.gz' | grep -v 'tbi' > single_sample_vcf_file_paths.txt".format(vcf_dir)
+	get_file_paths = "find {} -type f -name '*.gz' | grep -v 'tbi' | grep 'try2' > single_sample_vcf_file_paths.txt".format(vcf_dir)
 	os.system(get_file_paths)
-	file_paths_string = file_path_string = " ".join(["-V " + path for path in open("single_sample_vcf_file_paths.txt","r").read().splitlines()])
+	file_paths_string = " ".join(["-V " + path for path in open("single_sample_vcf_file_paths.txt","r").read().splitlines()])
 	os.system("rm single_sample_vcf_file_paths.txt")
 	output_file = multisample_vcf_dir + "raw_combined_vcf.g.vcf.gz"
 	combine_gvcfs = "gatk CombineGVCFs -R {} -O {} {}".format(reference_genome, output_file, file_paths_string)
