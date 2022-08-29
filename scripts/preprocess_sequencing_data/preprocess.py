@@ -268,7 +268,7 @@ class Accessions:
 	
 		input_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		output_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
-		norm = "bcftools norm -f {} -m- -Oz -o {} {}".format(reference_genome, output_file, input_file)
+		norm = "bcftools norm -f {} -Oz -o {} {}".format(reference_genome, output_file, input_file)
 		os.system(norm)
 
 		#Remove the original vcf file and index
