@@ -255,7 +255,7 @@ class Accessions:
 		
 		# Old Command
 		#haplotype_caller = 'gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(reference_genome, input_file, output_file)
-		haplotype_caller = 'gatk --java-options "-Djava.io.tmpdir={}/{}_{} -Xms20G -Xmx20G -XX:ParallelGCThreads=2" HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(temporary_directory, self.species, self.accession, reference_genome, input_file, output_file)
+		haplotype_caller = 'gatk --java-options "-Djava.io.tmpdir={}/{}_{} -Xms20G -Xmx20G -XX:ParallelGCThreads=2" HaplotypeCaller -R {} -I {} -O {} -ERC GVCF'.format(temporary_directory, self.species, self.accession, reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
 		# Delete unnecesary BAM file. If need to retain BAM file, comment out this line
