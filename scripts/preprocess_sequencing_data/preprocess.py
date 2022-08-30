@@ -263,18 +263,6 @@ class Accessions:
 
 		print("Done calling variants!")
 
-	def normalize_indels(self):
-		print("bcftools norm. Left-align and normalize indels.")
-	
-		input_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
-		output_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
-		norm = "bcftools norm -f {} -Oz -o {} {}".format(reference_genome, output_file, input_file)
-		os.system(norm)
-
-		#Remove the original vcf file and index
-		os.system("rm " + input_file)
-		os.system("rm " + input_file + ".tbi")
-
 	def index_vcf(self):
 		print("gatk IndexFeatureFile. Create index for normalized vcf files.")
 	
