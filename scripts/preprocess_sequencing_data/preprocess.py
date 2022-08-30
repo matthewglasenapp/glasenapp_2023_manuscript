@@ -253,6 +253,8 @@ class Accessions:
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
+		# Old Command
+		#haplotype_caller = 'gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(reference_genome, input_file, output_file)
 		haplotype_caller = 'gatk --java-options "-Djava.io.tmpdir={}/{}_{} -Xms20G -Xmx20G -XX:ParallelGCThreads=2" HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(temporary_directory, self.species, self.accession, reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
@@ -284,7 +286,6 @@ def main():
 	#accession.mark_duplicates()
 	#accession.get_alignment_stats()
 	accession.call_variants()
-	accession.normalize_indels()
 	accession.index_vcf()
 
 if __name__ == "__main__":
