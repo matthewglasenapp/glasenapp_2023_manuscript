@@ -85,7 +85,7 @@ def vcf_stats(input_file):
 	os.system("rm samples_file.txt")
 
 def main():
-	combine_GVCFs()
+	#combine_GVCFs()
 	genotype_GVCFs()
 	index_vcf(multisample_vcf_dir + "genotype_calls.g.vcf.gz")
 	#vcf_stats(multisample_vcf_dir + "genotype_calls.g.vcf.gz")
