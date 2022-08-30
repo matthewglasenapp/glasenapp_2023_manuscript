@@ -16,7 +16,7 @@ from joblib import Parallel, delayed
 # Specify maximum number of CPU cores available per task (ie per sample, per job in the array job). Should match the sbatch script #SBATCH --cpus-per-task
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
-cores = 12
+cores = 4
 
 # Max number of threads for multi-threading
 max_threads = int(cores*2)
@@ -252,8 +252,8 @@ class Accessions:
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
-
-		haplotype_caller = "gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF".format(reference_genome, input_file, output_file)
+		
+		haplotype_caller = 'gatk --java-options "-Djava.io.tmpdir={}/{}_{} -Xms20G -Xmx20G -XX:ParallelGCThreads=2" HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(temporary_directory, self.species, self.accession, reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
 		# Delete unnecesary BAM file. If need to retain BAM file, comment out this line
@@ -277,12 +277,12 @@ def main():
 	accession_id = accession_list[int(array_id)]
 	accession = Accessions(accession_id,dict[accession_id][1],dict[accession_id][2],dict[accession_id][3],dict[accession_id][4],dict[accession_id][5],dict[accession_id][6])
 
-	accession.convert_fastq_to_unmapped_bam()
+	#accession.convert_fastq_to_unmapped_bam()
 	
-	accession.mark_illumina_adapters()
-	accession.align_to_reference()
-	accession.mark_duplicates()
-	accession.get_alignment_stats()
+	#accession.mark_illumina_adapters()
+	#accession.align_to_reference()
+	#accession.mark_duplicates()
+	#accession.get_alignment_stats()
 	accession.call_variants()
 	accession.normalize_indels()
 	accession.index_vcf()
