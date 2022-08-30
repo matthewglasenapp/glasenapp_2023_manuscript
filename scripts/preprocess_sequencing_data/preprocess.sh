@@ -5,15 +5,13 @@
 #SBATCH --output=preprocess_%J.out
 #SBATCH --error=preprocess_%J.err
 #SBATCH --partition=128x24
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=12
-#SBATCH --mem=60GB
-#SBATCH --array=[0-9]%6
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=20GB
+#SBATCH --array=[0-11]
 
 module load python-3.6.5
-module load samtools/samtools-1.14
-module load bcftools/bcftools-1.14
 
 array_id=$SLURM_ARRAY_TASK_ID
 export array_id
