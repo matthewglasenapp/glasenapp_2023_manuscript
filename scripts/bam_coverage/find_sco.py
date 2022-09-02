@@ -25,7 +25,7 @@ bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
-min_cov_threshold = 5
+min_cov_threshold = 7
 prop_1x_threshold = 0.5
 
 subset_mean_coverage_supr5_exons = dict()
