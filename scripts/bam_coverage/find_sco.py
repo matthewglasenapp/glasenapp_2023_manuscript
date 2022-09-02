@@ -3,6 +3,21 @@ import gzip
 from itertools import islice
 import csv
 
+mean_coverage_spur5_exons = {
+"depressus_SRR5767284": 47.45,
+"droebachiensis_SRR5767286" : 41.46,
+"fragilis_SRR5767279": 46.75,
+"franciscanus_SRR5767282": 33.77,
+"intermedius_SRR5767280": 44.21,
+"lividus_ERS2351987": 11.99,
+"nudus_SRR5767281": 40.53,
+"pallidus_SRR5767285": 15,
+"pulcherrimus_DRR107784": 108.47,
+"pulcherrimus_SRR5767283": 44.34,
+"purpuratus_SRR6281818": 55.81,
+"purpuratus_SRR7211988": 100.31
+}
+
 bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
