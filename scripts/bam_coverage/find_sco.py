@@ -5,7 +5,7 @@ import csv
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 #subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_exons = {
 "depressus_SRR5767284": 47.45,
@@ -27,6 +27,8 @@ bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
 min_cov_threshold = 5
+
+# Consdier not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 prop_1x_threshold = 0.0
 
 subset_mean_coverage_spur5_exons = dict()
