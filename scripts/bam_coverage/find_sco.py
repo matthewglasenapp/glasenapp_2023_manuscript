@@ -3,6 +3,9 @@ import gzip
 from itertools import islice
 import csv
 
+# Specify species to include for ortholog finder
+species = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
+
 mean_coverage_spur5_exons = {
 "depressus_SRR5767284": 47.45,
 "droebachiensis_SRR5767286" : 41.46,
@@ -111,6 +114,7 @@ def write_passed_genes_dict_csv():
 	csv_file.close()
 
 def main():
+
 	bed_file_list = get_zipped_bed_file_list()
 	
 	initialize_gene_dict()
