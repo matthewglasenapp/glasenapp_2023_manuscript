@@ -25,18 +25,23 @@ bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
-min_cov_threshold = 7
-prop_1x_threshold = 0.5
+min_cov_threshold = 5
+prop_1x_threshold = 0.75
 
-subset_mean_coverage_supr5_exons = dict()
+subset_mean_coverage_spur5_exons = dict()
 
 gene_dict = dict()
 
 passed_genes_dict = dict()
 
 def subset_coverage_dict():
-	for sample in subset_sample_list:
-		subset_mean_coverage_supr5_exons[sample] = mean_coverage_spur5_exons[sample]
+	try:
+		for sample in subset_sample_list:
+			subset_mean_coverage_spur5_exons[sample] = mean_coverage_spur5_exons[sample]
+	
+	except:
+		for key in mean_coverage_spur5_exons:
+			subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
 
 def get_zipped_bed_file_list():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
@@ -80,9 +85,13 @@ def filter_gene_dict():
 		one_x_lst = [item for item in value[1]]
 		
 		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold:
-			for counter, sample in enumerate(subset_mean_coverage_supr5_exons):
-				if mean_depth_lst[counter] <= subset_mean_coverage_supr5_exons[sample] * 2:
-					passed_genes_dict[key] = value
+			test_var = True
+			for counter, sample in enumerate(subset_mean_coverage_spur5_exons):
+				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_exons[sample] * 2):
+					test_var = False
+				
+			if test_var == True:
+				passed_genes_dict[key] = value
 
 	print("{} genes passed filter".format(len(passed_genes_dict)))
 
@@ -99,9 +108,14 @@ def write_all_gene_dict_csv():
 	csv_file = open("all_genes.csv","w")
 	writer = csv.writer(csv_file)	
 	header = ["gene"]
-	for i in range(2):
-		for sample in subset_sample_list:
-			header.append(sample)
+	try:
+		for i in range(2):
+			for sample in subset_sample_list:
+				header.append(sample)
+	except NameError:
+		for i in range(2):
+			for key in mean_coverage_spur5_exons.keys():
+				header.append(key)
 	writer.writerow(header)
 
 	for key,value in gene_dict.items():
@@ -114,9 +128,14 @@ def write_passed_genes_dict_csv():
 	csv_file = open("passed_genes.csv","w")
 	writer = csv.writer(csv_file)	
 	header = ["gene"]
-	for i in range(2):
-		for sample in subset_sample_list:
-			header.append(sample)
+	try:
+		for i in range(2):
+			for sample in subset_sample_list:
+				header.append(sample)
+	except NameError:
+		for i in range(2):
+			for key in mean_coverage_spur5_exons.keys():
+				header.append(key)
 	writer.writerow(header)
 
 	for key,value in passed_genes_dict.items():
@@ -133,9 +152,13 @@ def main():
 	initialize_gene_dict()
 
 	for regions_file, thresholds_file in bed_file_list:
-		for sample in subset_sample_list:
-			if sample in regions_file and sample in thresholds_file:
-				fill_gene_dict(regions_file, thresholds_file)
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_gene_dict(regions_file, thresholds_file)
+		
+		except NameError:
+			fill_gene_dict(regions_file, thresholds_file)
 
 	filter_gene_dict()
 
