@@ -22,15 +22,8 @@ bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
 
 bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
-min_cov_threshold = 10
-max_cov_threshold = 100
+min_cov_threshold = 5
 prop_1x_threshold = 0.5
-
-lividus_min = 5
-lividus_prop_1x_threshold = 0.33
-
-purpuratus_7211988_max = 150
-pulcherrimus_DRR107784_max = 150
 
 gene_dict = dict()
 
@@ -46,18 +39,9 @@ def get_zipped_bed_file_list():
 	with open("regions_files", "r") as f1, open("thresholds_files","r") as f2:
 		file_list = zip(sorted(f1.read().splitlines()),sorted(f2.read().splitlines()))
 
-	# Get index of purpuratus_7211988 and pulcherrimus_DRR107784 in created lists
-	global purpuratus_7211988_index	
-	global pulcherrimus_DRR107784_index
-	global lividus_index
-	with open("regions_files","r") as f:
-		order = sorted(f.read().splitlines())
-		purpuratus_7211988_index = [order.index(item) for item in order if "purpuratus_SRR7211988" in item][0]
-		pulcherrimus_DRR107784_index = [order.index(item) for item in order if "pulcherrimus_DRR107784" in item][0]
-		lividus_index = [order.index(item) for item in order if "lividus_ERS2351987" in item][0]
-
 	return list(file_list)
 
+# Create dictionary in the format of {"gene_id": [average coverage depth for each species], [proportion of bases covered for each species]}
 def initialize_gene_dict():
 	with open(bed_file,"r") as f:
 		for line in f:
@@ -86,22 +70,12 @@ def filter_gene_dict():
 		mean_depth_lst = [item for item in value[0]]
 		one_x_lst = [item for item in value[1]]
 		
-		# Pop purpuratus first. Will not impact the index of pulcherrimus becuase pulcherrimus comes before it. 
-		purpuratus_7211988_mean = mean_depth_lst.pop(purpuratus_7211988_index)
-		purpuratus_7211988_1x = one_x_lst.pop(purpuratus_7211988_index)
-
-		pulcherrimus_DRR107784_mean = mean_depth_lst.pop(pulcherrimus_DRR107784_index)
-		pulcherrimus_DRR107784_1x = one_x_lst.pop(pulcherrimus_DRR107784_index)
-		
-		lividus_mean = mean_depth_lst.pop(lividus_index)
-		lividus_prop_1x = one_x_lst.pop(lividus_index)
-		
-		if min(mean_depth_lst) >= min_cov_threshold and max(mean_depth_lst) < max_cov_threshold and min(one_x_lst) >= prop_1x_threshold and purpuratus_7211988_mean >= min_cov_threshold and purpuratus_7211988_mean < purpuratus_7211988_max and purpuratus_7211988_1x >= prop_1x_threshold and pulcherrimus_DRR107784_mean >= min_cov_threshold and pulcherrimus_DRR107784_mean < pulcherrimus_DRR107784_max and pulcherrimus_DRR107784_1x >= prop_1x_threshold and lividus_mean >= lividus_min and lividus_prop_1x >= lividus_prop_1x_threshold:
-			
-			passed_genes_dict[key] = value
+		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold:
+			for counter, sample in enumerate(mean_coverage_spur5_exons):
+				if mean_depth_lst[counter] <= mean_coverage_spur5_exons[sample] * 2:
+					passed_genes_dict[key] = value
 
 	print("{} genes passed filter".format(len(passed_genes_dict)))
-
 
 def write_genes_passed_filter_bed():
 	with open("genes_pass_filter.bed", "a") as f1, open(bed_file,"r") as f2:
