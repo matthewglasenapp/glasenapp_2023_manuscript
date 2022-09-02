@@ -3,8 +3,8 @@ import gzip
 from itertools import islice
 import csv
 
-# Specify species to include for ortholog finder
-species = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
+# Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
+subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
 
 mean_coverage_spur5_exons = {
 "depressus_SRR5767284": 47.45,
@@ -28,9 +28,15 @@ bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 min_cov_threshold = 5
 prop_1x_threshold = 0.5
 
+subset_mean_coverage_supr5_exons = dict()
+
 gene_dict = dict()
 
 passed_genes_dict = dict()
+
+def subset_coverage_dict():
+	for sample in subset_sample_list:
+		subset_mean_coverage_supr5_exons[sample] = mean_coverage_spur5_exons[sample]
 
 def get_zipped_bed_file_list():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
@@ -74,8 +80,8 @@ def filter_gene_dict():
 		one_x_lst = [item for item in value[1]]
 		
 		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold:
-			for counter, sample in enumerate(mean_coverage_spur5_exons):
-				if mean_depth_lst[counter] <= mean_coverage_spur5_exons[sample] * 2:
+			for counter, sample in enumerate(subset_mean_coverage_supr5_exons):
+				if mean_depth_lst[counter] <= subset_mean_coverage_supr5_exons[sample] * 2:
 					passed_genes_dict[key] = value
 
 	print("{} genes passed filter".format(len(passed_genes_dict)))
@@ -92,7 +98,10 @@ def write_genes_passed_filter_bed():
 def write_all_gene_dict_csv():
 	csv_file = open("all_genes.csv","w")
 	writer = csv.writer(csv_file)	
-	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	header = ["gene"]
+	for i in range(2):
+		for sample in subset_sample_list:
+			header.append(sample)
 	writer.writerow(header)
 
 	for key,value in gene_dict.items():
@@ -104,7 +113,10 @@ def write_all_gene_dict_csv():
 def write_passed_genes_dict_csv():
 	csv_file = open("passed_genes.csv","w")
 	writer = csv.writer(csv_file)	
-	header = ["gene", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988", "depressus", "droebachiensis", "fragilis", "franciscanus", "intermedius", "lividus", "nudus", "pallidus", "pulcherrimus_DRR107784", "pulcherrimus_SRR5767283", "purpuratus_SRR6281818", "purpuratus_SRR7211988"]
+	header = ["gene"]
+	for i in range(2):
+		for sample in subset_sample_list:
+			header.append(sample)
 	writer.writerow(header)
 
 	for key,value in passed_genes_dict.items():
@@ -114,13 +126,16 @@ def write_passed_genes_dict_csv():
 	csv_file.close()
 
 def main():
+	subset_coverage_dict()
 
 	bed_file_list = get_zipped_bed_file_list()
 	
 	initialize_gene_dict()
 
 	for regions_file, thresholds_file in bed_file_list:
-		fill_gene_dict(regions_file, thresholds_file)
+		for sample in subset_sample_list:
+			if sample in regions_file and sample in thresholds_file:
+				fill_gene_dict(regions_file, thresholds_file)
 
 	filter_gene_dict()
 
@@ -132,4 +147,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-	
