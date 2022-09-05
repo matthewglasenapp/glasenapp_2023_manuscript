@@ -265,13 +265,6 @@ class Accessions:
 
 		print("Done calling variants!")
 
-	def index_vcf(self):
-		print("gatk IndexFeatureFile. Create index for normalized vcf files.")
-	
-		input_file = vcf_dir + self.species + "_" + self.accession + "_norm.g.vcf.gz"
-		index = "gatk IndexFeatureFile -I {}".format(input_file)
-		os.system(index)
-
 def main():
 	array_id = os.environ["array_id"]
 	print("Array ID: {}".format(array_id))
@@ -286,7 +279,6 @@ def main():
 	#accession.mark_duplicates()
 	#accession.get_alignment_stats()
 	accession.call_variants()
-	accession.index_vcf()
 
 if __name__ == "__main__":
 	main()
