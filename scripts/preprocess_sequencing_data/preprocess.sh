@@ -5,7 +5,7 @@
 #SBATCH --output=preprocess_%J.out
 #SBATCH --error=preprocess_%J.err
 #SBATCH --partition=128x24
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=20GB
