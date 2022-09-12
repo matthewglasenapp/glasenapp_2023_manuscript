@@ -1,0 +1,100 @@
+import os 
+
+reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
+
+root_dir = "/hb/scratch/mglasena/data/"
+
+multisample_vcf_dir = root_dir + "combined_vcf/"
+
+# Raw genotype calls file
+gentoype_calls = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
+
+samples_to_include = {
+"fragilis_SRR5767279" : "QB3KMK013",
+"nudus_SRR5767281" : "QB3KMK011",
+"franciscanus_SRR5767282" : "QB3KMK010",
+"depressus_SRR5767284" : "QB3KMK015",
+"pallidus_SRR5767285" : "QB3KMK002",
+"droebachiensis_SRR5767286" : "QB3KMK014",
+"purpuratus_SRR6281818" : "S.purpuratus#1",
+"lividus_ERS2351987" : "4",
+"pulcherrimus_SRR5767283" : "QB3KMK016",
+"intermedius_SRR5767280" : "QB3KMK012",
+"purpuratus_SRR7211988" : "SPUR.00",
+"pulcherrimus_DRR107784" : "SAMD00098133"
+}
+
+def split_multiallelics():
+	input_file = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
+	output_file = multisample_vcf_dir + "genotype_calls_split_multiallelics.g.vcf.gz"
+	left_align_and_trim_variants = "gatk LeftAlignAndTrimVariants -R {} -V {} -O {} --split-multi-allelics".format(reference_genome, input_file, output_file)
+	os.system(left_align_and_trim_variants)
+
+def separate_SNP_INDEL():
+	sample_string = ""
+	for sample in samples_to_include.keys()[2]:
+		sample_string += "-sn " + sample + " "
+	input_file = multisample_vcf_dir + "genotype_calls_split_multiallelics.g.vcf.gz"
+	output_snp = multisample_vcf_dir + "genotype_calls_snv.g.vcf.gz"
+	output_indel = multisample_vcf_dir + "genotype_calls_indel.g.vcf.gz"
+	get_snp = "gatk SelectVariants -V {} {} --select-type-to-include SNP --output {}".format(input_file, sample_string, output_snp)
+	get_indel = "gatk SelectVariants -V {} {} --select-type-to-include INDEL --output {}".format(input_file, sample_string, output_indel)
+	os.system(get_snp)
+	os.system(get_indel)
+	os.system("rm " + input_file)
+
+def filter_variants():
+	input_snp = multisample_vcf_dir + "genotype_calls_snv.g.vcf.gz"
+	input_indel = multisample_vcf_dir + "genotype_calls_indel.g.vcf.gz"
+	output_snp = multisample_vcf_dir + "filtered_snv.g.vcf.gz"
+	output_indel = multisample_vcf_dir + "filtered_indel.g.vcf.gz"
+
+	filter_SNPs = 'gatk VariantFiltration --output {} --variant {} -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8"'.format(output_snp, input_snp)
+
+	filter_indels = 'gatk VariantFiltration --output {} --variant {} -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
+
+	os.system(filer_SNPs)
+	os.system(filter_indels)
+	os.system("rm " + input_snp)
+	os.system("rm " + input_indel)
+
+def merge_vcfs():
+	input_snp = multisample_vcf_dir + "filtered_snv.g.vcf.gz"
+	input_indel = multisample_vcf_dir + "filtered_indel.g.vcf.gz"
+	output_file = multisample_vcf_dir + "filtered_genotype_calls.g.vcf.gz"
+	
+	merge_vcfs = "gatk MergeVcfs -I {} -I {} -O {}".format(input_snp, input_indel, output_file)
+	os.system(merge_vcfs)
+	os.system("rm " + input_snp)
+	os.system("rm " + input_indel)
+
+# Set individual genotypes with low quality or read depth to missing: -S . -e 'FMT/DP<3 | FMT/GQ<20'
+# Filter SNPs within 3 base pairs of indel: --SnpGap 3
+# Remove monomorphic SNPs where no alternative alleles are called for any of the samples: -e 'AC==0'
+# Remove insertions from vcf file: 
+def bcftools_filter():
+	input_file = multisample_vcf_dir + "filtered_genotype_calls.g.vcf.gz"
+	output_file = multisample_vcf_dir + "3bp_filtered_genotype_calls.g.vcf.gz"
+	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Oz --output {}"(input_file, output_file)
+	os.system(filter)
+
+def index_vcf(input_file):
+	index = "gatk IndexFeatureFile -I {}".format(input_file)
+	os.system(index)
+
+def vcf_stats(input_file):
+	get_samples_file = "bcftools query -l {} > samples_file.txt".format(input_file)
+	os.system(get_samples_file)
+	get_stats = "bcftools stats --samples-file samples_file.txt {}".format(input_file)
+	os.system("rm samples_file.txt")
+
+def main():
+	separate_SNP_INDEL()
+	filter_variants()
+	merge_vcfs()
+	bcftools_filter()
+	index_vcf(multisample_vcf_dir + "3bp_filtered_genotype_calls.g.vcf.gz")
+	vcf_stats(multisample_vcf_dir + "3bp_filtered_genotype_calls.g.vcf.gz")
+
+if __name__ == "__main__":
+	main()
