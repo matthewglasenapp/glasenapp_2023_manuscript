@@ -25,15 +25,17 @@ samples_to_include = {
 }
 
 def split_multiallelics():
-	input_file = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
+	input_file = genotype_calls
 	output_file = multisample_vcf_dir + "genotype_calls_split_multiallelics.g.vcf.gz"
 	left_align_and_trim_variants = "gatk LeftAlignAndTrimVariants -R {} -V {} -O {} --split-multi-allelics".format(reference_genome, input_file, output_file)
 	os.system(left_align_and_trim_variants)
 
 def separate_SNP_INDEL():
 	sample_string = ""
-	for sample in samples_to_include.keys()[2]:
+	for sample in samples_to_include.values():
 		sample_string += "-sn " + sample + " "
+	sample_string = sample_string.strip()
+	
 	input_file = multisample_vcf_dir + "genotype_calls_split_multiallelics.g.vcf.gz"
 	output_snp = multisample_vcf_dir + "genotype_calls_snv.g.vcf.gz"
 	output_indel = multisample_vcf_dir + "genotype_calls_indel.g.vcf.gz"
