@@ -9,8 +9,5 @@ S.purpuratus#1	purpuratus_SRR6281818
 SPUR.00	purpuratus_SRR7211988
 SAMD00098133	pulcherrimus_DRR107784
 QB3KMK016	pulcherrimus_SRR5767283
-QB3KMK011	nudus
-QB3KMK010	franciscanus
-QB3KMK015	depressus
-4	lividus
+QB3KMK010	Outgroup
 
