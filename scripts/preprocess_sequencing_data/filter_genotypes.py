@@ -52,7 +52,7 @@ def filter_variants():
 
 	filter_indels = 'gatk VariantFiltration --output {} --variant {} -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
 
-	os.system(filer_SNPs)
+	os.system(filter_SNPs)
 	os.system("rm " + input_snp)
 	os.system(filter_indels)
 	os.system("rm " + input_indel)
