@@ -25,8 +25,8 @@ samples_to_include = {
 def split_multiallelics():
 	input_file = genotype_calls
 	output_file = output_directory + "genotype_calls_split_multiallelics.g.vcf.gz"
-	left_align_and_trim_variants = "gatk LeftAlignAndTrimVariants -R {} -V {} -O {} --split-multi-allelics".format(reference_genome, input_file, output_file)
-	os.system(left_align_and_trim_variants)
+	norm = "bcftools norm -m- -f {} -Oz -o {} {}".format(reference_genome, output_file, input_file)
+	os.system(norm)
 
 def separate_SNP_INDEL():
 	sample_string = ""
@@ -70,13 +70,14 @@ def merge_vcfs():
 # Set individual genotypes with low quality or read depth to missing: -S . -e 'FMT/DP<3 | FMT/GQ<20'
 # Filter SNPs within 3 base pairs of indel: --SnpGap 3
 # Remove monomorphic SNPs where no alternative alleles are called for any of the samples: -e 'AC==0'
-# Remove insertions from vcf file: 
+# Remove insertions from vcf file:
+# Join multiallelics
 def bcftools_filter():
 	input_file = output_directory + "filtered_genotype_calls.g.vcf.gz"
 	output_file = output_directory + "3bp_filtered_genotype_calls.g.vcf.gz"
-	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Oz --output {}"(input_file, output_file)
+	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Ou | bcftools norm -m +any -f {} -Oz -o {}"(input_file, reference_genome, output_file)
 	os.system(filter)
-	os.system("rm " + input_file)
+	#os.system("rm " + input_file)
 
 def index_vcf(input_file):
 	index = "gatk IndexFeatureFile -I {}".format(input_file)
@@ -90,12 +91,12 @@ def vcf_stats(input_file):
 
 def main():
 	split_multiallelics()
-	separate_SNP_INDEL()
-	filter_variants()
-	merge_vcfs()
-	bcftools_filter()
-	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
-	vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#separate_SNP_INDEL()
+	#filter_variants()
+	#merge_vcfs()
+	#bcftools_filter()
+	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 
 if __name__ == "__main__":
 	main()
