@@ -90,13 +90,14 @@ def vcf_stats(input_file):
 	os.system("rm samples_file.txt")
 
 def main():
-	split_multiallelics()
-	#separate_SNP_INDEL()
-	#filter_variants()
-	#merge_vcfs()
-	#bcftools_filter()
-	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
-	#vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#split_multiallelics()
+	index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
+	separate_SNP_INDEL()
+	filter_variants()
+	merge_vcfs()
+	bcftools_filter()
+	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 
 if __name__ == "__main__":
 	main()
