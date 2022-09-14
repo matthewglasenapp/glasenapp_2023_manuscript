@@ -41,7 +41,6 @@ def separate_SNP_INDEL():
 	get_indel = "gatk SelectVariants -V {} {} --select-type-to-include INDEL --output {}".format(input_file, sample_string, output_indel)
 	os.system(get_snp)
 	os.system(get_indel)
-	os.system("rm " + input_file)
 
 def filter_variants():
 	input_snp = output_directory + "genotype_calls_snv.g.vcf.gz"
