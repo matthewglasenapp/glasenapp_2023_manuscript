@@ -3,7 +3,7 @@ import os
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # Raw genotype calls file
-gentoype_calls = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
+genotype_calls = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
 
 output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus/"
 
@@ -90,6 +90,7 @@ def vcf_stats(input_file):
 	os.system("rm samples_file.txt")
 
 def main():
+	split_multiallelics()
 	separate_SNP_INDEL()
 	filter_variants()
 	merge_vcfs()
