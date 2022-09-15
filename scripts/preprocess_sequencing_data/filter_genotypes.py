@@ -48,9 +48,9 @@ def filter_variants():
 	output_snp = output_directory + "filtered_snv.g.vcf.gz"
 	output_indel = output_directory + "filtered_indel.g.vcf.gz"
 
-	filter_SNPs = 'gatk VariantFiltration --output {} --variant {} -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8"'.format(output_snp, input_snp)
+	filter_SNPs = 'gatk VariantFiltration --output {} --variant {} --verbosity ERROR -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "SOR > 3.0" --filter-name "SOR3" -filter "FS > 60.0" --filter-name "FS60" -filter "MQ < 40.0" --filter-name "MQ40" -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8"'.format(output_snp, input_snp)
 
-	filter_indels = 'gatk VariantFiltration --output {} --variant {} -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
+	filter_indels = 'gatk VariantFiltration --output {} --variant {} --verbosity ERROR -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
 
 	#os.system(filter_SNPs)
 	#os.system("rm " + input_snp)
@@ -93,8 +93,8 @@ def main():
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
 	#separate_SNP_INDEL()
-	filter_variants()
-	#merge_vcfs()
+	#filter_variants()
+	merge_vcfs()
 	#bcftools_filter()
 	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 	#vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
