@@ -52,7 +52,7 @@ def filter_variants():
 
 	filter_indels = 'gatk VariantFiltration --output {} --variant {} --verbosity ERROR -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
 
-	#os.system(filter_SNPs)
+	os.system(filter_SNPs)
 	#os.system("rm " + input_snp)
 	os.system(filter_indels)
 	#os.system("rm " + input_indel)
@@ -64,8 +64,8 @@ def merge_vcfs():
 	
 	merge_vcfs = "gatk MergeVcfs -I {} -I {} -O {}".format(input_snp, input_indel, output_file)
 	os.system(merge_vcfs)
-	os.system("rm " + input_snp)
-	os.system("rm " + input_indel)
+	#os.system("rm " + input_snp)
+	#os.system("rm " + input_indel)
 
 # Set individual genotypes with low quality or read depth to missing: -S . -e 'FMT/DP<3 | FMT/GQ<20'
 # Filter SNPs within 3 base pairs of indel: --SnpGap 3
@@ -93,7 +93,7 @@ def main():
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
 	#separate_SNP_INDEL()
-	#filter_variants()
+	filter_variants()
 	merge_vcfs()
 	#bcftools_filter()
 	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
@@ -101,3 +101,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
