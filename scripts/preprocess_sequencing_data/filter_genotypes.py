@@ -87,18 +87,17 @@ def vcf_stats(input_file):
 	get_samples_file = "bcftools query -l {} > samples_file.txt".format(input_file)
 	os.system(get_samples_file)
 	get_stats = "bcftools stats --samples-file samples_file.txt {}".format(input_file)
-	os.system("rm samples_file.txt")
+	#os.system("rm samples_file.txt")
 
 def main():
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
 	#separate_SNP_INDEL()
-	filter_variants()
-	merge_vcfs()
-	#bcftools_filter()
-	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
-	#vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#filter_variants()
+	#merge_vcfs()
+	bcftools_filter()
+	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 
 if __name__ == "__main__":
 	main()
-
