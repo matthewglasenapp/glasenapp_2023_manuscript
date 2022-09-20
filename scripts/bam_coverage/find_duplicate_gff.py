@@ -1,8 +1,11 @@
 import os
 import subprocess
 
+# Gene Pred file to check for duplicate records 
+os.environ['gff_file_to_check'] = "sco_gff"
+
 def subset_gff():
-	subset_gff = '''cat sco_gff | awk '$3 == "gene"' > test'''
+	subset_gff = '''cat $gff_file_to_check | awk '$3 == "gene"' > test'''
 
 	subprocess.call(subset_gff, shell=True);
 
