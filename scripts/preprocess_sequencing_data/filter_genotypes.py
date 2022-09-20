@@ -5,6 +5,8 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 # Raw genotype calls file
 genotype_calls = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
 
+genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
+
 output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus/"
 
 samples_to_include = {
@@ -22,6 +24,7 @@ samples_to_include = {
 "pulcherrimus_DRR107784" : "SAMD00098133"
 }
 
+# Only run once to get split multiallelic file!
 def split_multiallelics():
 	input_file = genotype_calls
 	output_file = output_directory + "genotype_calls_split_multiallelics.g.vcf.gz"
@@ -34,7 +37,7 @@ def separate_SNP_INDEL():
 		sample_string += "-sn " + sample + " "
 	sample_string = sample_string.strip()
 	
-	input_file = output_directory + "genotype_calls_split_multiallelics.g.vcf.gz"
+	input_file = genotype_calls_split_multiallelics
 	output_snp = output_directory + "genotype_calls_snv.g.vcf.gz"
 	output_indel = output_directory + "genotype_calls_indel.g.vcf.gz"
 	get_snp = "gatk SelectVariants -V {} {} --select-type-to-include SNP --output {}".format(input_file, sample_string, output_snp)
@@ -85,19 +88,19 @@ def index_vcf(input_file):
 
 def vcf_stats(input_file):
 	get_samples_file = "bcftools query -l {} > samples_file.txt".format(input_file)
-	#os.system(get_samples_file)
+	os.system(get_samples_file)
 	get_stats = "bcftools stats --samples-file samples_file.txt {}".format(input_file)
 	os.system(get_stats)
-	#os.system("rm samples_file.txt")
+	os.system("rm samples_file.txt")
 
 def main():
 	#split_multiallelics()
-	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
-	#separate_SNP_INDEL()
-	#filter_variants()
-	#merge_vcfs()
-	#bcftools_filter()
-	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
+	separate_SNP_INDEL()
+	filter_variants()
+	merge_vcfs()
+	bcftools_filter()
+	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 	vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 
 if __name__ == "__main__":
