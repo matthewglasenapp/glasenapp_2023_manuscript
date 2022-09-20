@@ -1,6 +1,3 @@
-# Skip with xxx
-# Specify outgroup with "Outgroup"
-
 QB3KMK014	droebachiensis
 QB3KMK013	fragilis
 QB3KMK002	pallidus
@@ -10,4 +7,3 @@ SPUR.00	purpuratus_SRR7211988
 SAMD00098133	pulcherrimus_DRR107784
 QB3KMK016	pulcherrimus_SRR5767283
 QB3KMK010	Outgroup
-
