@@ -75,7 +75,7 @@ def merge_vcfs():
 def bcftools_filter():
 	input_file = output_directory + "filtered_genotype_calls.g.vcf.gz"
 	output_file = output_directory + "3bp_filtered_genotype_calls.g.vcf.gz"
-	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Ou | bcftools norm -m +any -f {} -Oz -o {}"(input_file, reference_genome, output_file)
+	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Ou | bcftools norm -m +any -f {} -Oz -o {}".format(input_file, reference_genome, output_file)
 	os.system(filter)
 	#os.system("rm " + input_file)
 
