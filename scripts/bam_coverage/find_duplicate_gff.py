@@ -24,6 +24,8 @@ def find_duplicate_ids():
 	with open("duplicate_records", "r") as f3:
 		duplicate_records = f3.read().splitlines()
 
+	print("Duplicate Records:" + "\n")
+	
 	for record in duplicate_records:
 		print(record)
 
