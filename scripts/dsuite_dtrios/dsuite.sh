@@ -13,6 +13,7 @@
 # --JKnum sets the number of JackKnife blocks. A block size of 1Mb would require 922 blocks. 
 
 Dsuite="/hb/groups/pogson_group/dissertation/software/Dsuite/Build/Dsuite"
+Dsuite_path="/hb/groups/pogson_group/dissertation/software/Dsuite/"
 filtered_vcf="/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls.g.vcf.gz"
 SETS="/hb/home/mglasena/dissertation/data/dsuite/franciscanus/SETS.txt"
 
@@ -22,4 +23,4 @@ SETS="/hb/home/mglasena/dissertation/data/dsuite/franciscanus/SETS.txt"
 DtriosParallel="/hb/groups/pogson_group/dissertation/software/Dsuite/utils/DtriosParallel"
 cores=24
 
-$DtriosParallel --dsuite-path $Dsuite --cores $cores -k 922 -t tree.nwk $SETS $filtered_vcf
+$DtriosParallel --dsuite-path $Dsuite_path --cores $cores -k 922 -t tree.nwk $SETS $filtered_vcf
