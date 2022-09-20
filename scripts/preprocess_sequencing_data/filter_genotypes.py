@@ -3,16 +3,16 @@ import os
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # Raw genotype calls file
-genotype_calls = "/hb/scratch/mglasena/data/combined_vcf/genotype_calls.g.vcf.gz"
+#genotype_calls = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls.g.vcf.gz"
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus/"
+output_directory = "/hb/scratch/mglasena/data/genotypes/nudus/"
 
 samples_to_include = {
 "fragilis_SRR5767279" : "QB3KMK013",
-#"nudus_SRR5767281" : "QB3KMK011",
-"franciscanus_SRR5767282" : "QB3KMK010",
+"nudus_SRR5767281" : "QB3KMK011",
+#"franciscanus_SRR5767282" : "QB3KMK010",
 #"depressus_SRR5767284" : "QB3KMK015",
 "pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
@@ -42,7 +42,7 @@ def separate_SNP_INDEL():
 	output_indel = output_directory + "genotype_calls_indel.g.vcf.gz"
 	get_snp = "gatk SelectVariants -V {} {} --select-type-to-include SNP --output {}".format(input_file, sample_string, output_snp)
 	get_indel = "gatk SelectVariants -V {} {} --select-type-to-include INDEL --output {}".format(input_file, sample_string, output_indel)
-	#os.system(get_snp)
+	os.system(get_snp)
 	os.system(get_indel)
 
 def filter_variants():
@@ -57,9 +57,9 @@ def filter_variants():
 	filter_indels = 'gatk VariantFiltration --output {} --variant {} --verbosity ERROR -filter "QD < 2.0" --filter-name "QD2" -filter "QUAL < 30.0" --filter-name "QUAL30" -filter "FS > 200.0" --filter-name "FS200" -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"'.format(output_indel, input_indel)
 
 	os.system(filter_SNPs)
-	#os.system("rm " + input_snp)
+	os.system("rm " + input_snp)
 	os.system(filter_indels)
-	#os.system("rm " + input_indel)
+	os.system("rm " + input_indel)
 	
 def merge_vcfs():
 	input_snp = output_directory + "filtered_snv.g.vcf.gz"
@@ -68,8 +68,8 @@ def merge_vcfs():
 	
 	merge_vcfs = "gatk MergeVcfs -I {} -I {} -O {}".format(input_snp, input_indel, output_file)
 	os.system(merge_vcfs)
-	#os.system("rm " + input_snp)
-	#os.system("rm " + input_indel)
+	os.system("rm " + input_snp)
+	os.system("rm " + input_indel)
 
 # Set individual genotypes with low quality or read depth to missing: -S . -e 'FMT/DP<3 | FMT/GQ<20'
 # Filter SNPs within 3 base pairs of indel: --SnpGap 3
@@ -81,7 +81,7 @@ def bcftools_filter():
 	output_file = output_directory + "3bp_filtered_genotype_calls.g.vcf.gz"
 	filter = "bcftools filter -S . -e 'FMT/DP<3 | FMT/GQ<20' -Ou {} | bcftools filter --SnpGap 3 -e 'AC==0' -Ou | bcftools norm -m +any -f {} -Oz -o {}".format(input_file, reference_genome, output_file)
 	os.system(filter)
-	#os.system("rm " + input_file)
+	os.system("rm " + input_file)
 
 def index_vcf(input_file):
 	index = "gatk IndexFeatureFile -I {}".format(input_file)
@@ -96,7 +96,7 @@ def vcf_stats(input_file):
 
 def main():
 	#split_multiallelics()
-	index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
+	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
 	separate_SNP_INDEL()
 	filter_variants()
 	merge_vcfs()
