@@ -25,7 +25,8 @@ temporary_directory = "/hb/scratch/mglasena/SRA/"
 
 # species, sample_name, ncbi biosample
 
-#urchin_sra_accessions = {
+urchin_sra_accessions = {
+	"SRR7207203": "variegatus,LVAR.00,SAMN00205415"
 	#"SRR5767279": "fragilis,QB3KMK013,SAMN07269103",
 	#"SRR5767281": "nudus,QB3KMK011,SAMN07269101",
 	#"SRR5767282": "franciscanus,QB3KMK010,SAMN07269100",
@@ -36,24 +37,12 @@ temporary_directory = "/hb/scratch/mglasena/SRA/"
 	#"SRR6281818": "purpuratus,S.purpuratus#1,SAMN08013506",
 	#"SRR7211988": "purpuratus,SPUR.00,SAMN00829422",
 	#"ERR5621404": "lividus,4,ERS2351987"
-	#"SRR2583947": "franciscanus,Sf1,SAMN04156173"}
-
-urchin_sra_accessions = {
+	#"SRR2583947": "franciscanus,Sf1,SAMN04156173"
 	#"ERR5621404": "lividus", "4", "ERS2351987",
 	#"ERR5621405": "lividus,4,ERS2351987",
 	#"ERR5621406": "lividus,4,ERS2351987",
 	#"ERR5621407": "lividus,4,ERS2351987",
 	#"ERR5621408": "lividus,4,ERS2351987",
-	"ERR5621409": "lividus,4,ERS2351987",
-	#"ERR5621410": "lividus,4,ERS2351987",
-	#"ERR5621411": "lividus,4,ERS2351987",
-	#"ERR5621412": "lividus,4,ERS2351987",
-	#"ERR5621413": "lividus,4,ERS2351987",
-	#"ERR5621414": "lividus,4,ERS2351987",
-	#"ERR5621415": "lividus,4,ERS2351987",
-	#"ERR5621416": "lividus,4,ERS2351987",
-	#"ERR5621417": "lividus,4,ERS2351987",
-	#"ERR5621418": "lividus,4,ERS2351987",
 }
 
 def prefetch_accession(accession_number):
