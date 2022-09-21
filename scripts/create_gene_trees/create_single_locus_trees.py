@@ -1,11 +1,20 @@
+# Two gff_file objects!
+
 import os
 import gzip
 from itertools import islice
 import csv
+from joblib import Parallel, delayed
+import multiprocessing
+import subprocess
+
+num_cores = multiprocessing.cpu_count()
+
+gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 #subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_exons = {
 "depressus_SRR5767284": 47.45,
@@ -36,6 +45,27 @@ subset_mean_coverage_spur5_exons = dict()
 gene_dict = dict()
 
 passed_genes_dict = dict()
+
+# For vcf2fasta part of the code 
+vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
+reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls.g.vcf.gz"
+gff_file = "/hb/scratch/mglasena/test/sco_gff.gff"
+feature = "gene"
+
+sample_names = {
+'QB3KMK013': 'fragilis',
+#'QB3KMK011': 'nudus',
+'QB3KMK010': 'franciscanus',
+#'QB3KMK015': 'depressus',
+'QB3KMK002': 'pallidus',
+'QB3KMK014': 'droebachiensis',
+#'S.purpuratus#1': 'purpuratus_SRR6281818',
+'QB3KMK016': 'pulcherrimus_SRR5767283',
+'QB3KMK012': 'intermedius',
+'SPUR.00': 'purpuratus_SRR7211988',
+#'SAMD00098133': 'pulcherrimus_DRR107784'
+}
 
 def subset_coverage_dict():
 	try:
@@ -147,6 +177,51 @@ def write_passed_genes_dict_csv():
 
 	csv_file.close()
 
+def get_gene_ids():
+	split_columns = "awk '{ print $10 }' genes_pass_filter.bed > gene_list"
+	os.system(split_columns)
+
+	with open("gene_list","r") as f:
+		with open("gene_ids","a") as f2:
+			gene_list = f.read().splitlines()
+			for gene in gene_list:
+				identifier = gene.split(";")[1]
+				f2.write(identifier + "\n")
+
+	gene_ids = open("gene_ids", "r").read().splitlines()
+	return gene_ids
+
+def make_sco_gff(gene):
+	command = "grep {} {} > {}.txt".format(gene, gff_file, gene)
+	os.system(command)
+
+def run_vcf2fasta():
+	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff --feat {}".format(vcf2fasta, reference_genome, vcf_file, feature)
+	os.system(run_vcf2fasta)
+
+def replace_missing_genotype_char():
+	replace_missing_genotypes = r'find ./vcf2fasta_gene/ -type f -exec sed -i.bak "s/\*/N/g" {} \;'
+	os.system(replace_missing_genotypes)
+	
+	delete_bak_files = 'find ./vcf2fasta_gene/ -type f -name "*.bak" -delete'
+	os.system(delete_bak_files)
+	
+def run_iqtree():
+	run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
+	os.system(run_iqtree)
+
+def edit_tree_files():
+	with open("loci.treefile", "r") as f:
+		tree_list = f.read().splitlines()
+	
+	with open("single_locus_trees.nwk","a") as f2:
+		for tree in tree_list:
+			for sample_name in sample_names.keys():
+				if sample_name in tree:
+					new_tree = tree.replace(sample_name, sample_names[sample_name])
+					tree = new_tree
+			f2.write(tree + "\n")
+
 def main():
 	subset_coverage_dict()
 
@@ -170,6 +245,17 @@ def main():
 	write_all_gene_dict_csv()
 
 	write_passed_genes_dict_csv()
+
+	gene_ids = get_gene_ids()
+
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("cat *.txt > sco_gff")
+	os.system("rm *.txt")
+
+	run_vcf2fasta()
+	replace_missing_genotype_char()
+	run_iqtree()
+	edit_tree_files()
 
 if __name__ == "__main__":
 	main()
