@@ -4,7 +4,7 @@ import subprocess
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls.g.vcf.gz"
-gff_file = "/hb/scratch/mglasena/test/sco_gff"
+gff_file = "/hb/scratch/mglasena/test/sco_gff.gff"
 feature = "gene"
 
 sample_names = {
