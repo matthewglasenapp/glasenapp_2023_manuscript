@@ -10,6 +10,7 @@ import subprocess
 
 num_cores = multiprocessing.cpu_count()
 
+# For make_sco_gff part of the script
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
@@ -50,7 +51,6 @@ passed_genes_dict = dict()
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls.g.vcf.gz"
-gff_file = "/hb/scratch/mglasena/test/sco_gff.gff"
 feature = "gene"
 
 sample_names = {
@@ -192,11 +192,11 @@ def get_gene_ids():
 	return gene_ids
 
 def make_sco_gff(gene):
-	command = "grep {} {} > {}.txt".format(gene, gff_file, gene)
+	command = "grep {} {} > {}.record".format(gene, gff_file, gene)
 	os.system(command)
 
 def run_vcf2fasta():
-	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff --feat {}".format(vcf2fasta, reference_genome, vcf_file, feature)
+	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {}".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
 
 def replace_missing_genotype_char():
@@ -249,8 +249,8 @@ def main():
 	gene_ids = get_gene_ids()
 
 	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	os.system("cat *.txt > sco_gff")
-	os.system("rm *.txt")
+	os.system("cat *.record > sco_gff.gff")
+	os.system("rm *.record")
 
 	run_vcf2fasta()
 	replace_missing_genotype_char()
