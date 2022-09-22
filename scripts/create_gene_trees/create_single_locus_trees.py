@@ -50,7 +50,7 @@ passed_genes_dict = dict()
 # For vcf2fasta part of the code 
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
-vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls.g.vcf.gz"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/lividus/3bp_filtered_genotype_calls.g.vcf.gz"
 feature = "gene"
 
 sample_names = {
@@ -256,7 +256,7 @@ def main():
 	run_vcf2fasta()
 	replace_missing_genotype_char()
 	run_iqtree()
-	edit_tree_files()
+	#edit_tree_files()
 
 if __name__ == "__main__":
 	main()
