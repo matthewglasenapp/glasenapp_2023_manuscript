@@ -16,12 +16,12 @@ samples_to_include = {
 "depressus_SRR5767284" : "QB3KMK015",
 "pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
-"purpuratus_SRR6281818" : "S.purpuratus#1",
+#"purpuratus_SRR6281818" : "S.purpuratus#1",
 "lividus_ERS2351987" : "4",
 "pulcherrimus_SRR5767283" : "QB3KMK016",
 "intermedius_SRR5767280" : "QB3KMK012",
 "purpuratus_SRR7211988" : "SPUR.00",
-"pulcherrimus_DRR107784" : "SAMD00098133"
+#"pulcherrimus_DRR107784" : "SAMD00098133"
 }
 
 # Only run once to get split multiallelic file!
