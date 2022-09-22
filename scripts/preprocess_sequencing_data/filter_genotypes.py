@@ -17,7 +17,7 @@ samples_to_include = {
 "pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
 "purpuratus_SRR6281818" : "S.purpuratus#1",
-#"lividus_ERS2351987" : "4",
+"lividus_ERS2351987" : "4",
 "pulcherrimus_SRR5767283" : "QB3KMK016",
 "intermedius_SRR5767280" : "QB3KMK012",
 "purpuratus_SRR7211988" : "SPUR.00",

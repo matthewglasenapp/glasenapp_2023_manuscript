@@ -54,10 +54,11 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genoty
 feature = "gene"
 
 sample_names = {
+'4': "lividus"
 'QB3KMK013': 'fragilis',
-#'QB3KMK011': 'nudus',
+'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
-#'QB3KMK015': 'depressus',
+'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
 #'S.purpuratus#1': 'purpuratus_SRR6281818',
