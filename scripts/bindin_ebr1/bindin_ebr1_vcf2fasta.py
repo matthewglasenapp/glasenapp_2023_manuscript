@@ -9,12 +9,12 @@ feature = "gene"
 
 sample_names = {
 'QB3KMK013': 'fragilis',
-'QB3KMK011': 'nudus',
+#'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
-'QB3KMK015': 'depressus',
+#'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
-'S.purpuratus#1': 'purpuratus_SRR6281818',
+'S.purpuratus_1': 'purpuratus_SRR6281818',
 'QB3KMK016': 'pulcherrimus_SRR5767283',
 'QB3KMK012': 'intermedius',
 'SPUR.00': 'purpuratus_SRR7211988',
@@ -51,7 +51,7 @@ def run_iqtree():
 	os.system("rm files")
 
 	for file in fasta_alignment_file_list:
-		run_iqtree = "iqtree -s {} -m MFP -B 10000 -o QB3KMK010".format(file)
+		run_iqtree = "iqtree -s {} -m MFP -B 10000".format(file)
 		os.system(run_iqtree)
 
 def edit_tree_files():
