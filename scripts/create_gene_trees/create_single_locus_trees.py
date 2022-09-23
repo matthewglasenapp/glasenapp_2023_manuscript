@@ -54,7 +54,7 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/lividus/3bp_filtered_genotype_ca
 feature = "gene"
 
 sample_names = {
-'4': "lividus"
+'4': "lividus",
 'QB3KMK013': 'fragilis',
 'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
