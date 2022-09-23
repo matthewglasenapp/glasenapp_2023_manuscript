@@ -1,5 +1,3 @@
-# Two gff_file objects!
-
 import os
 import gzip
 from itertools import islice
