@@ -1,0 +1,4 @@
+H1	H2	H3	nABBA	nBABA	Dstat	jackEst	SE	Z	
+franciscanus	nudus	depressus	392439	438188	-0.05507767	-0.05507767	0.001478308	-37.25723	
+depressus	nudus	franciscanus	648944	438188	0.1938642	0.1938642	0.00224517	86.34724	
+depressus	franciscanus	nudus	648944	392439	0.2463119	0.2463119	0.002509189	98.16393	
