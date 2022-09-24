@@ -9,4 +9,4 @@
 #SBATCH --time=168:00:00
 
 module load java/java-8
-java -Xmx125g -jar PhyloNet_3.8.0.jar file.nex
+java -Xmx125g -jar PhyloNet_3.8.0.jar retic_0
