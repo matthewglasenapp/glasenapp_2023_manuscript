@@ -14,33 +14,39 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 #subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
 #subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
+subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
 
-mean_coverage_spur5_exons = {
-"depressus_SRR5767284": 47.45,
-"droebachiensis_SRR5767286" : 41.46,
-"fragilis_SRR5767279": 46.75,
-"franciscanus_SRR5767282": 33.77,
-"intermedius_SRR5767280": 44.21,
-"lividus_ERS2351987": 11.99,
-"nudus_SRR5767281": 40.53,
-"pallidus_SRR5767285": 15,
-"pulcherrimus_DRR107784": 108.47,
-"pulcherrimus_SRR5767283": 44.34,
-"purpuratus_SRR6281818": 55.81,
-"purpuratus_SRR7211988": 100.31
+mean_coverage_spur5_genes = {
+"depressus_SRR5767284": 22,
+"droebachiensis_SRR5767286" : 26.46,
+"fragilis_SRR5767279": 33.73,
+"franciscanus_SRR5767282": 22.47,
+"intermedius_SRR5767280": 30.95,
+"lividus_ERS2351987": 6.22,
+"nudus_SRR5767281": 24.1,
+"pallidus_SRR5767285": 12.01,
+"pulcherrimus_DRR107784": 77.65,
+"pulcherrimus_SRR5767283": 28.15,
+"purpuratus_SRR6281818": 51.56,
+"purpuratus_SRR7211988": 93.9
 }
 
-bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
+#bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
+bed_file = "/hb/scratch/mglasena/mosdepth_exons/unique_exons.bed"
 
-bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
+#bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
+bed_file_dir = "/hb/scratch/mglasena/mosdepth_exons/"
 
 min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0
+prop_1x_threshold = 0.9
 
-subset_mean_coverage_spur5_exons = dict()
+prop_5x_threshold = 0.75
+
+subset_mean_coverage_spur5_genes = dict()
 
 gene_dict = dict()
 
@@ -53,11 +59,11 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/lividus/3bp_filtered_genotype_ca
 feature = "gene"
 
 sample_names = {
-'4': "lividus",
+#'4': "lividus",
 'QB3KMK013': 'fragilis',
-'QB3KMK011': 'nudus',
+#'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
-'QB3KMK015': 'depressus',
+#'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
 #'S.purpuratus#1': 'purpuratus_SRR6281818',
@@ -70,11 +76,11 @@ sample_names = {
 def subset_coverage_dict():
 	try:
 		for sample in subset_sample_list:
-			subset_mean_coverage_spur5_exons[sample] = mean_coverage_spur5_exons[sample]
+			subset_mean_coverage_spur5_genes[sample] = mean_coverage_spur5_genes[sample]
 	
 	except:
-		for key in mean_coverage_spur5_exons:
-			subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
+		for key in mean_coverage_spur5_genes:
+			subset_mean_coverage_spur5_genes[key] = mean_coverage_spur5_genes[key]
 
 def get_zipped_bed_file_list():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
@@ -93,7 +99,7 @@ def initialize_gene_dict():
 	with open(bed_file,"r") as f:
 		for line in f:
 			gene = line.split("\t")[3]
-			gene_dict[gene] = [],[]
+			gene_dict[gene] = [],[],[]
 
 def fill_gene_dict(regions_file, thresholds_file):
 	with gzip.open(regions_file, "rt") as file1, gzip.open(thresholds_file, "rt") as file2:
@@ -105,22 +111,27 @@ def fill_gene_dict(regions_file, thresholds_file):
 
 			total_base_count = int(line_file2.split("\t")[2]) - int(line_file2.split("\t")[1]) + 1
 			one_x_count = int(line_file2.split("\t")[4])
+			five_x_count = int(line_file2.split("\t")[5])
 			try:
 				prop_1x = float(one_x_count / total_base_count)
+				prop_5x = float(five_x_count / total_base_count)
 			except ZeroDivisionError:
 				prop_1x = 0.0
+				prop_5x = 0.0
 
 			gene_dict[gene_id][1].append(prop_1x)
+			gene_dict[gene_id][2].append(prop_5x)
 
 def filter_gene_dict():
 	for key, value in gene_dict.items():
 		mean_depth_lst = [item for item in value[0]]
 		one_x_lst = [item for item in value[1]]
+		five_x_lst = [item for item in value[2]]
 		
-		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold:
+		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) > prop_5x_threshold:
 			test_var = True
-			for counter, sample in enumerate(subset_mean_coverage_spur5_exons):
-				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_exons[sample] * 2):
+			for counter, sample in enumerate(subset_mean_coverage_spur5_genes):
+				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_genes[sample] * 2):
 					test_var = False
 				
 			if test_var == True:
@@ -142,17 +153,17 @@ def write_all_gene_dict_csv():
 	writer = csv.writer(csv_file)	
 	header = ["gene"]
 	try:
-		for i in range(2):
+		for i in range(3):
 			for sample in subset_sample_list:
 				header.append(sample)
 	except NameError:
-		for i in range(2):
-			for key in mean_coverage_spur5_exons.keys():
+		for i in range(3):
+			for key in mean_coverage_spur5_genes.keys():
 				header.append(key)
 	writer.writerow(header)
 
 	for key,value in gene_dict.items():
-		row = [key] + value[0] + value[1]
+		row = [key] + value[0] + value[1] + value[2]
 		writer.writerow(row)
 
 	csv_file.close()
@@ -162,17 +173,17 @@ def write_passed_genes_dict_csv():
 	writer = csv.writer(csv_file)	
 	header = ["gene"]
 	try:
-		for i in range(2):
+		for i in range(3):
 			for sample in subset_sample_list:
 				header.append(sample)
 	except NameError:
-		for i in range(2):
-			for key in mean_coverage_spur5_exons.keys():
+		for i in range(3):
+			for key in mean_coverage_spur5_genes.keys():
 				header.append(key)
 	writer.writerow(header)
 
 	for key,value in passed_genes_dict.items():
-		row = [key] + value[0] + value[1]
+		row = [key] + value[0] + value[1] + value[2]
 		writer.writerow(row)
 
 	csv_file.close()
