@@ -36,8 +36,9 @@ bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
 
 min_cov_threshold = 5
 
-# Consdier not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
-prop_1x_threshold = 0.0
+# Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
+# Enter as a proportion
+prop_1x_threshold = 0
 
 subset_mean_coverage_spur5_exons = dict()
 
@@ -52,11 +53,11 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/lividus/3bp_filtered_genotype_ca
 feature = "gene"
 
 sample_names = {
-#'4': "lividus",
+'4': "lividus",
 'QB3KMK013': 'fragilis',
-#'QB3KMK011': 'nudus',
+'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
-#'QB3KMK015': 'depressus',
+'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
 #'S.purpuratus#1': 'purpuratus_SRR6281818',
@@ -222,28 +223,28 @@ def edit_tree_files():
 			f2.write(tree + "\n")
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_gene_dict()
+	initialize_gene_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#try:
-			#for sample in subset_sample_list:
-				#if sample in regions_file and sample in thresholds_file:
-					#fill_gene_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_gene_dict(regions_file, thresholds_file)
 		
-		#except NameError:
-			#fill_gene_dict(regions_file, thresholds_file)
+		except NameError:
+			fill_gene_dict(regions_file, thresholds_file)
 
-	#filter_gene_dict()
+	filter_gene_dict()
 
-	#write_genes_passed_filter_bed()
+	write_genes_passed_filter_bed()
 
-	#write_all_gene_dict_csv()
+	write_all_gene_dict_csv()
 
-	#write_passed_genes_dict_csv()
+	write_passed_genes_dict_csv()
 
 	#gene_ids = get_gene_ids()
 
@@ -253,8 +254,8 @@ def main():
 
 	#run_vcf2fasta()
 	#replace_missing_genotype_char()
-	run_iqtree()
-	edit_tree_files()
+	#run_iqtree()
+	#edit_tree_files()
 
 if __name__ == "__main__":
 	main()
