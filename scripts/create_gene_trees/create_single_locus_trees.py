@@ -52,11 +52,11 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/lividus/3bp_filtered_genotype_ca
 feature = "gene"
 
 sample_names = {
-'4': "lividus",
+#'4': "lividus",
 'QB3KMK013': 'fragilis',
-'QB3KMK011': 'nudus',
+#'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
-'QB3KMK015': 'depressus',
+#'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
 #'S.purpuratus#1': 'purpuratus_SRR6281818',
@@ -206,7 +206,7 @@ def replace_missing_genotype_char():
 	os.system(delete_bak_files)
 	
 def run_iqtree():
-	run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
+	run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T 10"
 	os.system(run_iqtree)
 
 def edit_tree_files():
@@ -222,39 +222,39 @@ def edit_tree_files():
 			f2.write(tree + "\n")
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_gene_dict()
+	#initialize_gene_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		try:
-			for sample in subset_sample_list:
-				if sample in regions_file and sample in thresholds_file:
-					fill_gene_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#try:
+			#for sample in subset_sample_list:
+				#if sample in regions_file and sample in thresholds_file:
+					#fill_gene_dict(regions_file, thresholds_file)
 		
-		except NameError:
-			fill_gene_dict(regions_file, thresholds_file)
+		#except NameError:
+			#fill_gene_dict(regions_file, thresholds_file)
 
-	filter_gene_dict()
+	#filter_gene_dict()
 
-	write_genes_passed_filter_bed()
+	#write_genes_passed_filter_bed()
 
-	write_all_gene_dict_csv()
+	#write_all_gene_dict_csv()
 
-	write_passed_genes_dict_csv()
+	#write_passed_genes_dict_csv()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	os.system("cat *.record > sco_gff.gff")
-	os.system("rm *.record")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("cat *.record > sco_gff.gff")
+	#os.system("rm *.record")
 
-	run_vcf2fasta()
-	replace_missing_genotype_char()
+	#run_vcf2fasta()
+	#replace_missing_genotype_char()
 	run_iqtree()
-	#edit_tree_files()
+	edit_tree_files()
 
 if __name__ == "__main__":
 	main()
