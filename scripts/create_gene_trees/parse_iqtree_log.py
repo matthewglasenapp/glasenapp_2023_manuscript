@@ -2,78 +2,71 @@
 
 import re
 
-# Create new file that does not have lines beginning with "Warning"
-file1 = open('loci.log','r')
-file2 = open('test_remove_warning.txt','w')
-for line in file1.readlines():
-	x = re.findall("^WARNING:", line)
-	if not x:
-		file2.write(line)
+iqtree_log = "loci.log"
 
-file1.close()
-file2.close()
+number_samples_analyzed = 10
 
-lines = open("test_remove_warning.txt","r").read().splitlines()
-gene_list = {}
-
+gene_dict = {}
+passed_genes = {}
+passed_gene_names = []
+passed_gene_files = []
 failed_genes = {}
 failed_gene_names = []
-passed_genes =[]
+failed_gene_files = []
 
-for item in lines:
-	if item[0:22] == "Reading alignment file":
-		index = lines.index(item)
-		gene = item.split("/")[1].split(".fas")[0]
-		gene_file = item.split("file ")[1].split(" ...")[0]
-		number_sites = lines[index+4].split(" ")[5]
-		parsimony_informative_sites = lines[index + 5].split(" ")[0]
-		gap_ambiguity_lst = []
-		gap_ambiguity_1 = lines[index+9].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_1)))
-		gap_ambiguity_2 = lines[index+10].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_2)))
-		gap_ambiguity_3 = lines[index+11].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_3)))
-		gap_ambiguity_4 = lines[index+12].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_4)))
-		gap_ambiguity_5 = lines[index+13].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_5)))
-		gap_ambiguity_6 = lines[index+14].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_6)))
-		gap_ambiguity_7 = lines[index+15].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_7)))
-		gap_ambiguity_8 = lines[index+16].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_8)))
-		gap_ambiguity_9 = lines[index+17].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_9)))
-		gap_ambiguity_10 = lines[index+18].split("%")[0].split(" ")[-1]
-		gap_ambiguity_lst.append(int(float(gap_ambiguity_10)))
+# Create new file that does not have lines beginning with "Warning"
+def remove_warning_lines():
+	with open(iqtree_log,'r') as file1:
+		with open('warning_removed.txt','w') as file2:
+			for line in file1.readlines():
+				x = re.findall("^WARNING:", line)
+				if not x:
+					file2.write(line)
 
-		gene_list[gene] = [number_sites,parsimony_informative_sites,gap_ambiguity_1,gap_ambiguity_2,gap_ambiguity_3,gap_ambiguity_4]
+def parse_log_file():
+	lines = open("warning_removed.txt","r").read().splitlines()
+	for line in lines:
+		if line[0:22] == "Reading alignment file":
+			index = lines.index(line)
+			gene_name = line.split("/")[1].split(".fas")[0]
+			gene_file = line.split("file ")[1].split(" ...")[0]
+			number_sites = int(lines[index+4].split(" ")[5])
+			parsimony_informative_sites = int(lines[index + 5].split(" ")[0])
 
-		# int(float(number_sites)) < 300 or 
-		if int(float(parsimony_informative_sites)) == 0 or int(max(gap_ambiguity_lst)) > 50:
-			failed_genes[gene] = [number_sites,parsimony_informative_sites,gap_ambiguity_lst]
-			failed_gene_names.append(gene)
-		else:
-			passed_genes.append(gene_file)
+			gap_ambiguity_list = []
+			for n in range(index+8, (index + 8 + number_samples_analyzed)):
+				gap_ambiguity_percent = float(lines[n].split("%")[0].split(" ")[-1])
+				gap_ambiguity_list.append(gap_ambiguity_percent)
 
-print(len(gene_list))
-print(len(failed_genes))
-print(len(failed_gene_names))
-print(len(passed_genes))
+			# Add data for all genes to gene_dict
+			gene_dict[gene_name] = [number_sites,parsimony_informative_sites,gap_ambiguity_list]
 
-failed_genes_file = open("failed_genes.txt","a")
-for gene in failed_gene_names:
-	failed_genes_file.write(gene + "\n")
-failed_genes_file.close()
+			# If no parsimony informative sites or gap_ambiguity > 50, add to failed_genes dict
+			#if parsimony_informative_sites == 0 or max(gap_ambiguity_list) > 50:
+			if max(gap_ambiguity_list) > 50:
+				failed_genes[gene_name] = [number_sites,parsimony_informative_sites,gap_ambiguity_list]
+				failed_gene_names.append(gene_name)
+				failed_gene_files.append(gene_file)
+			else:
+				passed_genes[gene_name] = [number_sites,parsimony_informative_sites,gap_ambiguity_list]
+				passed_gene_files.append(gene_file)
+				passed_gene_names.append(gene_name)
 
-passed_genes_file = open("passed_genes.txt","a")
-for gene in passed_genes:
-	passed_genes_file.write(gene + "\n")
-passed_genes_file.close()
+def write_failed_genes_file():
+	with open("failed_genes.txt","a") as failed_genes_file:
+		for gene in failed_gene_files:
+			failed_genes_file.write(gene + "\n")
 
-print(failed_genes)
+def write_passed_genes_file():
+	with open("passed_genes.txt","a") as passed_genes_file:
+		for gene in passed_gene_files:
+			passed_genes_file.write(gene + "\n")
 
+def main():
+	remove_warning_lines()
+	parse_log_file()
+	write_failed_genes_file()
+	write_passed_genes_file()
 
-
+if __name__ == "__main__":
+	main()
