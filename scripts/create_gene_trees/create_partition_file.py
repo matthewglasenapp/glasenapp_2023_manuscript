@@ -26,5 +26,10 @@ def write_partition_file(output_file, length):
 
 		f.write("end;" + "\n")
 
-write_partition_file(output_file, number_snv_sites_alignment)
+
+def main():
+	write_partition_file(output_file, number_snv_sites_alignment)
+
+if __name__ == "__main__":
+	main()
 
