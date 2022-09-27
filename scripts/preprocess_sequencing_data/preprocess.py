@@ -16,7 +16,7 @@ from joblib import Parallel, delayed
 # Specify maximum number of CPU cores available per task (ie per sample, per job in the array job). Should match the sbatch script #SBATCH --cpus-per-task
 # If going below 5 cores, update gatk HaplotypeCaller --native-pair-hmm-threads option. It is currently set to 10 threads for optimal performance:
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3169-7
-cores = 4
+cores = 24
 
 # Max number of threads for multi-threading
 max_threads = int(cores*2)
@@ -77,7 +77,7 @@ dict = {
 #"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
 #"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]],
 #"DRR107784" : ["DRR107784", "pulcherrimus", "SAMD00098133","SAMD00098133","DRR107784", ["HWI-ST462R:262:C1J2AACXX:5", "HWI-1KL134:197:C1JJYACXX:4", "HWI-ST462R:262:C1J2AACXX:4", "HWI-1KL134:198:C1MA0ACXX:8"], ["C1J2AACXX:5", "C1JJYACXX:4", "C1J2AACXX:4", "C1MA0ACXX:8"]],
-"SRR7207203" : ["SRR7207203", "variegatus", "LVAR.00", "SAMN00205415","CIT_GEC_LV_1", ["H3LK7BCXX:1", "H3LK7BCXX:2"]]
+"SRR7207203" : ["SRR7207203", "variegatus", "LVAR.00", "SAMN00205415","CIT_GEC_LV_1",["HISEQ:352:H3LK7BCXX:1", "HISEQ:352:H3LK7BCXX:2"],["H3LK7BCXX:1", "H3LK7BCXX:2"]]
 }
 
 class Accessions:
