@@ -14,7 +14,7 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 # File with scaffold names, one per line
 scaffold_list_file = "ebr1"
 
-filtered_vcf = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/3bp_filtered_genotype_calls.g.vcf.gz"
+filtered_vcf = "/hb/scratch/mglasena/data/genotypes/ebr1_network/3bp_filtered_genotype_calls.g.vcf.gz"
 
 # Path to vcf2phylip program
 vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
@@ -35,7 +35,7 @@ def subset_vcf_by_scaffold(scaffold):
 	os.mkdir(root_dir + "hmm_input/")
 	output_dir = root_dir + "hmm_input/vcf_by_scaffold/"
 	os.mkdir(output_dir)
-	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true --exclude-sample-name QB3KMK002 --exclude-sample-name QB3KMK012 --exclude-sample-name QB3KMK013".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
+	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
 	
 	os.system(subset_vcf_by_scaffold)
 
