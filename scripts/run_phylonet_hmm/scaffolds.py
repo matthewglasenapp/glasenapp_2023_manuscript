@@ -12,28 +12,28 @@ num_cores = multiprocessing.cpu_count()
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # File with scaffold names, one per line
-scaffold_list_file = "scaffold_list.txt"
+scaffold_list_file = "ebr1"
 
-filtered_vcf = "/hb/groups/pogson_group/dissertation/data/combined_vcf/filtered_genotype_calls.g.vcf.gz"
+filtered_vcf = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/3bp_filtered_genotype_calls.g.vcf.gz"
 
 # Path to vcf2phylip program
-vcf2phylip_path = "/hb/home/mglasena/software/vcf2phylip/"
+vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
 
-root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
+root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/"
 
-outgroup_sample_name = "QB3KMK012"
+outgroup_sample_name = "QB3KMK010"
 number_species = "4"
 
 def get_scaffold_list():
 	with open(scaffold_list_file, "r") as f:
 		scaffold_list = f.read().splitlines()
-
 	return scaffold_list
 
 # Get a vcf file for each scaffold 
 def subset_vcf_by_scaffold(scaffold):
 	output_dir = root_dir + "vcf_by_scaffold/"
-	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}/{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true --exclude-sample-name QB3KMK011 --exclude-sample-name QB3KMK010 --exclude-sample-name QB3KMK015 --exclude-sample-name QB3KMK016 --exclude-sample-name SPUR.00".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
+	os.mkdir(output_dir)
+	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true --exclude-sample-name QB3KMK002 --exclude-sample-name QB3KMK012 --exclude-sample-name QB3KMK013".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
 	
 	os.system(subset_vcf_by_scaffold)
 

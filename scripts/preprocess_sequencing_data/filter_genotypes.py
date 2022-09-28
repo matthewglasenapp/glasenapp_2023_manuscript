@@ -7,19 +7,19 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/"
+output_directory = "/hb/scratch/mglasena/data/genotypes/ebr1_network/"
 
 samples_to_include = {
-"fragilis_SRR5767279" : "QB3KMK013",
+#"fragilis_SRR5767279" : "QB3KMK013",
 #"nudus_SRR5767281" : "QB3KMK011",
 "franciscanus_SRR5767282" : "QB3KMK010",
 #"depressus_SRR5767284" : "QB3KMK015",
-"pallidus_SRR5767285" : "QB3KMK002",
+#"pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
 #"purpuratus_SRR6281818" : "S.purpuratus#1",
 #"lividus_ERS2351987" : "4",
 "pulcherrimus_SRR5767283" : "QB3KMK016",
-"intermedius_SRR5767280" : "QB3KMK012",
+#"intermedius_SRR5767280" : "QB3KMK012",
 "purpuratus_SRR7211988" : "SPUR.00",
 #"pulcherrimus_DRR107784" : "SAMD00098133"
 }
