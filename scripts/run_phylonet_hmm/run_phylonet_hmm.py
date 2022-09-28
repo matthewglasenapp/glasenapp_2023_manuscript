@@ -31,7 +31,9 @@ def main():
 
 	scaffold_input_nexus_file_path_list = get_scaffold_input_nexus_file_path_list()
 	
-	Parallel(n_jobs=num_jobs)(delayed(run_hmm)(scaffold_input_nexus_file) for scaffold_input_nexus_file in scaffold_input_nexus_file_path_list)
+	#Parallel(n_jobs=num_jobs)(delayed(run_hmm)(scaffold_input_nexus_file) for scaffold_input_nexus_file in scaffold_input_nexus_file_path_list)
+	for file in scaffold_input_nexus_file_path_list:
+		run_hmm(file)
 
 if __name__ == "__main__":
         main()

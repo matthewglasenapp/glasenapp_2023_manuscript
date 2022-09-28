@@ -21,6 +21,7 @@ number_taxa = 4
 #number_runs = 100
 number_runs = 10
 number_iterations = 1000
+threads = 48
 
 def get_scaffold_file_paths():
     # Create file containing paths to scaffold alignments produced by vcf2phylip.
@@ -51,7 +52,7 @@ def create_hmm_input_file(scaffold_file):
     line9 = ";"
     line10 = "END;"
     line11 = "BEGIN PHYLONET;"
-    line12 = "HmmCommand net -gtr -allelemap {} -outputdirectory {} -numberofruns {} -iterations {} -noplots;".format(allele_map, outdir, number_runs, number_iterations)
+    line12 = "HmmCommand net -gtr -allelemap {} -outputdirectory {} -numberofruns {} -iterations {} -threads {} -noplots;".format(allele_map, outdir, number_runs, number_iterations, threads)
     line13 = "END;"
     
 
