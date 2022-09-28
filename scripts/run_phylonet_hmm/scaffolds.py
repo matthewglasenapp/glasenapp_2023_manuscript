@@ -19,7 +19,8 @@ filtered_vcf = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/3bp_filt
 # Path to vcf2phylip program
 vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
 
-root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/"
+root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/"
+os.mkdir(root_dir)
 
 outgroup_sample_name = "QB3KMK010"
 number_species = "4"
@@ -31,7 +32,8 @@ def get_scaffold_list():
 
 # Get a vcf file for each scaffold 
 def subset_vcf_by_scaffold(scaffold):
-	output_dir = root_dir + "vcf_by_scaffold/"
+	os.mkdir(root_dir + "hmm_input/")
+	output_dir = root_dir + "hmm_input/vcf_by_scaffold/"
 	os.mkdir(output_dir)
 	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true --exclude-sample-name QB3KMK002 --exclude-sample-name QB3KMK012 --exclude-sample-name QB3KMK013".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
 	
@@ -47,7 +49,7 @@ def convert_vcf_to_nexus(scaffold):
 
 # Reformat vcf2phylip used sites output file for compatibility with phylonet_hmm output. 
 def reformat_coordinate_files(scaffold):
-	input_dir = root_dir + "scaffold_nexus_alignemnts/" + scaffold
+	input_dir = root_dir + "scaffold_nexus_alignments/" + scaffold
 	os.chdir(input_dir)
 	
 	os.environ['coordinate_file'] = "{}.min{}.used_sites.tsv".format(scaffold, number_species)
