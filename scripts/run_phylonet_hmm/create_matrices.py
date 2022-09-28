@@ -4,7 +4,7 @@ from joblib import Parallel, delayed
 
 num_cores = multiprocessing.cpu_count()
 
-root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
+root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/"
 
 # Directory for phylonet_hmm scaffold input files 
 output_dir = root_dir + "/hmm_nexus_files/"
@@ -12,11 +12,14 @@ make_output_dir = "mkdir -p {}".format(output_dir)
 os.system(make_output_dir)
 
 # Copy/paste from phylonet InferNetwork_ML run with 1 retiulcation age
-phylogenetic_network = "Network net = (intermedius:0.2358047382668817,((fragilis:0.947834903226071,(droebachiensis:0.20102859349321878)#H1:1.0144626112368627::0.578093455107686):0.6877223535737972,(#H1:1.859606432191539::0.42190654489231405,pallidus:1.0045273614964096):0.11154011939943985):4.676738730180861);"
-allele_map = "<intermedius:QB3KMK012; pallidus:QB3KMK002; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
+#phylogenetic_network = "Network net = (intermedius:0.2358047382668817,((fragilis:0.947834903226071,(droebachiensis:0.20102859349321878)#H1:1.0144626112368627::0.578093455107686):0.6877223535737972,(#H1:1.859606432191539::0.42190654489231405,pallidus:1.0045273614964096):0.11154011939943985):4.676738730180861);"
+phylogenetic_network = "Network net = (franciscanus,((#H1,pulcherrimus),(purpuratus,(droebachiensis)#H1)));"
+#allele_map = "<intermedius:QB3KMK012; pallidus:QB3KMK002; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
+allele_map = "<franciscanus:QB3KMK010; pulcherrimus:QB3KMK016; droebachiensis:QB3KMK014; purpuratus:SPUR.00>"
 
 number_taxa = 4 
-number_runs = 100
+#number_runs = 100
+number_runs = 10
 number_iterations = 1000
 
 def get_scaffold_file_paths():

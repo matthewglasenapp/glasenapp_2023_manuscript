@@ -41,21 +41,21 @@ def subset_vcf_by_scaffold(scaffold):
 
 # Run vcf2phylip on each individual scaffold
 def convert_vcf_to_nexus(scaffold):
-	input_dir = root_dir + "vcf_by_scaffold/" 
-	output_dir = root_dir + "scaffold_nexus_alignments/" + scaffold
-	run_vcf2phylip = "python3 {}vcf2phylip.py -w --input {}/{}.vcf.gz --min-samples-locus {} -p -n -r --outgroup {} --output-folder {} --output-prefix {}".format(vcf2phylip_path, input_dir, scaffold, number_species, outgroup_sample_name, output_dir, scaffold)
+	input_dir = root_dir + "hmm_input/vcf_by_scaffold/" 
+	output_dir = root_dir + "hmm_input/scaffold_nexus_alignments/" + scaffold
+	run_vcf2phylip = "python3 {}vcf2phylip.py -w --input {}{}.vcf.gz --min-samples-locus {} -p -n -r --outgroup {} --output-folder {} --output-prefix {}".format(vcf2phylip_path, input_dir, scaffold, number_species, outgroup_sample_name, output_dir, scaffold)
 	
 	os.system(run_vcf2phylip)
 
 # Reformat vcf2phylip used sites output file for compatibility with phylonet_hmm output. 
 def reformat_coordinate_files(scaffold):
-	input_dir = root_dir + "scaffold_nexus_alignments/" + scaffold
+	input_dir = root_dir + "hmm_input/scaffold_nexus_alignments/" + scaffold
 	os.chdir(input_dir)
 	
 	os.environ['coordinate_file'] = "{}.min{}.used_sites.tsv".format(scaffold, number_species)
 
 
-	create_local_coordinate_file = "cat {}.min{}.used_sites.tsv | grep -v POS | awk '{ print $2 }' > {}_coordinates".format(scaffold, number_species, scaffold)
+	create_local_coordinate_file = 'cat {}.min{}.used_sites.tsv | grep -v POS | awk "{{print $2}}" > {}_coordinates'.format(scaffold, number_species, scaffold)
 
 	create_global_coordinate_file = '''cat $coordinate_file | grep -v POS | awk '{ print $1 ":" $2 }' > coordinates'''
 	
