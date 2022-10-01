@@ -12,9 +12,9 @@ num_cores = multiprocessing.cpu_count()
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # File with scaffold names, one per line
-scaffold_list_file = "ebr1"
+scaffold_list_file = "bindin"
 
-filtered_vcf = "/hb/scratch/mglasena/data/genotypes/ebr1_network/3bp_filtered_genotype_calls.g.vcf.gz"
+filtered_vcf = "/hb/scratch/mglasena/data/genotypes/bindin_network/3bp_filtered_genotype_calls.g.vcf.gz"
 
 # Path to vcf2phylip program
 vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
@@ -22,7 +22,7 @@ vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
 root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/"
 os.mkdir(root_dir)
 
-outgroup_sample_name = "QB3KMK010"
+outgroup_sample_name = "SPUR.00"
 number_species = "4"
 
 def get_scaffold_list():

@@ -13,14 +13,16 @@ os.system(make_output_dir)
 
 # Copy/paste from phylonet InferNetwork_ML run with 1 retiulcation age
 #phylogenetic_network = "Network net = (intermedius:0.2358047382668817,((fragilis:0.947834903226071,(droebachiensis:0.20102859349321878)#H1:1.0144626112368627::0.578093455107686):0.6877223535737972,(#H1:1.859606432191539::0.42190654489231405,pallidus:1.0045273614964096):0.11154011939943985):4.676738730180861);"
-phylogenetic_network = "Network net = (franciscanus,((#H1,pulcherrimus),(fragilis,(droebachiensis)#H1)));"
+#phylogenetic_network = "Network net = (franciscanus,((#H1,pulcherrimus),(fragilis,(droebachiensis)#H1)));"
+phylogenetic_network = "Network net = (purpuratus,((#H1,intermedius),(fragilis,(pallidus)#H1)));"
 #allele_map = "<intermedius:QB3KMK012; pallidus:QB3KMK002; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
-allele_map = "<franciscanus:QB3KMK010; pulcherrimus:QB3KMK016; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
+#allele_map = "<franciscanus:QB3KMK010; pulcherrimus:QB3KMK016; droebachiensis:QB3KMK014; fragilis:QB3KMK013>"
+allele_map = "<purpuratus:SPUR.00; intermedius:QB3KMK012; pallidus:QB3KMK002; fragilis:QB3KMK013>"
 
 number_taxa = 4 
-number_runs = 100
+number_runs = 10
 number_iterations = 1000
-threads = 48
+threads = 10
 
 def get_scaffold_file_paths():
     # Create file containing paths to scaffold alignments produced by vcf2phylip.
