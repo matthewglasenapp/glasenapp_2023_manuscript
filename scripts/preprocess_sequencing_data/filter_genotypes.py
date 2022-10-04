@@ -3,9 +3,9 @@ import os
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # Raw genotype calls file
-genotype_calls = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls.g.vcf.gz"
+#genotype_calls = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls.g.vcf.gz"
 
-#genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
+genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
 output_directory = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/"
 
@@ -103,14 +103,14 @@ def vcf_stats(input_file):
 	os.system("rm samples_file.txt")
 
 def main():
-	split_multiallelics()
-	index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
-	#separate_SNP_INDEL()
-	#filter_variants()
-	#merge_vcfs()
-	#bcftools_filter()
-	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
-	#vcf_stats(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#split_multiallelics()
+	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
+	separate_SNP_INDEL()
+	filter_variants()
+	merge_vcfs()
+	bcftools_filter()
+	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#vcf_stats(output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz")
 
 if __name__ == "__main__":
 	main()
