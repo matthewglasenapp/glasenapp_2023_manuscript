@@ -88,6 +88,13 @@ def index_vcf(input_file):
 	index = "gatk IndexFeatureFile -I {}".format(input_file)
 	os.system(index)
 
+def select_passed_variants():
+	filtered_vcf = "3bp_filtered_genotype_calls.g.vcf.gz"
+	output_dir = output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz"
+	select_variants = "gatk SelectVariants -R {} -V {} -O {} --exclude-filtered true".format(reference_genome, filtered_vcf, output_dir)
+	os.system(select_variants)
+	#os.system("rm " + filtered_vcf)
+
 def vcf_stats(input_file):
 	get_samples_file = "bcftools query -l {} > samples_file.txt".format(input_file)
 	os.system(get_samples_file)
