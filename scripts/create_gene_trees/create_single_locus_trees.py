@@ -13,9 +13,10 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 #subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 #subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
 #subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
+subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -42,9 +43,9 @@ min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0.7
+prop_1x_threshold = 0.75
 
-prop_5x_threshold = 0.33
+prop_5x_threshold = 0.5
 
 subset_mean_coverage_spur5_genes = dict()
 
@@ -128,7 +129,7 @@ def filter_gene_dict():
 		one_x_lst = [item for item in value[1]]
 		five_x_lst = [item for item in value[2]]
 		
-		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) > prop_5x_threshold:
+		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) >= prop_5x_threshold:
 			test_var = True
 			for counter, sample in enumerate(subset_mean_coverage_spur5_genes):
 				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_genes[sample] * 2):
@@ -251,11 +252,11 @@ def main():
 
 	filter_gene_dict()
 
-	write_genes_passed_filter_bed()
+	#write_genes_passed_filter_bed()
 
-	write_all_gene_dict_csv()
+	#write_all_gene_dict_csv()
 
-	write_passed_genes_dict_csv()
+	#write_passed_genes_dict_csv()
 
 	#gene_ids = get_gene_ids()
 
