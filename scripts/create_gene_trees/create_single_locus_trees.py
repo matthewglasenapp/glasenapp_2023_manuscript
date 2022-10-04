@@ -12,11 +12,12 @@ num_cores = multiprocessing.cpu_count()
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
-#subset_sample_list = ["droebachiensis_SRR5767286", "fragilis_SRR5767279", "intermedius_SRR5767280", "pallidus_SRR5767285"]
-#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
-#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
-#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
-subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280','pallidus_SRR5767285','pulcherrimus_SRR5767283','purpuratus_SRR7211988']
+
+# No lividus
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988', 'variegatus_SRR7207203']
+
+# No variegatus
+subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -30,7 +31,8 @@ mean_coverage_spur5_genes = {
 "pulcherrimus_DRR107784": 77.65,
 "pulcherrimus_SRR5767283": 28.15,
 "purpuratus_SRR6281818": 51.56,
-"purpuratus_SRR7211988": 93.9
+"purpuratus_SRR7211988": 93.9,
+"variegatus_SRR7207203": 8.4
 }
 
 bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
@@ -43,9 +45,9 @@ min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0.75
+prop_1x_threshold = 0.5
 
-prop_5x_threshold = 0.5
+prop_5x_threshold = 0.0
 
 subset_mean_coverage_spur5_genes = dict()
 
