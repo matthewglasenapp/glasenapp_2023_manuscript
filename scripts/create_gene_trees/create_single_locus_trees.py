@@ -221,8 +221,8 @@ def replace_missing_genotype_char():
 	os.system(delete_bak_files)
 	
 def run_iqtree():
-	run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T 10"
-	os.system(run_iqtree)
+	#run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
+	#os.system(run_iqtree)
 
 def edit_tree_files():
 	with open("loci.treefile", "r") as f:
