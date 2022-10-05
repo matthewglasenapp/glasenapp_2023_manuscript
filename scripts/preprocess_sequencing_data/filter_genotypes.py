@@ -7,7 +7,7 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/"
+output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset"
 
 samples_to_include = {
 "fragilis_SRR5767279" : "QB3KMK013",
@@ -105,11 +105,12 @@ def vcf_stats(input_file):
 def main():
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
-	separate_SNP_INDEL()
-	filter_variants()
-	merge_vcfs()
-	bcftools_filter()
-	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	#separate_SNP_INDEL()
+	#filter_variants()
+	#merge_vcfs()
+	#bcftools_filter()
+	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	select_passed_variants()
 	#vcf_stats(output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz")
 
 if __name__ == "__main__":
