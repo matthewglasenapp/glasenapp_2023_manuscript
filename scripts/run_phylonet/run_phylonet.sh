@@ -2,11 +2,12 @@
 #SBATCH --job-name=phylonet
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=mglasena@ucsc.edu
-#SBATCH --output=phylonet_%j.out
-#SBATCH --nodes=1
+#SBATCH --output=phylonet_%J.out
 #SBATCH --partition=128x24
-#SBATCH --mem=125GB
-#SBATCH --time=168:00:00
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --mem=0   
+#SBATCH --time=20-0
 
 module load java/java-8
 
