@@ -9,4 +9,7 @@
 #SBATCH --time=168:00:00
 
 module load java/java-8
-java -Xmx125g -jar PhyloNet_3.8.0.jar retic_0
+
+phylonet="/hb/groups/pogson_group/dissertation/software/phylonet/PhyloNet_3.8.0.jar"
+
+java -Xmx125g -jar $phylonet retic_0
