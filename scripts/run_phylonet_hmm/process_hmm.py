@@ -9,11 +9,11 @@ import csv
 
 # Directory where vcf2phylip was run
 #original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
-original_vcf2phylip_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
+original_vcf2phylip_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/"
 
 # Root directory where phylonet_hmm was run
 #root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
-root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm/"
+root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm/"
 
 # Tsv file with scaffold names and length in base pairs
 scaffold_info_file = "scaffolds.tsv"
@@ -223,7 +223,7 @@ def write_summary_stats(combined_tract_length_distribution, combined_ten_kb_trac
 	print("Mean tract length of tracts greater than 10 kb: {}".format(statistics.mean(combined_ten_kb_tract_length_distribution)))
 	print("Median tract length of tracts longer than 10 kb: {}".format(statistics.median(combined_ten_kb_tract_length_distribution)))
 	print("Standard deviation of tracts greater than 10kb: {}".format(statistics.stdev(combined_ten_kb_tract_length_distribution)))
-	
+
 ### Helper functions to write introgression tracts and tract length distributions to bed and csv files ###
 
 # Write tract_list in format chr start stop
