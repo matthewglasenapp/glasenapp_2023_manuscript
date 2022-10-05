@@ -38,10 +38,10 @@ mean_coverage_spur5_genes = {
 "variegatus_SRR7207203": 8.4
 }
 
-bed_file = "/hb/scratch/mglasena/run_mosdepth/protein_coding_genes.bed"
+bed_file = "/hb/scratch/mglasena/mosdepth/protein_coding_genes.bed"
 #bed_file = "/hb/scratch/mglasena/mosdepth_exons/unique_exons.bed"
 
-bed_file_dir = "/hb/scratch/mglasena/run_mosdepth/"
+bed_file_dir = "/hb/scratch/mglasena/mosdepth/"
 #bed_file_dir = "/hb/scratch/mglasena/mosdepth_exons/"
 
 min_cov_threshold = 5
