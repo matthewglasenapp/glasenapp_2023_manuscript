@@ -9,12 +9,6 @@ abba_baba_dir_list = [
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/franciscanus/all/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/nudus/all/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/depressus/all/"
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/lividus/sco/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/purpuratus/sco/"
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/fragilis/sco/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/franciscanus/sco/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/nudus/sco/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/depressus/sco/"
 ]
 
 def run_abba_baba(dir):
