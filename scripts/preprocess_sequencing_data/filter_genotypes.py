@@ -7,7 +7,7 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset"
+output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/"
 
 samples_to_include = {
 "fragilis_SRR5767279" : "QB3KMK013",
