@@ -93,6 +93,7 @@ def select_passed_variants():
 	output_dir = output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz"
 	select_variants = "gatk SelectVariants -R {} -V {} -O {} --exclude-filtered true".format(reference_genome, filtered_vcf, output_dir)
 	os.system(select_variants)
+	# Alternative option: cat $filtered_vcf | awk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS") print}' > my_PASS.vcf
 	#os.system("rm " + filtered_vcf)
 
 def vcf_stats(input_file):
