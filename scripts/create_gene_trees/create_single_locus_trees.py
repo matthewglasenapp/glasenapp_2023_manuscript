@@ -65,18 +65,19 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/3bp_filtered
 feature = "gene"
 
 sample_names = {
-#'4': "lividus",
+#'(4': "(lividus",
 'QB3KMK013': 'fragilis',
 #'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
 #'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
-#'S.purpuratus#1': 'purpuratus_SRR6281818',
 'QB3KMK016': 'pulcherrimus_SRR5767283',
 'QB3KMK012': 'intermedius',
 'SPUR.00': 'purpuratus_SRR7211988',
-#'SAMD00098133': 'pulcherrimus_DRR107784'
+#'SAMD00098133': 'pulcherrimus_DRR107784',
+#'S.purpuratus_1': 'purpuratus_SRR6281818',
+#'LVAR.00': 'variegatus'
 }
 
 def subset_coverage_dict():
