@@ -17,7 +17,10 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 #subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988', 'variegatus_SRR7207203']
 
 # No variegatus
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+
+# Franc subset
+subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -45,9 +48,9 @@ min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0.5
+prop_1x_threshold = 0.7
 
-prop_5x_threshold = 0.0
+prop_5x_threshold = 0.5
 
 subset_mean_coverage_spur5_genes = dict()
 
@@ -225,8 +228,6 @@ def run_iqtree():
 	run_iqtree = "iqtree -S vcf2fasta_gene/ -m GTR --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
-
-
 def edit_tree_files():
 	with open("loci.treefile", "r") as f:
 		tree_list = f.read().splitlines()
@@ -257,21 +258,21 @@ def main():
 
 	filter_gene_dict()
 
-	#write_genes_passed_filter_bed()
+	write_genes_passed_filter_bed()
 
-	#write_all_gene_dict_csv()
+	write_all_gene_dict_csv()
 
-	#write_passed_genes_dict_csv()
+	write_passed_genes_dict_csv()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	#os.system("cat *.record > sco_gff.gff")
-	#os.system("rm *.record")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("cat *.record > sco_gff.gff")
+	os.system("rm *.record")
 
-	#run_vcf2fasta()
-	#replace_missing_genotype_char()
-	#run_iqtree()
+	run_vcf2fasta()
+	replace_missing_genotype_char()
+	run_iqtree()
 	#edit_tree_files()
 
 if __name__ == "__main__":
