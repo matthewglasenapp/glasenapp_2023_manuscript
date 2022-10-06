@@ -58,6 +58,13 @@ gene_dict = dict()
 
 passed_genes_dict = dict()
 
+# For filtering by gap part of code
+required_gap = 100000
+# Scaffold dictionay in format of "Scaffold":[[scaffold,gene,start,stop]]
+scaffold_dict = {}
+# Initialize list for genes passing gap filter
+passed_genes = []
+
 # For vcf2fasta part of the code 
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
@@ -195,8 +202,70 @@ def write_passed_genes_dict_csv():
 
 	csv_file.close()
 
+def remove_mt_genes_and_sort():
+	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' > genes_pf_sorted.bed"
+	os.system(remove_mt_and_sort)
+
+def create_scaffold_dict():
+	with open("genes_pf_sorted.bed","r") as f:
+		for line in f:
+			scaffold = line.split("\t")[0]
+			start = line.split("\t")[1]
+			stop = line.split("\t")[2]
+			gene = line.split("\t")[3]
+			if scaffold_dict.get(scaffold):
+				scaffold_dict[scaffold].append([scaffold,gene,start,stop])
+			else:
+				scaffold_dict[scaffold] = [[scaffold,gene,start,stop]]
+
+def check_proximity():
+	gene_counter = 0 
+	for gene_list in scaffold_dict.values():
+		for gene in gene_list:
+			try:
+				current_stop = gene_list[gene_counter][3]
+
+			except IndexError:
+				break
+				
+			try:
+				next_start = gene_list[gene_counter + 1][2]
+			
+			except IndexError:
+				gene_counter = 0
+				break
+			
+			while (int(next_start) - int(current_stop)) < required_gap:
+				current_gene = gene_list[gene_counter]
+				failed_gene = gene_list.pop(gene_counter+1)
+				#print(current_gene)
+				#print(failed_gene)
+				try:
+					next_start = gene_list[gene_counter+1][2]
+				except IndexError:
+					break
+			
+			gene_counter += 1
+
+def get_passed_genes_list():
+	for gene_list in scaffold_dict.values():
+		scaffold = gene_list[0][0]
+		#print(scaffold + "\t" + str(len(gene_list)))
+
+	for gene_list in scaffold_dict.values():
+		for gene in gene_list:
+			passed_genes.append(gene[1])
+
+def write_new_bed_file():
+	with open("genes_pf_sorted.bed","r") as f:
+		with open("unlinked_loci.bed","a") as f2:
+			for line in f:
+				for gene in passed_genes:
+					if line.split("\t")[3] == gene:
+						f2.write(line)
+
 def get_gene_ids():
-	split_columns = "awk '{ print $10 }' genes_pass_filter.bed > gene_list"
+	split_columns = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
 	os.system(split_columns)
 
 	with open("gene_list","r") as f:
@@ -242,37 +311,43 @@ def edit_tree_files():
 			f2.write(tree + "\n")
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_gene_dict()
+	initialize_gene_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#try:
-			#for sample in subset_sample_list:
-				#if sample in regions_file and sample in thresholds_file:
-					#fill_gene_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_gene_dict(regions_file, thresholds_file)
 		
-		#except NameError:
-			#fill_gene_dict(regions_file, thresholds_file)
+		except NameError:
+			fill_gene_dict(regions_file, thresholds_file)
 
-	#filter_gene_dict()
+	filter_gene_dict()
 
-	#write_genes_passed_filter_bed()
+	write_genes_passed_filter_bed()
 
-	#write_all_gene_dict_csv()
+	write_all_gene_dict_csv()
 
-	#write_passed_genes_dict_csv()
+	write_passed_genes_dict_csv()
 
-	#gene_ids = get_gene_ids()
+	remove_mt_genes_and_sort()
+	create_scaffold_dict()
+	check_proximity()
+	get_passed_genes_list()
+	write_new_bed_file()
 
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	#os.system("cat *.record > sco_gff.gff")
-	#os.system("rm *.record")
+	gene_ids = get_gene_ids()
 
-	#run_vcf2fasta()
-	#replace_missing_genotype_char()
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("cat *.record > sco_gff.gff")
+	os.system("rm *.record")
+
+	run_vcf2fasta()
+	replace_missing_genotype_char()
 	run_iqtree()
 	#edit_tree_files()
 
