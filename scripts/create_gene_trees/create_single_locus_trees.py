@@ -298,11 +298,23 @@ def run_iqtree():
 	run_iqtree = "iqtree -S vcf2fasta_gene/ -m GTR -o QB3KMK010 --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
-def edit_tree_files():
-	with open("loci.treefile", "r") as f:
+def subset_boot_file():
+	line_counter = 0 
+
+	with open("loci.ufboot_subset","a") as f:
+		for line in open("loci.ufboot","r"):
+			if ((line_counter + 1000) % 1000) == 0:
+				count = 0
+			if count <= 99:
+				f.write(line)
+				count += 1 
+			line_counter += 1
+
+def edit_tree_files(input_file, output_file):
+	with open(input_file, "r") as f:
 		tree_list = f.read().splitlines()
 	
-	with open("single_locus_trees.nwk","a") as f2:
+	with open(output_file,"a") as f2:
 		for tree in tree_list:
 			for sample_name in sample_names.keys():
 				if sample_name in tree:
@@ -349,7 +361,9 @@ def main():
 	run_vcf2fasta()
 	replace_missing_genotype_char()
 	run_iqtree()
-	#edit_tree_files()
+	subset_boot_file()
+	edit_tree_files("loci.treefile","single_locus_trees.nwk")
+	edit_tree_files("loci.ufboot", "single_locus_trees_boot.nwk")
 
 if __name__ == "__main__":
 	main()
