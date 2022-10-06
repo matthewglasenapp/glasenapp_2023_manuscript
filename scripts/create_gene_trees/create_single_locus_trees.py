@@ -323,43 +323,43 @@ def edit_tree_files(input_file, output_file):
 			f2.write(tree + "\n")
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_gene_dict()
+	#initialize_gene_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		try:
-			for sample in subset_sample_list:
-				if sample in regions_file and sample in thresholds_file:
-					fill_gene_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#try:
+			#for sample in subset_sample_list:
+				#if sample in regions_file and sample in thresholds_file:
+					#fill_gene_dict(regions_file, thresholds_file)
 		
-		except NameError:
-			fill_gene_dict(regions_file, thresholds_file)
+		#except NameError:
+			#fill_gene_dict(regions_file, thresholds_file)
 
-	filter_gene_dict()
+	#filter_gene_dict()
 
-	write_genes_passed_filter_bed()
+	#write_genes_passed_filter_bed()
 
-	write_all_gene_dict_csv()
+	#write_all_gene_dict_csv()
 
-	write_passed_genes_dict_csv()
+	#write_passed_genes_dict_csv()
 
-	remove_mt_genes_and_sort()
-	create_scaffold_dict()
-	check_proximity()
-	get_passed_genes_list()
-	write_new_bed_file()
+	#remove_mt_genes_and_sort()
+	#create_scaffold_dict()
+	#check_proximity()
+	#get_passed_genes_list()
+	#write_new_bed_file()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	os.system("cat *.record > sco_gff.gff")
-	os.system("rm *.record")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("cat *.record > sco_gff.gff")
+	#os.system("rm *.record")
 
-	run_vcf2fasta()
-	replace_missing_genotype_char()
+	#run_vcf2fasta()
+	#replace_missing_genotype_char()
 	run_iqtree()
 	subset_boot_file()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
