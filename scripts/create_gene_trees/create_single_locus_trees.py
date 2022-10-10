@@ -360,10 +360,11 @@ def main():
 
 	#run_vcf2fasta()
 	#replace_missing_genotype_char()
-	run_iqtree()
-	subset_boot_file()
-	edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	edit_tree_files("loci.ufboot", "single_locus_trees_boot.nwk")
+	#run_iqtree()
+	#subset_boot_file()
+	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
+	#edit_tree_files("loci.ufboot", "single_locus_trees_boot.nwk")
+	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
 
 if __name__ == "__main__":
 	main()
