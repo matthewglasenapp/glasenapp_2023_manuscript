@@ -16,7 +16,7 @@ print(number_loci)
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
 set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","franciscanus"}
 
-def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
+def create_input_file(output_file, program, num_reticulations, runs, num_net_returned):
     with open(raw_gene_trees, "r") as f:
         raw_tree_list = f.readlines()
 
@@ -35,7 +35,7 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
     reject_file.close()
 
     for count, tree in enumerate(filtered_gene_tree_lst):
-        line = "Tree gt" + str(count) + "=" + tree
+        line = "Tree gt" + str(count) + "  = " + tree
         filtered_gene_tree_lst[count] = line
 
     gt_string = "("
@@ -52,25 +52,26 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
 
     with open(output_file,'a') as f2:
         line1 = "#NEXUS"
-        line2 = "BEGIN Trees;"
+        line2 = "BEGIN TREES;"
         line3 = "END;"
         line4 = "Begin PHYLONET;"
-        line5 = "{} {} (all) {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
+        #line5 = "{} {} {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
+        line5 = "{} {} {} -x {} -n {} -di;".format(program, gt_string, num_reticulations, runs, num_net_returned)
         line6 = "END;"
         f2.write(line1 + "\n" + "\n")
-        f2.write(line2 + "\n" + "\n")
+        f2.write(line2 + "\n")
         for tree in filtered_gene_tree_lst:
             f2.write(tree)
-        f2.write("\n" + line3 + "\n" + "\n")
-        f2.write(line4 + "\n" + "\n")
-        f2.write(line5 + "\n" + "\n")
-        f2.write(line6)
+        f2.write(line3 + "\n" + "\n")
+        f2.write(line4 + "\n")
+        f2.write(line5 + "\n")
+        f2.write(line6 + "\n")
 
 def main():
-    create_input_file("retic_0", "InferNetwork_ML", "0", "200", "8", "1")
-    create_input_file("retic_1", "InferNetwork_ML", "1", "200", "8", "2")
-    create_input_file("retic_2", "InferNetwork_ML", "2", "200", "8", "2")
-    create_input_file("retic_3", "InferNetwork_ML", "3", "200", "8", "2")
+    create_input_file("retic_0", "InferNetwork_ML", "0", "10", "1")
+    create_input_file("retic_1", "InferNetwork_ML", "1", "10", "2")
+    create_input_file("retic_2", "InferNetwork_ML", "2", "10", "2")
+    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "2")
 
 if __name__ == "__main__":
     main()
