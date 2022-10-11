@@ -79,9 +79,11 @@ sample_names = {
 #'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
-'QB3KMK016': 'pulcherrimus_SRR5767283',
+#'QB3KMK016': 'pulcherrimus_SRR5767283',
+'QB3KMK016': 'pulcherrimus',
 'QB3KMK012': 'intermedius',
-'SPUR.00': 'purpuratus_SRR7211988',
+#'SPUR.00': 'purpuratus_SRR7211988',
+'SPUR.00': 'purpuratus',
 #'SAMD00098133': 'pulcherrimus_DRR107784',
 #'S.purpuratus_1': 'purpuratus_SRR6281818',
 #'LVAR.00': 'variegatus'
@@ -361,7 +363,7 @@ def main():
 	#run_vcf2fasta()
 	#replace_missing_genotype_char()
 	#run_iqtree()
-	#subset_boot_file()
+	subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	#edit_tree_files("loci.ufboot", "single_locus_trees_boot.nwk")
 	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")

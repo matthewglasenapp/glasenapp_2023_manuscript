@@ -12,11 +12,13 @@ print(number_trees)
 number_loci = int(int(subprocess.check_output("cat single_locus_trees.nwk | wc -l", shell=True).decode("utf-8").split("\n")[0])/(num_bootstrap_replicates))
 print(number_loci)
 
+#number_loci = 3019
+
 # Taxa expected to be present in each single locus tree
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
-set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","franciscanus"}
+set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus","franciscanus"}
 
-def create_input_file(output_file, program, num_reticulations, runs, num_net_returned):
+def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
         raw_tree_list = f.readlines()
 
@@ -42,11 +44,11 @@ def create_input_file(output_file, program, num_reticulations, runs, num_net_ret
 
     for n in range(0, number_loci + 1):
         if n == 0:
-            #new_string = r'{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
+            new_string = r'{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
         elif n == number_loci:
             new_string = ")"
         else:
-            #new_string = r',{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
+            new_string = r',{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
 
         gt_string += new_string
 
@@ -56,7 +58,7 @@ def create_input_file(output_file, program, num_reticulations, runs, num_net_ret
         line3 = "END;"
         line4 = "Begin PHYLONET;"
         #line5 = "{} {} {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
-        line5 = "{} {} {} -x {} -n {} -di;".format(program, gt_string, num_reticulations, runs, num_net_returned)
+        line5 = "{} (all) {} -x {} -pl {} -n {} -di;".format(program, num_reticulations, runs, processors, num_net_returned)
         line6 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
@@ -68,10 +70,10 @@ def create_input_file(output_file, program, num_reticulations, runs, num_net_ret
         f2.write(line6 + "\n")
 
 def main():
-    create_input_file("retic_0", "InferNetwork_ML", "0", "10", "1")
-    create_input_file("retic_1", "InferNetwork_ML", "1", "10", "2")
-    create_input_file("retic_2", "InferNetwork_ML", "2", "10", "2")
-    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "2")
+    create_input_file("retic_0", "InferNetwork_ML", "0", "10", "8", "1")
+    create_input_file("retic_1", "InferNetwork_ML", "1", "10", "8", "2")
+    create_input_file("retic_2", "InferNetwork_ML", "2", "10", "8", "2")
+    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "8", "2")
 
 if __name__ == "__main__":
     main()
