@@ -7,22 +7,22 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/"
+output_directory = "/hb/scratch/mglasena/data/genotypes/purpuratus/"
 
 samples_to_include = {
 "fragilis_SRR5767279" : "QB3KMK013",
-"nudus_SRR5767281" : "QB3KMK011",
-"franciscanus_SRR5767282" : "QB3KMK010",
-"depressus_SRR5767284" : "QB3KMK015",
+#"nudus_SRR5767281" : "QB3KMK011",
+#"franciscanus_SRR5767282" : "QB3KMK010",
+#"depressus_SRR5767284" : "QB3KMK015",
 "pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
-"purpuratus_SRR6281818" : "S.purpuratus#1",
-"lividus_ERS2351987" : "4",
-"pulcherrimus_SRR5767283" : "QB3KMK016",
+#"purpuratus_SRR6281818" : "S.purpuratus#1",
+#"lividus_ERS2351987" : "4",
+#"pulcherrimus_SRR5767283" : "QB3KMK016",
 "intermedius_SRR5767280" : "QB3KMK012",
 "purpuratus_SRR7211988" : "SPUR.00",
-"pulcherrimus_DRR107784" : "SAMD00098133",
-"variegatus_SRR7207203" : "LVAR.00"
+#"pulcherrimus_DRR107784" : "SAMD00098133",
+#"variegatus_SRR7207203" : "LVAR.00"
 }
 
 # Only run once to get split multiallelic file!
@@ -106,11 +106,11 @@ def vcf_stats(input_file):
 def main():
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
-	#separate_SNP_INDEL()
-	#filter_variants()
-	#merge_vcfs()
-	#bcftools_filter()
-	#index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
+	separate_SNP_INDEL()
+	filter_variants()
+	merge_vcfs()
+	bcftools_filter()
+	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 	select_passed_variants()
 	#vcf_stats(output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz")
 
