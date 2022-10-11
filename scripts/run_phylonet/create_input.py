@@ -42,11 +42,11 @@ def create_input_file(output_file, program, num_reticulations, runs, num_net_ret
 
     for n in range(0, number_loci + 1):
         if n == 0:
-            new_string = r'{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
+            #new_string = r'{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
         elif n == number_loci:
             new_string = ")"
         else:
-            new_string = r',{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
+            #new_string = r',{{gt{}-gt{}}}'.format(n * 100, (n * 100) + 99)
 
         gt_string += new_string
 
