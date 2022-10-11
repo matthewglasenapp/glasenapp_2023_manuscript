@@ -20,7 +20,10 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 #subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 # Franc subset
-subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+
+# Pulcherrimus subset
+subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -68,14 +71,14 @@ passed_genes = []
 # For vcf2fasta part of the code 
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
-vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus_subset/3bp_filtered_genotype_calls_pf.g.vcf.gz"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/pulcherrimus/3bp_filtered_genotype_calls_pf.g.vcf.gz"
 feature = "gene"
 
 sample_names = {
 #'(4': "(lividus",
 'QB3KMK013': 'fragilis',
 #'QB3KMK011': 'nudus',
-'QB3KMK010': 'franciscanus',
+#'QB3KMK010': 'franciscanus',
 #'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
@@ -325,47 +328,46 @@ def edit_tree_files(input_file, output_file):
 			f2.write(tree + "\n")
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_gene_dict()
+	initialize_gene_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#try:
-			#for sample in subset_sample_list:
-				#if sample in regions_file and sample in thresholds_file:
-					#fill_gene_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_gene_dict(regions_file, thresholds_file)
 		
-		#except NameError:
-			#fill_gene_dict(regions_file, thresholds_file)
+		except NameError:
+			fill_gene_dict(regions_file, thresholds_file)
 
-	#filter_gene_dict()
+	filter_gene_dict()
 
-	#write_genes_passed_filter_bed()
+	write_genes_passed_filter_bed()
 
-	#write_all_gene_dict_csv()
+	write_all_gene_dict_csv()
 
-	#write_passed_genes_dict_csv()
+	write_passed_genes_dict_csv()
 
-	#remove_mt_genes_and_sort()
-	#create_scaffold_dict()
-	#check_proximity()
-	#get_passed_genes_list()
-	#write_new_bed_file()
+	remove_mt_genes_and_sort()
+	create_scaffold_dict()
+	check_proximity()
+	get_passed_genes_list()
+	write_new_bed_file()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	#os.system("cat *.record > sco_gff.gff")
-	#os.system("rm *.record")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("cat *.record > sco_gff.gff")
+	os.system("rm *.record")
 
-	#run_vcf2fasta()
-	#replace_missing_genotype_char()
-	#run_iqtree()
+	run_vcf2fasta()
+	replace_missing_genotype_char()
+	run_iqtree()
 	subset_boot_file()
-	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	#edit_tree_files("loci.ufboot", "single_locus_trees_boot.nwk")
+	edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
 
 if __name__ == "__main__":
