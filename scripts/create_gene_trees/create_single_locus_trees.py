@@ -78,7 +78,7 @@ sample_names = {
 #'(4': "(lividus",
 'QB3KMK013': 'fragilis',
 #'QB3KMK011': 'nudus',
-'QB3KMK010': 'franciscanus',
+#'QB3KMK010': 'franciscanus',
 #'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
@@ -303,7 +303,7 @@ def replace_missing_genotype_char():
 	
 def run_iqtree():
 	#run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
-	run_iqtree = "iqtree -S vcf2fasta_gene/ -m GTR -o QB3KMK010 --prefix loci -T AUTO -B 1000 --boot-trees"
+	run_iqtree = "iqtree -S vcf2fasta_gene/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
 def subset_boot_file():
@@ -372,10 +372,10 @@ def main():
 
 	#run_vcf2fasta()
 	#replace_missing_genotype_char()
-	#run_iqtree()
-	#subset_boot_file()
+	run_iqtree()
+	subset_boot_file()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
+	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
 	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
 
 if __name__ == "__main__":
