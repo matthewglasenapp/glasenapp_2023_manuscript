@@ -12,11 +12,9 @@ print(number_trees)
 number_loci = int(int(subprocess.check_output("cat clean_single_locus_trees.nwk | wc -l", shell=True).decode("utf-8").split("\n")[0])/(num_bootstrap_replicates))
 print(number_loci)
 
-#number_loci = 3019
-
 # Taxa expected to be present in each single locus tree
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
-set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus","franciscanus"}
+set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
 
 def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
