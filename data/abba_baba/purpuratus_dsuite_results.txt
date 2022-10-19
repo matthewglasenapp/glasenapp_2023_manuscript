@@ -1,2 +1,0 @@
-P1	P2	P3	Dstatistic	Z-score	p-value	f4-ratio	BBAA	ABBA	BABA
-nudus	franciscanus	depressus	0.0694747	28.0164	2.3e-16	0.0149635	193319	116810	101633
