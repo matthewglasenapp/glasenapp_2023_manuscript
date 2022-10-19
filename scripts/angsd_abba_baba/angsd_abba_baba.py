@@ -5,10 +5,10 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 threads = 4
 
 abba_baba_dir_list = [
-#"/hb/home/mglasena/dissertation/data/angsd_abba_baba/franciscanus/all/",
+#"/hb/home/mglasena/dissertation/data/angsd_abba_baba/franciscanus/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/lividus/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/purpuratus/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/nudus/all/"
+"/hb/home/mglasena/dissertation/data/angsd_abba_baba/nudus/"
 ]
 
 def run_abba_baba(dir):
