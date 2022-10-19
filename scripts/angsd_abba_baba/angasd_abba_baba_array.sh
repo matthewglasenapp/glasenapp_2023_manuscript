@@ -7,8 +7,9 @@
 #SBATCH --partition=128x24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --array=[0-5]
+#SBATCH --cpus-per-task=8
+#SBATCH --array=[0-3]
+#SBATCH --time=20-0 
 
 module load python-3.6.5
 module load R
