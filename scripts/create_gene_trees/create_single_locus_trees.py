@@ -63,7 +63,7 @@ bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_e
 #bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
 bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
-min_cov_threshold = 5
+min_cov_threshold = 10
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
