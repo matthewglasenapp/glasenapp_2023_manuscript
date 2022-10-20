@@ -150,8 +150,7 @@ def filter_gene_dict():
 		one_x_lst = [item for item in value[1]]
 		five_x_lst = [item for item in value[2]]
 		
-		#if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) >= prop_5x_threshold:
-		if min(mean_depth_lst) >= min_cov_threshold:
+		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) >= prop_5x_threshold:
 			test_var = True
 			for counter, sample in enumerate(subset_mean_coverage_spur5_genes):
 				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_genes[sample] * 2):
@@ -212,7 +211,9 @@ def write_passed_genes_dict_csv():
 	csv_file.close()
 
 def remove_mt_genes_and_sort():
-	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' | awk '$3 - $2 > 2000 > genes_pf_sorted.bed"
+	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' > genes_pf_sorted.bed"
+	# Get exons > 2000 bp
+	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' | awk '$3 - $2 > 2000 > genes_pf_sorted.bed" 
 	os.system(remove_mt_and_sort)
 
 def create_scaffold_dict():
