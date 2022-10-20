@@ -299,6 +299,8 @@ def get_gene_ids():
 			gene_list = f.read().splitlines()
 			for gene in gene_list:
 				identifier = gene.split(";")[1]
+				# For exons
+				#identifier = gene.split("\t")[3]
 				f2.write(identifier + "\n")
 
 	gene_ids = open("gene_ids", "r").read().splitlines()
