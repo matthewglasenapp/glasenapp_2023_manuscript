@@ -41,6 +41,22 @@ mean_coverage_spur5_genes = {
 "variegatus_SRR7207203": 8.4
 }
 
+mean_coverage_spur5_exons = {
+"depressus_SRR5767284": 47.5,
+"droebachiensis_SRR5767286" : 41.5,
+"fragilis_SRR5767279": 46.8,
+"franciscanus_SRR5767282": 33.8,
+"intermedius_SRR5767280": 44.2,
+"lividus_ERS2351987": 12,
+"nudus_SRR5767281": 40.5,
+"pallidus_SRR5767285": 15,
+"pulcherrimus_DRR107784": 108.47,
+"pulcherrimus_SRR5767283": 44.3,
+"purpuratus_SRR6281818": , 55.81
+"purpuratus_SRR7211988": 100.3,
+"variegatus_SRR7207203": 8.4
+}
+
 #bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
 bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
 
