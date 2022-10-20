@@ -17,13 +17,13 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 #subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988', 'variegatus_SRR7207203']
 
 # No variegatus
-#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 # Franc subset
 #subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
 # Pulcherrimus subset
-subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -41,19 +41,19 @@ mean_coverage_spur5_genes = {
 "variegatus_SRR7207203": 8.4
 }
 
-bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
-#bed_file = "/hb/scratch/mglasena/mosdepth/mosdepth_exons/unique_exons.bed"
+#bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
+bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
 
-bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
-#bed_file_dir = "/hb/scratch/mglasena/mosdepth/mosdepth_exons/"
+#bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
+bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
 min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0.7
+prop_1x_threshold = 0.9
 
-prop_5x_threshold = 0.5
+prop_5x_threshold = 0.75
 
 subset_mean_coverage_spur5_genes = dict()
 
@@ -75,20 +75,20 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/pulcherrimus/3bp_filtered_genoty
 feature = "gene"
 
 sample_names = {
-#'(4': "(lividus",
+'(4': "(lividus",
 'QB3KMK013': 'fragilis',
-#'QB3KMK011': 'nudus',
-#'QB3KMK010': 'franciscanus',
-#'QB3KMK015': 'depressus',
+'QB3KMK011': 'nudus',
+'QB3KMK010': 'franciscanus',
+'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
-#'QB3KMK016': 'pulcherrimus_SRR5767283',
-'QB3KMK016': 'pulcherrimus',
+'QB3KMK016': 'pulcherrimus_SRR5767283',
+#'QB3KMK016': 'pulcherrimus',
 'QB3KMK012': 'intermedius',
-#'SPUR.00': 'purpuratus_SRR7211988',
-'SPUR.00': 'purpuratus',
-#'SAMD00098133': 'pulcherrimus_DRR107784',
-#'S.purpuratus_1': 'purpuratus_SRR6281818',
+'SPUR.00': 'purpuratus_SRR7211988',
+#'SPUR.00': 'purpuratus',
+'SAMD00098133': 'pulcherrimus_DRR107784',
+'S.purpuratus_1': 'purpuratus_SRR6281818',
 #'LVAR.00': 'variegatus'
 }
 
@@ -150,7 +150,8 @@ def filter_gene_dict():
 		one_x_lst = [item for item in value[1]]
 		five_x_lst = [item for item in value[2]]
 		
-		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) >= prop_5x_threshold:
+		#if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(five_x_lst) >= prop_5x_threshold:
+		if min(mean_depth_lst) >= min_cov_threshold:
 			test_var = True
 			for counter, sample in enumerate(subset_mean_coverage_spur5_genes):
 				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_genes[sample] * 2):
@@ -211,7 +212,7 @@ def write_passed_genes_dict_csv():
 	csv_file.close()
 
 def remove_mt_genes_and_sort():
-	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' > genes_pf_sorted.bed"
+	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' | awk '$3 - $2 > 2000 > genes_pf_sorted.bed"
 	os.system(remove_mt_and_sort)
 
 def create_scaffold_dict():
@@ -335,34 +336,34 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_gene_dict()
+	initialize_gene_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#try:
-			#for sample in subset_sample_list:
-				#if sample in regions_file and sample in thresholds_file:
-					#fill_gene_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_gene_dict(regions_file, thresholds_file)
 		
-		#except NameError:
-			#fill_gene_dict(regions_file, thresholds_file)
+		except NameError:
+			fill_gene_dict(regions_file, thresholds_file)
 
-	#filter_gene_dict()
+	filter_gene_dict()
 
-	#write_genes_passed_filter_bed()
+	write_genes_passed_filter_bed()
 
-	#write_all_gene_dict_csv()
+	write_all_gene_dict_csv()
 
-	#write_passed_genes_dict_csv()
+	write_passed_genes_dict_csv()
 
-	#remove_mt_genes_and_sort()
-	#create_scaffold_dict()
-	#check_proximity()
-	#get_passed_genes_list()
-	#write_new_bed_file()
+	remove_mt_genes_and_sort()
+	create_scaffold_dict()
+	check_proximity()
+	get_passed_genes_list()
+	write_new_bed_file()
 
 	#gene_ids = get_gene_ids()
 
@@ -372,11 +373,11 @@ def main():
 
 	#run_vcf2fasta()
 	#replace_missing_genotype_char()
-	run_iqtree()
-	subset_boot_file()
-	edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
-	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
+	#run_iqtree()
+	#subset_boot_file()
+	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
+	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
+	#clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
 
 if __name__ == "__main__":
 	main()
