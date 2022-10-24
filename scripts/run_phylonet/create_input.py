@@ -14,7 +14,8 @@ print(number_loci)
 
 # Taxa expected to be present in each single locus tree
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
-set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
+#set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
+set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "nudus"}
 
 def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
