@@ -17,13 +17,17 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 #subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988', 'variegatus_SRR7207203']
 
 # No variegatus
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'lividus_ERS2351987', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_DRR107784', 'pulcherrimus_SRR5767283', 'purpuratus_SRR6281818', 'purpuratus_SRR7211988']
 
 # Franc subset
 #subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
 # Pulcherrimus subset
 #subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+
+# Strongylocentrotidae Subset
+subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+
 
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
@@ -52,24 +56,24 @@ mean_coverage_spur5_exons = {
 "pallidus_SRR5767285": 15,
 "pulcherrimus_DRR107784": 108.47,
 "pulcherrimus_SRR5767283": 44.3,
-"purpuratus_SRR6281818": , 55.81
+"purpuratus_SRR6281818": 55.81,
 "purpuratus_SRR7211988": 100.3,
 "variegatus_SRR7207203": 8.4
 }
 
-#bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
-bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
+bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
+#bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
 
-#bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
-bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
+bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
+#bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
-min_cov_threshold = 10
+min_cov_threshold = 5
 
 # Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
 # Enter as a proportion
-prop_1x_threshold = 0.9
+prop_1x_threshold = 0.7
 
-prop_5x_threshold = 0.75
+prop_5x_threshold = 0.33
 
 subset_mean_coverage_spur5_genes = dict()
 
@@ -87,24 +91,24 @@ passed_genes = []
 # For vcf2fasta part of the code 
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
-vcf_file = "/hb/scratch/mglasena/data/genotypes/pulcherrimus/3bp_filtered_genotype_calls_pf.g.vcf.gz"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/3bp_filtered_genotype_calls_pf.g.vcf.gz"
 feature = "gene"
 
 sample_names = {
-'(4': "(lividus",
+#'(4': "(lividus",
 'QB3KMK013': 'fragilis',
 'QB3KMK011': 'nudus',
 'QB3KMK010': 'franciscanus',
 'QB3KMK015': 'depressus',
 'QB3KMK002': 'pallidus',
 'QB3KMK014': 'droebachiensis',
-'QB3KMK016': 'pulcherrimus_SRR5767283',
-#'QB3KMK016': 'pulcherrimus',
+#'QB3KMK016': 'pulcherrimus_SRR5767283',
+'QB3KMK016': 'pulcherrimus',
 'QB3KMK012': 'intermedius',
-'SPUR.00': 'purpuratus_SRR7211988',
-#'SPUR.00': 'purpuratus',
-'SAMD00098133': 'pulcherrimus_DRR107784',
-'S.purpuratus_1': 'purpuratus_SRR6281818',
+#'SPUR.00': 'purpuratus_SRR7211988',
+'SPUR.00': 'purpuratus',
+#'SAMD00098133': 'pulcherrimus_DRR107784',
+#'S.purpuratus_1': 'purpuratus_SRR6281818',
 #'LVAR.00': 'variegatus'
 }
 
@@ -229,7 +233,7 @@ def write_passed_genes_dict_csv():
 def remove_mt_genes_and_sort():
 	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' > genes_pf_sorted.bed"
 	# Get exons > 2000 bp
-	remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' | awk '$3 - $2 > 2000 > genes_pf_sorted.bed" 
+	#remove_mt_and_sort = "cat genes_pass_filter.bed | sort -u -k1,1 -k2,2n -k3,3n | grep -v 'NC_001453.1' | awk '$3 - $2 > 2000 > genes_pf_sorted.bed" 
 	os.system(remove_mt_and_sort)
 
 def create_scaffold_dict():
