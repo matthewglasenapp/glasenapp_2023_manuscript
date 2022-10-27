@@ -6,7 +6,7 @@ threads = 4
 
 abba_baba_dir_list = [
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/franciscanus/",
-"/hb/home/mglasena/dissertation/data/angsd_abba_baba/lividus/",
+#"/hb/home/mglasena/dissertation/data/angsd_abba_baba/lividus/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/purpuratus/",
 "/hb/home/mglasena/dissertation/data/angsd_abba_baba/nudus/"
 ]
@@ -14,9 +14,9 @@ abba_baba_dir_list = [
 def run_abba_baba(dir):
 	os.chdir(dir)
 
-	angsd_command = "angsd -doAbbababa2 1 -doCounts 1 -baq 1 -ref {} -useLast 1 -bam bam.filelist -out bam.Angsd -blockSize 1000000 -minMapQ 30 -minQ 25 -only_proper_pairs 1 -remove_bads 1 -uniqueOnly 1 -nThreads {}".format(reference_genome, threads)
+	angsd_command = "angsd -doAbbababa2 1 -doCounts 1 -baq 1 -ref {} -useLast 1 -bam bam.filelist -out bam_mq30.Angsd -blockSize 1000000 -minMapQ 30 -minQ 30 -only_proper_pairs 1 -remove_bads 1 -uniqueOnly 1 -enhance -nThreads {}".format(reference_genome, threads)
 
-	jackknife = 'Rscript DSTAT.R angsdFile="bam.Angsd" out="weighted_results" nameFile=bam.filelistnames'
+	jackknife = 'Rscript DSTAT.R angsdFile="bam_mq30.Angsd" out="weighted_results_mq30" nameFile=bam.filelistnames'
 
 	os.system(angsd_command)
 	os.system(jackknife)
