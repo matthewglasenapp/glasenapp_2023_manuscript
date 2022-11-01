@@ -1,14 +1,18 @@
 import gzip 
+import os
 
-input_file = "purpuratus_SRR7211988.regions.bed.gz"
-output_file = "results_mrna.tsv"
+bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
+
+def get_coverage_files_paths():
+	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
+	os.system(get_regions_file_paths)
 
 def get_mRNA_cov(input_file):
 	rna_dict = dict()
 	
 	line_index = 0
 	
-	records = gzip.open(file, "rt").read().splitlines()
+	records = gzip.open(input_file, "rt").read().splitlines()
 	
 	for record in records:
 		
@@ -74,7 +78,17 @@ def write_results(output_file):
 			f.write(str(key) + "\t" + str(value) + "\n")
 
 def main():
+	coverage_file_list = open("regions_files","r").read().splitlines()
+
+	array_id = os.environ["array_id"]
+	print("Array ID: {}".format(array_id))
+	
+	input_file = coverage_file_list[int(array_id)]
+	print("Caclulating mean coverage for mRNA molecules in {}".format(input_file))
+
 	get_mRNA_cov(input_file)
+	
+	output_file = input_file.split(".regions")[0] + "_mrna_cov.tsv"
 	write_results(output_file)
 
 if __name__ == "__main__":
