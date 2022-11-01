@@ -28,7 +28,6 @@ gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_0
 # Strongylocentrotidae Subset
 subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
-
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
 "droebachiensis_SRR5767286" : 26.46,
