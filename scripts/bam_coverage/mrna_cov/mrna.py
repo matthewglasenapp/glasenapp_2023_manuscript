@@ -3,12 +3,14 @@ import os
 
 bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
+# Initialize dictionary for mRNA names and their average coverage
+rna_dict = dict()
+
 def get_coverage_files_paths():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
 	os.system(get_regions_file_paths)
 
 def get_mRNA_cov(input_file):
-	rna_dict = dict()
 	
 	line_index = 0
 	
