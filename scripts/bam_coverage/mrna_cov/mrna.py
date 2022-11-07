@@ -4,94 +4,139 @@ import os
 bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
 # Initialize dictionary for mRNA names and their average coverage
-rna_dict = dict()
+rna_dict_depth = dict()
+
+rna_dict_threshold = dict()
 
 def get_coverage_files_paths():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
 	os.system(get_regions_file_paths)
 
-def get_mRNA_cov(input_file):
+	get_thresholds_file_paths = "find {} -type f -name *.thresholds.bed.gz* | grep -v 'csi' > thresholds_files".format(bed_file_dir)
+	os.system(get_thresholds_file_paths)
+
+	with open("regions_files", "r") as f1, open("thresholds_files","r") as f2:
+		file_list = zip(sorted(f1.read().splitlines()),sorted(f2.read().splitlines()))
+
+	return list(file_list)
+
+def get_mRNA_cov(regions_file, thresholds_file):
 	
 	line_index = 0
 	
-	records = gzip.open(input_file, "rt").read().splitlines()
-	
-	for record in records:
+	with gzip.open(regions_file, "rt") as f1, gzip.open(thresholds_file,"rt") as f2:
 		
-		if line_index > records.index(record) and line_index != 0:
-			continue
-		
-		else:
-			
-			current_mrna = record.split("\t")[3].split("exon-")[1].split(".")[0]
-			
-			exon_dict = dict()
+		records = f1.read().splitlines()
+		thresholds = f2.read().splitlines()[1:]
 
-			current_exon = record.split("\t")[3]
-			current_exon_length = float(record.split("\t")[2]) - float(record.split("\t")[1])
-			current_exon_coverage = float(record.split("\t")[4])
-
-			exon_dict[current_exon] = [current_exon_length, current_exon_coverage]
-			
-			try:
-				next_record = records[line_index + 1]
-				next_mrna = next_record.split("\t")[3].split("exon-")[1].split(".")[0]
-			
-			except IndexError:
-				rna_dict[current_mrna] = current_exon_coverage
-				break
+		zipped_list = list(zip(records,thresholds))
 	
-			if current_mrna == next_mrna:
-				
-				while current_mrna == next_mrna:
-					# Add additional exons to exons dict 
-					# {"Exon_name": [exon_length, exon_coverage]
-					exon_dict[next_record.split("\t")[3]] = [float(next_record.split("\t")[2]) - float(next_record.split("\t")[1]), float(next_record.split("\t")[4])]
-				
-					line_index += 1
-					
-					try:
-						next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1].split(".")[0]
-						next_record = records[line_index + 1]
-					
-					except IndexError:
-						break
+		for record, threshold in zipped_list:
 
-				mrna_length = sum([item[0] for item in exon_dict.values()])
-
-				mean = 0 
-
-				for value in exon_dict.values():
-					# Calculate weighted average. Sum of (coverage * exon length)/mRNA length)
-					mean += (value[1] * (value[0]/mrna_length))
-
-				# {"mRNA_name": mean coverage}
-				rna_dict[current_mrna] = mean
-
-				line_index +=1 
-			
+			# Skip over an exon record if it has already been accounted for
+			if line_index > records.index(record) and line_index != 0:
+				continue
+		
 			else:
-				rna_dict[current_mrna] = current_exon_coverage
-				line_index += 1
+			
+				current_mrna = record.split("\t")[3].split("exon-")[1].split(".")[0]
+			
+				exon_dict = dict()
 
-def write_results(output_file):
-	with open(output_file,"a") as f:
-		for key,value in rna_dict.items():
+				current_exon = record.split("\t")[3]
+				current_exon_length = float(record.split("\t")[2]) - float(record.split("\t")[1])
+				current_exon_coverage = float(record.split("\t")[4])
+				
+				prop_1x = float(threshold.split("\t")[4])
+				prop_10x = float(threshold.split("\t")[5])
+				prop_20x = float(threshold.split("\t")[6])
+
+				exon_dict[current_exon] = [current_exon_length, current_exon_coverage, prop_1x, prop_10x, prop_20x]
+			
+				try:
+					next_record = records[line_index + 1]
+					next_threshold = thresholds[line_index+1]
+					next_mrna = next_record.split("\t")[3].split("exon-")[1].split(".")[0]
+			
+				except IndexError:
+					rna_dict[current_mrna] = current_exon_coverage
+					break
+	
+				if current_mrna == next_mrna:
+				
+					while current_mrna == next_mrna:
+						# Add additional exons to exons dict 
+						# {"Exon_name": [exon_length, exon_coverage, prop_1x, prop_10x, prop_20x]
+						exon_dict[next_record.split("\t")[3]] = [float(next_record.split("\t")[2]) - float(next_record.split("\t")[1]), float(next_record.split("\t")[4]), float(next_threshold.split("\t")[4]), float(next_threshold.split("\t")[5]), float(next_threshold.split("\t")[6])]
+				
+						line_index += 1
+					
+						try:
+							next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1].split(".")[0]
+							next_threshold = thresholds[line_index + 1]
+							next_record = records[line_index + 1]
+					
+						except IndexError:
+							break
+
+					mrna_length = sum([item[0] for item in exon_dict.values()])
+
+					mean = 0 
+					prop_1x = 0
+					prop_10x = 0
+					prop_20x = 0
+
+					for value in exon_dict.values():
+						# Calculate weighted average. Sum of (coverage * exon length)/mRNA length)
+						mean += (value[1] * (value[0]/mrna_length))
+
+						prop_1x += (value[2] * (value[0]/mrna_length))
+
+						prop_10x += (value[3] * (value[0]/mrna_length))
+
+						prop_20x += (value[4] * (value[0]/mrna_length))
+
+					# {"mRNA_name": mean coverage}
+					rna_dict_depth[current_mrna] = [mean]
+
+					rna_dict_threshold[current_mrna] = [prop_1x, prop_10x, prop_20x]
+
+					line_index +=1 
+			
+				else:
+					rna_dict_depth[current_mrna] = [current_exon_coverage]
+
+					rna_dict_threshold[current_mrna] = [prop_1x, prop_10x, prop_20x]
+					line_index += 1
+
+def write_results(out1, out2):
+	with open(out1,"a") as f:
+		for key,value in rna_dict_depth.items():
 			f.write(str(key) + "\t" + str(value) + "\n")
 
+	with open(out2) as f2:
+		for key,value in rna_dict_threshold.items():
+			f.write(str(key) + "\t" + str(value[0]) + "\t" + str(value[1]) + "\t" + str(value[2]) + "\n")
+
+
 def main():
-	coverage_file_list = open("regions_files","r").read().splitlines()
+	coverage_file_list = get_coverage_files_paths()
 
 	array_id = os.environ["array_id"]
 	print("Array ID: {}".format(array_id))
-	
-	input_file = coverage_file_list[int(array_id)]
-	print("Caclulating mean coverage for mRNA molecules in {}".format(input_file))
 
-	get_mRNA_cov(input_file)
+	regions_file = coverage_file_list[int(array_id)][0]
+	thresholds_file = coverage_file_list[int(array_id)][1]
+	print(regions_file)
+	print(thresholds_file)
+
+	print("Caclulating mean coverage for mRNA molecules in {}".format(regions_file))
+
+	get_mRNA_cov(regions_file, thresholds_file)
 	
-	output_file = input_file.split(".regions")[0] + "_mrna_cov.tsv"
-	write_results(output_file)
+	out1 = input_file.split(".regions")[0].split("/")[-1] + "_mrna_cov.tsv"
+	out2 = input_file.split(".regions")[0].split("/")[-1] + "_mrna_thresh.tsv"
+	write_results(out1, out2)
 
 if __name__ == "__main__":
 	main()
