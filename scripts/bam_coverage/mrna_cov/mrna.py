@@ -47,15 +47,15 @@ def get_mRNA_cov(regions_file, thresholds_file):
 				current_exon_length = float(record.split("\t")[2]) - float(record.split("\t")[1])
 				current_exon_coverage = float(record.split("\t")[4])
 				
-				prop_1x = float(threshold.split("\t")[4])
-				prop_10x = float(threshold.split("\t")[5])
-				prop_20x = float(threshold.split("\t")[6])
+				num_1x = int(threshold.split("\t")[4])
+				num_10x = int(threshold.split("\t")[5])
+				num_20x = int(threshold.split("\t")[6])
 
-				exon_dict[current_exon] = [current_exon_length, current_exon_coverage, prop_1x, prop_10x, prop_20x]
+				exon_dict[current_exon] = [current_exon_length, current_exon_coverage, num_1x, num_10x, num_20x]
 			
 				try:
 					next_record = records[line_index + 1]
-					next_threshold = thresholds[line_index+1]
+					next_threshold = thresholds[line_index + 1]
 					next_mrna = next_record.split("\t")[3].split("exon-")[1].split(".")[0]
 			
 				except IndexError:
@@ -66,8 +66,8 @@ def get_mRNA_cov(regions_file, thresholds_file):
 				
 					while current_mrna == next_mrna:
 						# Add additional exons to exons dict 
-						# {"Exon_name": [exon_length, exon_coverage, prop_1x, prop_10x, prop_20x]
-						exon_dict[next_record.split("\t")[3]] = [float(next_record.split("\t")[2]) - float(next_record.split("\t")[1]), float(next_record.split("\t")[4]), float(next_threshold.split("\t")[4]), float(next_threshold.split("\t")[5]), float(next_threshold.split("\t")[6])]
+						# {"Exon_name": [exon_length, exon_coverage, num_1x, num_10x, num_20x]
+						exon_dict[next_record.split("\t")[3]] = [float(next_record.split("\t")[2]) - float(next_record.split("\t")[1]), float(next_record.split("\t")[4]), int(next_threshold.split("\t")[4]), int(next_threshold.split("\t")[5]), int(next_threshold.split("\t")[6])]
 				
 						line_index += 1
 					
@@ -81,32 +81,27 @@ def get_mRNA_cov(regions_file, thresholds_file):
 
 					mrna_length = sum([item[0] for item in exon_dict.values()])
 
+					total_1x = sum([item[2] for item in exon_dict.values()])
+					total_10x = sum([item[3] for item in exon_dict.values()])
+					total_20x = sum([item[4] for item in exon_dict.values()])
+
 					mean = 0 
-					prop_1x = 0
-					prop_10x = 0
-					prop_20x = 0
 
 					for value in exon_dict.values():
-						# Calculate weighted average. Sum of (coverage * exon length)/mRNA length)
+						# Calculate weighted average. Sum of (coverage * (exon length/mRNA length))
 						mean += (value[1] * (value[0]/mrna_length))
 
-						prop_1x += (value[2] * (value[0]/mrna_length))
-
-						prop_10x += (value[3] * (value[0]/mrna_length))
-
-						prop_20x += (value[4] * (value[0]/mrna_length))
-
 					# {"mRNA_name": mean coverage}
-					rna_dict_depth[current_mrna] = [mean]
+					rna_dict_depth[current_mrna] = mean
 
-					rna_dict_threshold[current_mrna] = [prop_1x, prop_10x, prop_20x]
+					rna_dict_threshold[current_mrna] = [total_1x, total_10x, total_20x]
 
 					line_index +=1 
 			
 				else:
-					rna_dict_depth[current_mrna] = [current_exon_coverage]
+					rna_dict_depth[current_mrna] = current_exon_coverage
 
-					rna_dict_threshold[current_mrna] = [prop_1x, prop_10x, prop_20x]
+					rna_dict_threshold[current_mrna] = [num_1x, num_10x, num_20x]
 					line_index += 1
 
 def write_results(out1, out2):
@@ -114,9 +109,9 @@ def write_results(out1, out2):
 		for key,value in rna_dict_depth.items():
 			f.write(str(key) + "\t" + str(value) + "\n")
 
-	with open(out2) as f2:
+	with open(out2, "a") as f2:
 		for key,value in rna_dict_threshold.items():
-			f.write(str(key) + "\t" + str(value[0]) + "\t" + str(value[1]) + "\t" + str(value[2]) + "\n")
+			f2.write(str(key) + "\t" + str(value[0]) + "\t" + str(value[1]) + "\t" + str(value[2]) + "\n")
 
 
 def main():
@@ -134,8 +129,8 @@ def main():
 
 	get_mRNA_cov(regions_file, thresholds_file)
 	
-	out1 = input_file.split(".regions")[0].split("/")[-1] + "_mrna_cov.tsv"
-	out2 = input_file.split(".regions")[0].split("/")[-1] + "_mrna_thresh.tsv"
+	out1 = regions_file.split("/")[-1].split(".gz")[0]
+	out2 = thresholds_file.split("/")[-1].split(".gz")[0]
 	write_results(out1, out2)
 
 if __name__ == "__main__":
