@@ -15,7 +15,7 @@ print(number_loci)
 # Taxa expected to be present in each single locus tree
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
-set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "nudus"}
+set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "franciscanus"}
 
 def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
@@ -56,8 +56,8 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line2 = "BEGIN TREES;"
         line3 = "END;"
         line4 = "Begin PHYLONET;"
-        #line5 = "{} {} {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
-        line5 = "{} (all) {} -x {} -pl {} -n {} -di;".format(program, num_reticulations, runs, processors, num_net_returned)
+        line5 = "{} {} {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
+        #line5 = "{} (all) {} -x {} -pl {} -n {} -di;".format(program, num_reticulations, runs, processors, num_net_returned)
         line6 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
