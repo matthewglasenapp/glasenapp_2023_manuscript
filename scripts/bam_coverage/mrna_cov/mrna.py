@@ -94,14 +94,14 @@ def get_mRNA_cov(regions_file, thresholds_file):
 					# {"mRNA_name": mean coverage}
 					rna_dict_depth[current_mrna] = mean
 
-					rna_dict_threshold[current_mrna] = [total_1x, total_10x, total_20x]
+					rna_dict_threshold[current_mrna] = [mrna_length, total_1x, total_10x, total_20x]
 
 					line_index +=1 
 			
 				else:
 					rna_dict_depth[current_mrna] = current_exon_coverage
 
-					rna_dict_threshold[current_mrna] = [num_1x, num_10x, num_20x]
+					rna_dict_threshold[current_mrna] = [current_exon_length, num_1x, num_10x, num_20x]
 					line_index += 1
 
 def write_results(out1, out2):
@@ -111,12 +111,14 @@ def write_results(out1, out2):
 
 	with open(out2, "a") as f2:
 		for key,value in rna_dict_threshold.items():
-			f2.write(str(key) + "\t" + str(value[0]) + "\t" + str(value[1]) + "\t" + str(value[2]) + "\n")
+			f2.write(str(key) + "\t" + str(int(value[0])) + "\t" + str(value[1]) + "\t" + str(value[2]) + "\t" + str(value[3]) + "\n")
 
 
 def main():
-	coverage_file_list = get_coverage_files_paths()
+	#coverage_file_list = get_coverage_files_paths()
 
+	coverage_file_list = [('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/depressus_SRR5767284.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/depressus_SRR5767284.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/droebachiensis_SRR5767286.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/droebachiensis_SRR5767286.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/fragilis_SRR5767279.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/fragilis_SRR5767279.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/franciscanus_SRR5767282.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/franciscanus_SRR5767282.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/intermedius_SRR5767280.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/intermedius_SRR5767280.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/lividus_ERS2351987.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/lividus_ERS2351987.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/nudus_SRR5767281.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/nudus_SRR5767281.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pallidus_SRR5767285.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pallidus_SRR5767285.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_DRR107784.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_DRR107784.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_SRR5767283.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_SRR5767283.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR6281818.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR6281818.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR7211988.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR7211988.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/variegatus_SRR7207203.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/variegatus_SRR7207203.thresholds.bed.gz')]	
+	
 	array_id = os.environ["array_id"]
 	print("Array ID: {}".format(array_id))
 
