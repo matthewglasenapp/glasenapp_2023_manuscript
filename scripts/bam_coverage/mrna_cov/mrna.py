@@ -56,10 +56,10 @@ def get_mRNA_cov(regions_file, thresholds_file):
 				try:
 					next_record = records[line_index + 1]
 					next_threshold = thresholds[line_index + 1]
-					next_mrna = next_record.split("\t")[3].split("exon-")[1].split(".")[0]
+					next_mrna = next_record.split("\t")[3].split("exon-")[1]
 			
 				except IndexError:
-					rna_dict[current_mrna] = current_exon_coverage
+					rna_dict_depth[current_mrna] = current_exon_coverage
 					break
 	
 				if current_mrna == next_mrna:
@@ -72,7 +72,7 @@ def get_mRNA_cov(regions_file, thresholds_file):
 						line_index += 1
 					
 						try:
-							next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1].split(".")[0]
+							next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1]
 							next_threshold = thresholds[line_index + 1]
 							next_record = records[line_index + 1]
 					
