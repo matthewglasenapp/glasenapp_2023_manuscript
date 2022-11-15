@@ -1,13 +1,24 @@
+"""
+This script calculate coverage depth metrics for mRNA transcripts using mosdepth. 
+Mosdepth is used to estimate depth for all protein coding exons.
+The exons of each transcript are aggregated to calcuate depths metrics for each mRNA transcript. 
+The mosdepth command that was run to generate the input files was:
+mosdepth --by regions_file --no-per-base --thresholds 1,5,10,20,30,100 -t 4 --fast-mode prefix bam_file
+"""
+
 import gzip 
 import os
 
+# Specify directory containing mosdepth outputfiles (both regions.bed.gz and thresholds.bed.gz files)
 bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
 
-# Initialize dictionary for mRNA names and their average coverage
+# Initialize dictionary for mRNA names and their average coverage.
 rna_dict_depth = dict()
 
+# Initialize dictionary for mRNA names and the number of bases covered by 1, 10, and 20 reads. 
 rna_dict_threshold = dict()
 
+# Get zipped list of mosdepth regions and thresholds files for each species
 def get_coverage_files_paths():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* | grep -v 'csi' > regions_files".format(bed_file_dir)
 	os.system(get_regions_file_paths)
@@ -20,6 +31,7 @@ def get_coverage_files_paths():
 
 	return list(file_list)
 
+# Calculate coverage depth metrics for mRNA transcripts 
 def get_mRNA_cov(regions_file, thresholds_file):
 	
 	line_index = 0
@@ -48,15 +60,15 @@ def get_mRNA_cov(regions_file, thresholds_file):
 				current_exon_coverage = float(record.split("\t")[4])
 				
 				num_1x = int(threshold.split("\t")[4])
-				num_10x = int(threshold.split("\t")[5])
-				num_20x = int(threshold.split("\t")[6])
+				num_10x = int(threshold.split("\t")[6])
+				num_20x = int(threshold.split("\t")[7])
 
 				exon_dict[current_exon] = [current_exon_length, current_exon_coverage, num_1x, num_10x, num_20x]
 			
 				try:
 					next_record = records[line_index + 1]
 					next_threshold = thresholds[line_index + 1]
-					next_mrna = next_record.split("\t")[3].split("exon-")[1]
+					next_mrna = next_record.split("\t")[3].split("exon-")[1].split("-")[0]
 			
 				except IndexError:
 					rna_dict_depth[current_mrna] = current_exon_coverage
@@ -67,12 +79,12 @@ def get_mRNA_cov(regions_file, thresholds_file):
 					while current_mrna == next_mrna:
 						# Add additional exons to exons dict 
 						# {"Exon_name": [exon_length, exon_coverage, num_1x, num_10x, num_20x]
-						exon_dict[next_record.split("\t")[3]] = [float(next_record.split("\t")[2]) - float(next_record.split("\t")[1]), float(next_record.split("\t")[4]), int(next_threshold.split("\t")[4]), int(next_threshold.split("\t")[5]), int(next_threshold.split("\t")[6])]
+						exon_dict[next_record.split("\t")[3]] = [(float(next_record.split("\t")[2]) - float(next_record.split("\t")[1])), float(next_record.split("\t")[4]), int(next_threshold.split("\t")[4]), int(next_threshold.split("\t")[6]), int(next_threshold.split("\t")[7])]
 				
 						line_index += 1
 					
 						try:
-							next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1]
+							next_mrna = records[line_index + 1].split("\t")[3].split("exon-")[1].split("-")[0]
 							next_threshold = thresholds[line_index + 1]
 							next_record = records[line_index + 1]
 					
@@ -102,8 +114,10 @@ def get_mRNA_cov(regions_file, thresholds_file):
 					rna_dict_depth[current_mrna] = current_exon_coverage
 
 					rna_dict_threshold[current_mrna] = [current_exon_length, num_1x, num_10x, num_20x]
+					
 					line_index += 1
 
+# Write results to output files 
 def write_results(out1, out2):
 	with open(out1,"a") as f:
 		for key,value in rna_dict_depth.items():
@@ -117,6 +131,8 @@ def write_results(out1, out2):
 def main():
 	#coverage_file_list = get_coverage_files_paths()
 
+	# Output from get_coverage_files_paths()
+	# get_coverage_files_paths() throws an error when the script is submitted as a slurm array job
 	coverage_file_list = [('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/depressus_SRR5767284.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/depressus_SRR5767284.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/droebachiensis_SRR5767286.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/droebachiensis_SRR5767286.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/fragilis_SRR5767279.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/fragilis_SRR5767279.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/franciscanus_SRR5767282.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/franciscanus_SRR5767282.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/intermedius_SRR5767280.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/intermedius_SRR5767280.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/lividus_ERS2351987.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/lividus_ERS2351987.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/nudus_SRR5767281.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/nudus_SRR5767281.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pallidus_SRR5767285.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pallidus_SRR5767285.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_DRR107784.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_DRR107784.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_SRR5767283.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/pulcherrimus_SRR5767283.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR6281818.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR6281818.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR7211988.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/purpuratus_SRR7211988.thresholds.bed.gz'), ('/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/variegatus_SRR7207203.regions.bed.gz', '/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/variegatus_SRR7207203.thresholds.bed.gz')]	
 	
 	array_id = os.environ["array_id"]

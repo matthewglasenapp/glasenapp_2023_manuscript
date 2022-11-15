@@ -8,19 +8,17 @@ import subprocess
 
 num_cores = multiprocessing.cpu_count()
 
-# For make_sco_gff part of the script
+# S. purpuratus gff3 file
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
+# Bed file containing a record for each protein coding gene in the S. purpuratus assembly. See the ncbi/ directory for scripts to generate this file
+protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
+
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
-# Franc subset
-#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
-
-# Pulcherrimus subset
-#subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
-
 # Strongylocentrotidae Subset
 subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
+# Average coverage of S. purpuratus genes for each sample
 mean_coverage_spur5_genes = {
 "depressus_SRR5767284": 22,
 "droebachiensis_SRR5767286" : 26.46,
@@ -37,6 +35,7 @@ mean_coverage_spur5_genes = {
 "variegatus_SRR7207203": 8.4
 }
 
+# Average coverage of S. purpuratus exons for each sample
 mean_coverage_spur5_exons = {
 "depressus_SRR5767284": 47.5,
 "droebachiensis_SRR5767286" : 41.5,
@@ -52,8 +51,6 @@ mean_coverage_spur5_exons = {
 "purpuratus_SRR7211988": 100.3,
 "variegatus_SRR7207203": 8.4
 }
-
-protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
 
 #bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
 bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
