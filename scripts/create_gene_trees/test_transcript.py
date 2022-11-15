@@ -8,32 +8,46 @@ import subprocess
 
 num_cores = multiprocessing.cpu_count()
 
+# nw_utils directory
+nw_utils = "/hb/groups/pogson_group/dissertation/software/newick_utils/src/"
+
+# Path to vcf2fasta.py
+vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
+
+# Feature of gff file that vcf2fasta.py will build alignments for
+feature = "CDS"
+
+# Path to S. purpuratus reference genome
+reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
+
 # S. purpuratus gff3 file
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
+# Path to filtered multisample vcf file
+vcf_file = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/3bp_filtered_genotype_calls_pf.g.vcf.gz"
+
 # Bed file containing a record for each protein coding gene in the S. purpuratus assembly. See the ncbi/ directory for scripts to generate this file
 protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
+
+# Directory containing the output files from mrna.py
+bed_file_dir = "/hb/scratch/mglasena/mrna_cov_2/"
+
+# Sample bed file from the output of mrna.py
+bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 # Strongylocentrotidae Subset
 subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
-# Average coverage of S. purpuratus genes for each sample
-mean_coverage_spur5_genes = {
-"depressus_SRR5767284": 22,
-"droebachiensis_SRR5767286" : 26.46,
-"fragilis_SRR5767279": 33.73,
-"franciscanus_SRR5767282": 22.47,
-"intermedius_SRR5767280": 30.95,
-"lividus_ERS2351987": 6.22,
-"nudus_SRR5767281": 24.1,
-"pallidus_SRR5767285": 12.01,
-"pulcherrimus_DRR107784": 77.65,
-"pulcherrimus_SRR5767283": 28.15,
-"purpuratus_SRR6281818": 51.56,
-"purpuratus_SRR7211988": 93.9,
-"variegatus_SRR7207203": 8.4
-}
+# Specify thresholds for filtering. 
+min_cov_threshold = 10
+
+prop_1x_threshold = 0.9
+
+prop_10x_threshold = 0.0
+
+# Required gap between two adjacent loci in base pairs 
+required_gap = 50000
 
 # Average coverage of S. purpuratus exons for each sample
 mean_coverage_spur5_exons = {
@@ -52,47 +66,7 @@ mean_coverage_spur5_exons = {
 "variegatus_SRR7207203": 8.4
 }
 
-#bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
-bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
-
-#bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
-#bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
-bed_file_dir = "/hb/scratch/mglasena/mrna_cov_2/"
-
-min_cov_threshold = 10
-
-# Consider not filtering by prop_1x_threshold, because this value is heavily determined by what proportion of the gene is actually CDS. 
-# Enter as a proportion
-prop_1x_threshold = 0.9
-
-prop_10x_threshold = 0.0
-
-subset_mean_coverage_spur5_exons = dict()
-
-# {"rna": ("parent_gene", [average coverage depth for each species], [prop_1x], [prop_10x], [prop_20x])}
-rna_dict = dict()
-
-passed_genes_dict = dict()
-
-# For filtering by gap part of code
-#required_gap = 100000
-required_gap = 50000
-# Scaffold dictionay in format of "Scaffold":[[scaffold,gene,start,stop]]
-scaffold_dict = {}
-# Initialize list for genes passing gap filter
-passed_genes = []
-
-# Dictionary linking mRNA to parent genes
-mrna_gene_dict = dict()
-
-filtered_mrna_gene_dict = dict()
-
-# For vcf2fasta part of the code 
-vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
-reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
-vcf_file = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/3bp_filtered_genotype_calls_pf.g.vcf.gz"
-feature = "gene"
-
+# Mapping of DNA sample names to species names 
 sample_names = {
 #'(4': "(lividus",
 'QB3KMK013': 'fragilis',
@@ -111,9 +85,29 @@ sample_names = {
 #'LVAR.00': 'variegatus'
 }
 
-# nw_utils directory
-nw_utils = "/hb/groups/pogson_group/dissertation/software/newick_utils/src/"
+# Initialize new dictionary containing the average coverage of S. purpuratus exons for each sample in subset_sample_list variable
+subset_mean_coverage_spur5_exons = dict()
 
+# Initialize dictionary in format of {"rna": [average coverage depth for each species], [prop_1x], [prop_10x], [prop_20x])}
+rna_dict = dict()
+
+# Initialize dictionary for mRNAs passing initial filter by coverage depth 
+passed_rna_dict = dict()
+
+# Initialize dictionary mapping mRNAs passing intial filter by coverage depth to the name of their parent gene
+mrna_gene_dict = dict()
+
+# Initialize dictionay in format of "Scaffold":[[scaffold,rna,start,stop]] for mRNAs passing initial filter. 
+# This dictionary will be used to filter out mRNAs that are too close to one another
+scaffold_dict = {}
+
+# Initialize final list for genes passing both the coverage depth and gap filters
+passed_rnas = []
+
+# Initialize dictionary mapping mRNA names to parent gene name for mRNAs that passed all filters
+filtered_mrna_gene_dict = dict()
+
+# Populate subset_mean_coverage_spur5_exons variable with the samples included in the subset_sample_list variable
 def subset_coverage_dict():
 	try:
 		for sample in subset_sample_list:
@@ -123,6 +117,7 @@ def subset_coverage_dict():
 		for key in mean_coverage_spur5_exons:
 			subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
 
+# Get zipped list of regions and thresholds files for each species 
 def get_zipped_bed_file_list():
 	get_regions_file_paths = "find {} -type f -name *.regions.bed.gz* > regions_files".format(bed_file_dir)
 	os.system(get_regions_file_paths)
@@ -133,16 +128,20 @@ def get_zipped_bed_file_list():
 	with open("regions_files", "r") as f1, open("thresholds_files","r") as f2:
 		file_list = zip(sorted(f1.read().splitlines()),sorted(f2.read().splitlines()))
 
+	os.system("rm regions_files")
+	os.system("rm thresholds_files")
+
 	return list(file_list)
 
-# Create dictionary in the format of 
-def initialize_gene_dict():
+# Populate keys and create structure for rna_dict in format of {"rna": [average coverage depth for each species], [prop_1x], [prop_10x], [prop_20x])}
+def initialize_rna_dict():
 	with gzip.open(bed_file,"rt") as f:
 		for line in f:
 			gene = line.split("\t")[0]
 			rna_dict[gene] = [],[],[],[]
 
-def fill_gene_dict(regions_file, thresholds_file):
+# Populate rna dict with coverage metrics for each species. No filtering involved in this step 
+def fill_rna_dict(regions_file, thresholds_file):
 	with gzip.open(regions_file, "rt") as file1, gzip.open(thresholds_file, "rt") as file2:
 		for line_file1, line_file2 in zip(file1, islice(file2, 0, None)):
 			gene_id = line_file1.split("\t")[-2]
@@ -168,10 +167,15 @@ def fill_gene_dict(regions_file, thresholds_file):
 			rna_dict[gene_id][2].append(prop_10x)
 			rna_dict[gene_id][3].append(prop_20x)
 
+	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
+
+# Write rna_dict to csv file 
 def write_all_rna_dict_csv():
 	csv_file = open("all_rna.csv","w")
 	writer = csv.writer(csv_file)	
 	header = ["mRNA"]
+	
+	# Create header row for csv file
 	try:
 		for i in range(4):
 			for sample in subset_sample_list:
@@ -180,15 +184,21 @@ def write_all_rna_dict_csv():
 		for i in range(4):
 			for key in mean_coverage_spur5_genes.keys():
 				header.append(key)
+	
 	writer.writerow(header)
 
+	# Write row for each mRNA containing mean depth, prop1x, prop10x, and prop20x for each species/sample
+	counter = 0
 	for key,value in rna_dict.items():
 		row = [key] + value[0] + value[1] + value[2] + value[3]
+		counter += 1
 		writer.writerow(row)
 
+	print("{} mRNA records written to all_rna.csv".format(counter))
 	csv_file.close()
 
-def filter_gene_dict():
+# Filter rna_dict by coverage metrics. Add mRNA's passing filter to passed_rna_dict
+def filter_rna_dict():
 	for key, value in rna_dict.items():
 		mean_depth_lst = [item for item in value[0]]
 		one_x_lst = [item for item in value[1]]
@@ -197,18 +207,26 @@ def filter_gene_dict():
 		
 		if min(mean_depth_lst) >= min_cov_threshold and min(one_x_lst) >= prop_1x_threshold and min(ten_x_lst) >= prop_10x_threshold:
 			test_var = True
+			
+			# Filter any species who's coverage for that mRNA is double or greater the average coverage for exons
 			for counter, sample in enumerate(subset_mean_coverage_spur5_exons):
 				if mean_depth_lst[counter] >= (subset_mean_coverage_spur5_exons[sample] * 2):
 					test_var = False
 				
 			if test_var == True:
-				passed_genes_dict[key] = value
+				passed_rna_dict[key] = value
 
-def write_passed_genes():
+	print("{} mRNA records passed intial coverage depth filters".format(len(passed_rna_dict)))
+
+# Get file of mRNA records from gff3 file
+def get_mrna_gff():
 	get_mrna_from_gff = '''awk '$3 == "mRNA"' {} > mrna_records.txt'''.format(gff_file)
 	os.system(get_mrna_from_gff)
 	
-	# Creates mapping of rna: parent_gene for mRNAs in passed_genes_dict 
+# Create dictionary for mRNAs passing initial filter in the format of "Scaffold":[[scaffold,rna,start,stop]]. This dictionary will be used for filtering by distance on chromosome
+def create_scaffold_dict():
+	
+	# Creates mapping of rna: parent_gene for mRNAs in passed_rna_dict 
 	with open("mrna_records.txt", "r") as f:
 		for line in f:
 			scaffold = line.split("\t")[0]
@@ -217,63 +235,92 @@ def write_passed_genes():
 			rna = line.split("\t")[8].split(";")[0].split("rna-")[1]
 			parent_gene = line.split("\t")[8].split(";")[1].split("gene-")[1]
 			
-			if rna in passed_genes_dict.keys() and scaffold != "NC_001453.1":
-				mrna_gene_dict[rna] = parent_gene
+			mt_rna_counter = 0 
+			if rna in passed_rna_dict.keys():
+				
+				if scaffold != "NC_001453.1":
+					mrna_gene_dict[rna] = parent_gene
+				
+				else:
+					mt_rna_counter += 1
 
 				if scaffold_dict.get(scaffold):
 					scaffold_dict[scaffold].append([scaffold,rna,start,stop])
 				else:
 					scaffold_dict[scaffold] = [[scaffold,rna,start,stop]]
 
+	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
+	print("{} mRNAs added to scaffold_dict")
+
+
+# Filter mRNA records in scaffold_dict so that all remaining mRNAs are >= required_gap apart from each other
 def check_proximity():
-	gene_counter = 0 
-	for gene_list in scaffold_dict.values():
-		for gene in gene_list:
+	rna_counter = 0
+	filter_counter = 0
+	
+	for rna_list in scaffold_dict.values():
+		for rna in rna_list:
 			try:
-				current_stop = gene_list[gene_counter][3]
+				current_stop = rna_list[rna_counter][3]
 
 			except IndexError:
 				break
 				
 			try:
-				next_start = gene_list[gene_counter + 1][2]
+				next_start = rna_list[rna_counter + 1][2]
 			
 			except IndexError:
-				gene_counter = 0
+				rna_counter = 0
 				break
 			
 			while (int(next_start) - int(current_stop)) < required_gap:
-				current_gene = gene_list[gene_counter]
-				failed_gene = gene_list.pop(gene_counter+1)
+				current_rna = rna_list[rna_counter]
+				failed_rna = rna_list.pop(rna_counter+1)
+				filter_counter += 1
 
 				try:
-					next_start = gene_list[gene_counter+1][2]
+					next_start = rna_list[rna_counter+1][2]
+				
 				except IndexError:
 					break
 			
-			gene_counter += 1
+			rna_counter += 1
 
-def get_passed_genes_list():
-	for gene_list in scaffold_dict.values():
-		for gene in gene_list:
-			passed_genes.append(gene[1])
+	print("{} mRNAs removed to satisfy gap filter".format(filter_counter))
+	print("{} mRNAs passed both coverage deptha and gap filters".format(len(scaffold_dict)))
+
+# Get list of passed mRNAs and create new filtered_mrna_gene_dict that only includes mRNAs that passed the gap filter. 
+def get_passed_rnas():
+	for rna_list in scaffold_dict.values():
+		for rna in rna_list:
+			passed_rnas.append(gene[1])
 
 	for key,value in mrna_gene_dict.items():
-		if key in passed_genes:
+		if key in passed_rnas:
 			filtered_mrna_gene_dict[key] = value
 
+	print("{} mRNAs in passed_rnas list".format(len(passed_rnas)))
+	print("{} mRNAs in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
+
+# Write new bed file ("unlinked_loci.bed") of parent genes with an mRNA transcript that passed all filters
 def write_new_bed_file():
+	records_written = 0
 	with open(protein_coding_genes_bed_file,"r") as f:
 		with open("unlinked_loci.bed","a") as f2:
 			for line in f:
 				if line.split("\t")[3].split("gene-")[1] in filtered_mrna_gene_dict.values():
+					records_written += 1
 					f2.write(line)
 
-def write_passed_gene_dict_csv():
+	print("{} records written to unlinked_loci.bed".format(records_written))
 
+# Write csv file of RNAs passing all filters and their coverage metrics
+def write_passed_rna_dict_csv():
 	csv_file = open("passed_rna.csv","w")
 	writer = csv.writer(csv_file)	
 	header = ["mRNA"]
+	records_written = 0 
+	
 	try:
 		for i in range(4):
 			for sample in subset_sample_list:
@@ -282,14 +329,18 @@ def write_passed_gene_dict_csv():
 		for i in range(4):
 			for key in mean_coverage_spur5_genes.keys():
 				header.append(key)
+	
 	writer.writerow(header)
 
-	for key,value in passed_genes_dict.items():
+	for key,value in passed_rna_dict.items():
 		if key in filtered_mrna_gene_dict.keys():
 			row = [key] + value[0] + value[1] + value[2] + value[3]
+			records_written += 1
 			writer.writerow(row)
 
 	csv_file.close()
+
+	print("{} records written to passed_rna.csv".format(records_writeen))
 
 def get_gene_ids():
 	split_columns = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
@@ -360,29 +411,25 @@ def main():
 
 	bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_gene_dict()
+	initialize_rna_dict()
 
 	for regions_file, thresholds_file in bed_file_list:
 		try:
 			for sample in subset_sample_list:
 				if sample in regions_file and sample in thresholds_file:
-					fill_gene_dict(regions_file, thresholds_file)
+					fill_rna_dict(regions_file, thresholds_file)
 		
 		except NameError:
-			fill_gene_dict(regions_file, thresholds_file)
-
+			fill_rna_dict(regions_file, thresholds_file)
 
 	write_all_rna_dict_csv()
-
-	filter_gene_dict()
-
-	write_passed_genes()
-	
+	filter_rna_dict()
+	get_mrna_gff()
+	create_scaffold_dict()
 	check_proximity()
-	get_passed_genes_list()
-	
+	get_passed_rnas()
 	write_new_bed_file()
-	write_passed_gene_dict_csv()
+	write_passed_rna_dict_csv()
 
 	#gene_ids = get_gene_ids()
 
