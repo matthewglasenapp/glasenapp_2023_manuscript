@@ -56,11 +56,11 @@ mean_coverage_spur5_exons = {
 protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
 
 #bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/unique_exons.bed"
-bed_file = "/hb/scratch/mglasena/mrna_cov/pallidus_SRR5767285.regions.bed.gz"
+bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
 
 #bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/"
 #bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
-bed_file_dir = "/hb/scratch/mglasena/mrna_cov/"
+bed_file_dir = "/hb/scratch/mglasena/mrna_cov_2/"
 
 min_cov_threshold = 10
 
@@ -217,7 +217,7 @@ def write_passed_genes():
 			scaffold = line.split("\t")[0]
 			start = line.split("\t")[3]
 			stop = line.split("\t")[4]
-			rna = line.split("\t")[8].split(";")[0].split("rna-")[1].split(".")[0]
+			rna = line.split("\t")[8].split(";")[0].split("rna-")[1]
 			parent_gene = line.split("\t")[8].split(";")[1].split("gene-")[1]
 			
 			if rna in passed_genes_dict.keys() and scaffold != "NC_001453.1":
