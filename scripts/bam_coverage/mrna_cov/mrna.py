@@ -39,7 +39,7 @@ def get_mRNA_cov(regions_file, thresholds_file):
 		
 			else:
 			
-				current_mrna = record.split("\t")[3].split("exon-")[1].split(".")[0]
+				current_mrna = record.split("\t")[3].split("exon-")[1].split("-")[0]
 			
 				exon_dict = dict()
 
