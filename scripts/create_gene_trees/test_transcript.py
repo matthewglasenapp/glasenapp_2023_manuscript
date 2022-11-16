@@ -15,7 +15,7 @@ nw_utils = "/hb/groups/pogson_group/dissertation/software/newick_utils/src/"
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 
 # Feature of gff file that vcf2fasta.py will build alignments for
-feature = "transcript"
+feature = "CDS"
 
 # Path to S. purpuratus reference genome
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
@@ -379,7 +379,7 @@ def make_sco_gff(gene):
 
 # Use vcf2fasta to create fasta alignments for all mRNAs passing filter
 def run_vcf2fasta():
-	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {}".format(vcf2fasta, reference_genome, vcf_file, feature)
+	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
 
 def replace_missing_genotype_char():
