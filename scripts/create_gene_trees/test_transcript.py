@@ -167,8 +167,6 @@ def fill_rna_dict(regions_file, thresholds_file):
 			rna_dict[gene_id][2].append(prop_10x)
 			rna_dict[gene_id][3].append(prop_20x)
 
-	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
-
 # Write rna_dict to csv file 
 def write_all_rna_dict_csv():
 	csv_file = open("all_rna.csv","w")
@@ -249,9 +247,14 @@ def create_scaffold_dict():
 				else:
 					scaffold_dict[scaffold] = [[scaffold,rna,start,stop]]
 
-	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
-	print("{} mRNAs added to scaffold_dict")
+	record_counter = 0
+	for value in scaffold_dict.values():
+		for item in value:
+			record_counter += 1
 
+	os.system("rm mrna_records.txt")
+	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
+	print("{} mRNAs added to scaffold_dict".format(record_counter))
 
 # Filter mRNA records in scaffold_dict so that all remaining mRNAs are >= required_gap apart from each other
 def check_proximity():
@@ -286,14 +289,19 @@ def check_proximity():
 			
 			rna_counter += 1
 
+	record_counter = 0
+	for value in scaffold_dict.values():
+		for item in value:
+			record_counter += 1
+
 	print("{} mRNAs removed to satisfy gap filter".format(filter_counter))
-	print("{} mRNAs passed both coverage deptha and gap filters".format(len(scaffold_dict)))
+	print("{} mRNAs passed both coverage depth and gap filters".format(record_counter))
 
 # Get list of passed mRNAs and create new filtered_mrna_gene_dict that only includes mRNAs that passed the gap filter. 
 def get_passed_rnas():
 	for rna_list in scaffold_dict.values():
 		for rna in rna_list:
-			passed_rnas.append(gene[1])
+			passed_rnas.append(rna[1])
 
 	for key,value in mrna_gene_dict.items():
 		if key in passed_rnas:
@@ -302,13 +310,21 @@ def get_passed_rnas():
 	print("{} mRNAs in passed_rnas list".format(len(passed_rnas)))
 	print("{} mRNAs in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
 
+	with open("test_list","a") as f:
+		for record in passed_rnas:
+			f.write(record + "\n")
+
+
 # Write new bed file ("unlinked_loci.bed") of parent genes with an mRNA transcript that passed all filters
 def write_new_bed_file():
 	records_written = 0
+	records_written_lst = []
+	
 	with open(protein_coding_genes_bed_file,"r") as f:
 		with open("unlinked_loci.bed","a") as f2:
 			for line in f:
 				if line.split("\t")[3].split("gene-")[1] in filtered_mrna_gene_dict.values():
+					records_written_lst.append(line.split("\t")[3].split("gene-")[1])
 					records_written += 1
 					f2.write(line)
 
@@ -340,7 +356,7 @@ def write_passed_rna_dict_csv():
 
 	csv_file.close()
 
-	print("{} records written to passed_rna.csv".format(records_writeen))
+	print("{} records written to passed_rna.csv".format(records_written))
 
 def get_gene_ids():
 	split_columns = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
@@ -421,6 +437,8 @@ def main():
 		
 		except NameError:
 			fill_rna_dict(regions_file, thresholds_file)
+
+	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 
 	write_all_rna_dict_csv()
 	filter_rna_dict()
