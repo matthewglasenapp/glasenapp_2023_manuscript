@@ -107,6 +107,9 @@ passed_rnas = []
 # Initialize dictionary mapping mRNA names to parent gene name for mRNAs that passed all filters
 filtered_mrna_gene_dict = dict()
 
+cds_parent_rna_dict = dict()
+records_to_delete = []
+
 # Populate subset_mean_coverage_spur5_exons variable with the samples included in the subset_sample_list variable
 def subset_coverage_dict():
 	try:
@@ -382,6 +385,44 @@ def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
 
+def identify_redundant_isoforms():
+	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
+	os.system(get_cds_gff)
+
+	with open("cds.gff", "r") as f:
+		records = f.read().splitlines()
+
+		for record in records:
+			cds_name = record.split("\t")[8].split(";")[0].split("cds-")[1]
+			parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
+
+			if cds_name in cds_parent_rna_dict:
+				if cds_parent_rna_dict[cds_name] == parent_rna_name:
+					continue
+			
+				else:
+					print(cds_name)
+					print(parent_rna_name)
+					break
+
+			else:
+				cds_parent_rna_dict[cds_name] = parent_rna_name
+
+	with open("passed_rnas.txt") as f2:
+		passed_rnas_lst = f2.read().splitlines()
+
+		for key,value in cds_parent_rna_dict.items():
+			if value in passed_rnas_lst:
+				continue
+
+			else:
+				records_to_delete.append(key)
+
+def delete_redundant_isoforms():
+	for record in records_to_delete:
+		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
+		os.system(delete)
+
 def replace_missing_genotype_char():
 	replace_missing_genotypes = r'find ./vcf2fasta_gene/ -type f -exec sed -i.bak "s/\*/N/g" {} \;'
 	os.system(replace_missing_genotypes)
@@ -423,45 +464,49 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_rna_dict()
+	#initialize_rna_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		try:
-			for sample in subset_sample_list:
-				if sample in regions_file and sample in thresholds_file:
-					fill_rna_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#try:
+			#for sample in subset_sample_list:
+				#if sample in regions_file and sample in thresholds_file:
+					#fill_rna_dict(regions_file, thresholds_file)
 		
-		except NameError:
-			fill_rna_dict(regions_file, thresholds_file)
+		#except NameError:
+			#fill_rna_dict(regions_file, thresholds_file)
 
-	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
+	#print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 
-	write_all_rna_dict_csv()
-	filter_rna_dict()
-	get_mrna_gff()
-	create_scaffold_dict()
-	check_proximity()
-	get_passed_rnas()
-	write_new_bed_file()
-	write_passed_rna_dict_csv()
+	#write_all_rna_dict_csv()
+	#filter_rna_dict()
+	#get_mrna_gff()
+	#create_scaffold_dict()
+	#check_proximity()
+	#get_passed_rnas()
+	#write_new_bed_file()
+	#write_passed_rna_dict_csv()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
-	run_vcf2fasta()
+	#run_vcf2fasta()
+
+	identify_redundant_isoforms()
+	delete_redundant_isoforms()
+
 	#replace_missing_genotype_char()
 	#run_iqtree()
 	#subset_boot_file()
