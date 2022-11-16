@@ -15,7 +15,7 @@ nw_utils = "/hb/groups/pogson_group/dissertation/software/newick_utils/src/"
 vcf2fasta = "/hb/groups/pogson_group/dissertation/software/vcf2fasta/vcf2fasta.py"
 
 # Feature of gff file that vcf2fasta.py will build alignments for
-feature = "CDS"
+feature = "transcript"
 
 # Path to S. purpuratus reference genome
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
@@ -252,44 +252,41 @@ def create_scaffold_dict():
 		for item in value:
 			record_counter += 1
 
-	print(scaffold_dict)
 	os.system("rm mrna_records.txt")
 	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
 	print("{} mRNAs added to scaffold_dict".format(record_counter))
 
 # Filter mRNA records in scaffold_dict so that all remaining mRNAs are >= required_gap apart from each other
 def check_proximity():
-	rna_counter = 0
 	filter_counter = 0
+	failed_rna_lst = []
 	
 	for rna_list in scaffold_dict.values():
-		for rna in rna_list:
-			try:
-				current_stop = rna_list[rna_counter][3]
+		first = True
+		last_stop = 0
+		rna_counter = 0
 
-			except IndexError:
-				break
-				
-			try:
-				next_start = rna_list[rna_counter + 1][2]
-			
-			except IndexError:
-				rna_counter = 0
-				break
-			
-			while (int(next_start) - int(current_stop)) < required_gap:
-				current_rna = rna_list[rna_counter]
-				rna_list.pop(rna_counter + 1)
-				filter_counter += 1
+		while rna_counter < len(rna_list):
+			(chromosome, gene, start, stop) = rna_list[rna_counter]
 
-				try:
-					next_start = rna_list[rna_counter + 1][2]
-				
-				except IndexError:
-					break
+			if first:
+				last_stop = int(stop)
+				first = False
+				rna_counter += 1
+				continue
 			
-			rna_counter += 1
+			elif int(start) < (last_stop + required_gap):
 
+				failed_rna = rna_list.pop(rna_counter)
+				#failed_rna_lst.append(failed_rna)
+				filter_counter +=1 
+			
+			else:
+				last_stop = int(stop)
+				rna_counter +=1
+
+	#print(failed_rna_lst)
+	
 	record_counter = 0
 	for value in scaffold_dict.values():
 		for item in value:
@@ -311,7 +308,7 @@ def get_passed_rnas():
 	print("{} mRNAs in passed_rnas list".format(len(passed_rnas)))
 	print("{} mRNAs in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
 
-	with open("test_list","a") as f:
+	with open("passed_rnas.txt","a") as f:
 		for record in passed_rnas:
 			f.write(record + "\n")
 
@@ -359,26 +356,28 @@ def write_passed_rna_dict_csv():
 
 	print("{} records written to passed_rna.csv".format(records_written))
 
+# Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
-	split_columns = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
-	os.system(split_columns)
+	get_info_column = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
+	os.system(get_info_column)
 
-	with open("gene_list","r") as f:
-		with open("gene_ids","a") as f2:
-			gene_list = f.read().splitlines()
-			for gene in gene_list:
-				identifier = gene.split(";")[1]
-				# For exons
-				#identifier = gene.split("\t")[3]
-				f2.write(identifier + "\n")
+	with open("gene_list","r") as f, open("gene_ids","a") as f2:
+		gene_list = f.read().splitlines()
+		for gene in gene_list:
+			identifier = gene.split(";")[1]
+			f2.write(identifier + "\n")
 
+	os.system("rm gene_list")
 	gene_ids = open("gene_ids", "r").read().splitlines()
+	os.system("rm gene_ids")
 	return gene_ids
 
+# Using S. purpuratus gff3 file, make gff file for each gene that passed previous filters
 def make_sco_gff(gene):
-	command = "grep {} {} > {}.record".format(gene, gff_file, gene)
+	command = "grep {} {} > single_gene_gff_records/{}.record".format(gene, gff_file, gene)
 	os.system(command)
 
+# Use vcf2fasta to create fasta alignments for all mRNAs passing filter
 def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {}".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
@@ -392,7 +391,7 @@ def replace_missing_genotype_char():
 	
 def run_iqtree():
 	#run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
-	run_iqtree = "iqtree -S vcf2fasta_gene/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
+	run_iqtree = "iqtree -S vcf2fasta_CDS/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
 def subset_boot_file():
@@ -450,13 +449,19 @@ def main():
 	write_new_bed_file()
 	write_passed_rna_dict_csv()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
-	#os.system("cat *.record > sco_gff.gff")
-	#os.system("rm *.record")
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	
+	# Concatenate all single gene gff records into "sco_gff.gff" file
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	
+	# Delete the single gene records
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
-	#run_vcf2fasta()
+	run_vcf2fasta()
 	#replace_missing_genotype_char()
 	#run_iqtree()
 	#subset_boot_file()
