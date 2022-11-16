@@ -107,7 +107,10 @@ passed_rnas = []
 # Initialize dictionary mapping mRNA names to parent gene name for mRNAs that passed all filters
 filtered_mrna_gene_dict = dict()
 
+# Initialize dictionary mapping CDS names to parent mRNA names for CDS of genes that had an mRNA pass previous filters. 
 cds_parent_rna_dict = dict()
+
+# List of redundant isoforms to delete following vcf2fasta
 records_to_delete = []
 
 # Populate subset_mean_coverage_spur5_exons variable with the samples included in the subset_sample_list variable
@@ -385,6 +388,7 @@ def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
 
+# Vcf2fasta makes alignments for all isoforms of each gene. This function identifies the unwanted isoform alignment files and adds them to the records_to_delete list.
 def identify_redundant_isoforms():
 	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
 	os.system(get_cds_gff)
@@ -418,21 +422,24 @@ def identify_redundant_isoforms():
 			else:
 				records_to_delete.append(key)
 
+# Delete redundant isoform alignment files 
 def delete_redundant_isoforms():
 	for record in records_to_delete:
 		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
 		os.system(delete)
 
+# Iqtree does not tolerate the '*'' symbol. Replace '*' with 'N'
 def replace_missing_genotype_char():
-	replace_missing_genotypes = r'find ./vcf2fasta_gene/ -type f -exec sed -i.bak "s/\*/N/g" {} \;'
+	replace_missing_genotypes = r'find ./vcf2fasta_CDS/ -type f -exec sed -i.bak "s/\*/N/g" {} \;'
 	os.system(replace_missing_genotypes)
 	
-	delete_bak_files = 'find ./vcf2fasta_gene/ -type f -name "*.bak" -delete'
+	delete_bak_files = 'find ./vcf2fasta_CDS/ -type f -name "*.bak" -delete'
 	os.system(delete_bak_files)
 	
 def run_iqtree():
 	#run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
-	run_iqtree = "iqtree -S vcf2fasta_CDS/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
+	#run_iqtree = "iqtree -S vcf2fasta_CDS/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
+	run_iqtree = "iqtree -S vcf2fasta_CDS/ -m MFP -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
 def subset_boot_file():
@@ -504,11 +511,11 @@ def main():
 
 	#run_vcf2fasta()
 
-	identify_redundant_isoforms()
-	delete_redundant_isoforms()
+	#identify_redundant_isoforms()
+	#delete_redundant_isoforms()
 
 	#replace_missing_genotype_char()
-	#run_iqtree()
+	run_iqtree()
 	#subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
