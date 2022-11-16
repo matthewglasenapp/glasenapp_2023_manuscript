@@ -435,13 +435,13 @@ def replace_missing_genotype_char():
 	
 	delete_bak_files = 'find ./vcf2fasta_CDS/ -type f -name "*.bak" -delete'
 	os.system(delete_bak_files)
-	
+
+# Run iqturee on the fasta files of mRNAs that passed all filters
 def run_iqtree():
-	#run_iqtree = "iqtree -S vcf2fasta_gene/ -m MFP --prefix loci -T AUTO"
-	#run_iqtree = "iqtree -S vcf2fasta_CDS/ -m GTR -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
-	run_iqtree = "iqtree -S vcf2fasta_CDS/ -m MFP -o QB3KMK016 --prefix loci -T AUTO -B 1000 --boot-trees"
+	run_iqtree = "iqtree -S vcf2fasta_CDS/ -m MFP --prefix loci -T AUTO -B 1000 --boot-trees"
 	os.system(run_iqtree)
 
+# Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
 def subset_boot_file():
 	line_counter = 0 
 
@@ -449,11 +449,14 @@ def subset_boot_file():
 		for line in open("loci.ufboot","r"):
 			if ((line_counter + 1000) % 1000) == 0:
 				count = 0
+			
 			if count <= 99:
 				f.write(line)
 				count += 1 
+			
 			line_counter += 1
 
+# Edit tree files to show species names instead of sample names. 
 def edit_tree_files(input_file, output_file):
 	with open(input_file, "r") as f:
 		tree_list = f.read().splitlines()
@@ -466,6 +469,7 @@ def edit_tree_files(input_file, output_file):
 					tree = new_tree
 			f2.write(tree + "\n")
 
+# Clean trees to remove branch lengths and bootstrap support values. Arrange identical topolgoies to have the same textual representation
 def clean_gene_trees(input_file, output_file):
 	clean = "{}nw_topology -I {} | {}nw_order -c d - > {}".format(nw_utils, input_file, nw_utils, output_file)
 	os.system(clean)
@@ -516,10 +520,10 @@ def main():
 
 	#replace_missing_genotype_char()
 	run_iqtree()
-	#subset_boot_file()
+	subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
-	#clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
+	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
+	clean_gene_trees("ingle_locus_trees_boot_subset.nwk", "clean_trees.nwk")
 
 if __name__ == "__main__":
 	main()	
