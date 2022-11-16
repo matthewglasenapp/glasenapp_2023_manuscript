@@ -252,6 +252,7 @@ def create_scaffold_dict():
 		for item in value:
 			record_counter += 1
 
+	print(scaffold_dict)
 	os.system("rm mrna_records.txt")
 	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
 	print("{} mRNAs added to scaffold_dict".format(record_counter))
@@ -278,11 +279,11 @@ def check_proximity():
 			
 			while (int(next_start) - int(current_stop)) < required_gap:
 				current_rna = rna_list[rna_counter]
-				failed_rna = rna_list.pop(rna_counter+1)
+				rna_list.pop(rna_counter + 1)
 				filter_counter += 1
 
 				try:
-					next_start = rna_list[rna_counter+1][2]
+					next_start = rna_list[rna_counter + 1][2]
 				
 				except IndexError:
 					break
@@ -464,4 +465,4 @@ def main():
 	#clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
 
 if __name__ == "__main__":
-	main()
+	main()	
