@@ -439,8 +439,47 @@ def replace_missing_genotype_char():
 # Run iqturee on the fasta files of mRNAs that passed all filters
 def run_iqtree():
 	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T AUTO -B 1000 --boot-trees"
-	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees"
+	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
 	os.system(run_iqtree)
+
+def remove_no_variant_and_rerun():
+	no_parsimony_lst = []
+	no_variant_lst = []
+	
+	get_no_parsimony = '''cat loci.log | grep "No parsimony" > no_parsimony.txt'''
+	get_no_variant = '''cat loci.log | grep "No variant" > no_variant.txt'''
+
+	os.system(get_no_parsimony)
+	os.system(get_no_variant)
+
+	with open("no_parsimony.txt", "r") as f, open("no_variant.txt", "r") as f2:
+		for line in f:
+			no_parsimony_lst.append(line.split(" ")[6].strip())
+
+		for line in f2:
+			no_variant_lst.append(line.split(" ")[6].strip())
+
+	os.mkdir('no_variant')
+	os.mkdir('no_parsimony')
+
+	print(no_parsimony_lst)
+	print(no_variant_lst)
+
+	for file in no_parsimony_lst:
+		move = "mv vcf2fasta_CDS/{} no_parsimony/".format(file)
+		print(move)
+		os.system(move)
+
+	for file in no_variant_lst:
+		move = "mv vcf2fasta_CDS/{} no_variant/".format(file)
+		print(move)
+		os.system(move)
+
+	os.system("rm no_parsimony.txt")
+	os.system("rm no_variant.txt")
+
+	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
+	#os.system(run_iqtree)
 
 # Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
 def subset_boot_file():
@@ -474,6 +513,14 @@ def edit_tree_files(input_file, output_file):
 def clean_gene_trees(input_file, output_file):
 	clean = "{}nw_topology -I {} | {}nw_order -c d - > {}".format(nw_utils, input_file, nw_utils, output_file)
 	os.system(clean)
+
+def root_trees():
+	root = "Rscript root.R"
+	os.system(root)
+
+	with open("clean_trees_rooted.nwk", "r") as f, open("clean_trees_rooted_final", "a") as f2:
+		for line in f:
+			f2.write(line.strip().replace(",franciscanus)", "")[1:] + "\n")
 
 def main():
 	#subset_coverage_dict()
@@ -521,10 +568,12 @@ def main():
 
 	#replace_missing_genotype_char()
 	run_iqtree()
+	remove_no_variant_and_rerun()
 	subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
 	clean_gene_trees("ingle_locus_trees_boot_subset.nwk", "clean_trees.nwk")
+	root_trees()
 
 if __name__ == "__main__":
 	main()	
