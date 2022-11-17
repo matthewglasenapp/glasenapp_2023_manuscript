@@ -440,7 +440,7 @@ def replace_missing_genotype_char():
 # Run iqturee on the fasta files of mRNAs that passed all filters
 def run_iqtree():
 	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T AUTO -B 1000 --boot-trees"
-	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
+	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8"
 	os.system(run_iqtree)
 
 def remove_no_variant_and_rerun():
@@ -479,8 +479,8 @@ def remove_no_variant_and_rerun():
 	os.system("rm no_parsimony.txt")
 	os.system("rm no_variant.txt")
 
-	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
-	#os.system(run_iqtree)
+	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
+	os.system(run_iqtree)
 
 # Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
 def subset_boot_file():
