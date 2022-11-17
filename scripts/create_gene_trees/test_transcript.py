@@ -387,6 +387,7 @@ def make_sco_gff(gene):
 def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
+	os.system("rm sco_gff.gff")
 
 # Vcf2fasta makes alignments for all isoforms of each gene. This function identifies the unwanted isoform alignment files and adds them to the records_to_delete list.
 def identify_redundant_isoforms():
