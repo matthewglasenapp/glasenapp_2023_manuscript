@@ -37,14 +37,18 @@ bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 # Strongylocentrotidae Subset
-subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+#subset_sample_list = ['depressus_SRR5767284', 'droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'nudus_SRR5767281', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+
+# Franciscanus outgroup
+subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
+
 
 # Specify thresholds for filtering. 
-min_cov_threshold = 10
+min_cov_threshold = 15
 
 prop_1x_threshold = 0.9
 
-prop_10x_threshold = 0.0
+prop_10x_threshold = 0.9
 
 # Required gap between two adjacent loci in base pairs 
 required_gap = 50000
@@ -524,57 +528,57 @@ def root_trees():
 			f2.write(line.strip().replace(",franciscanus)", "")[1:] + "\n")
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_rna_dict()
+	initialize_rna_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#try:
-			#for sample in subset_sample_list:
-				#if sample in regions_file and sample in thresholds_file:
-					#fill_rna_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		try:
+			for sample in subset_sample_list:
+				if sample in regions_file and sample in thresholds_file:
+					fill_rna_dict(regions_file, thresholds_file)
 		
-		#except NameError:
-			#fill_rna_dict(regions_file, thresholds_file)
+		except NameError:
+			fill_rna_dict(regions_file, thresholds_file)
 
-	#print("There were {} mRNA records pre-filter".format(len(rna_dict)))
+	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 
-	#write_all_rna_dict_csv()
-	#filter_rna_dict()
-	#get_mrna_gff()
-	#create_scaffold_dict()
-	#check_proximity()
-	#get_passed_rnas()
-	#write_new_bed_file()
-	#write_passed_rna_dict_csv()
+	write_all_rna_dict_csv()
+	filter_rna_dict()
+	get_mrna_gff()
+	create_scaffold_dict()
+	check_proximity()
+	get_passed_rnas()
+	write_new_bed_file()
+	write_passed_rna_dict_csv()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#os.system("mkdir single_gene_gff_records/")
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	#os.system('rmdir single_gene_gff_records/')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
-	#run_vcf2fasta()
+	run_vcf2fasta()
 
-	#identify_redundant_isoforms()
-	#delete_redundant_isoforms()
+	identify_redundant_isoforms()
+	delete_redundant_isoforms()
 
-	#replace_missing_genotype_char()
+	replace_missing_genotype_char()
 	#run_iqtree()
 	#remove_no_variant_and_rerun()
 	#subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
 	#clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
-	root_trees()
+	#root_trees()
 
 if __name__ == "__main__":
 	main()	
