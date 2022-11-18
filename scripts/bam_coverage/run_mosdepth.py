@@ -6,7 +6,7 @@ regions_file = "sorted_exons.bed"
 threads = 4
 
 def get_bam_file_paths():
-	get_files = 'find /hb/groups/pogson_group/dissertation/data/dedup_mapped_bam_files/ -type f -name "*.bam*" | grep -v "bai" | grep -v "sbi" > bam_file_paths.txt'
+	get_files = 'find /hb/groups/pogson_group/dissertation/data/bam_files -type f -name "*.bam*" | grep -v "bai" | grep -v "sbi" > bam_file_paths.txt'
 	os.system(get_files)
 
 	with open("bam_file_paths.txt","r") as f:
