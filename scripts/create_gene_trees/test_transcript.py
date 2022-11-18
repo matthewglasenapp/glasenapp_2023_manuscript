@@ -518,14 +518,6 @@ def clean_gene_trees(input_file, output_file):
 	clean = "{}nw_topology -I {} | {}nw_order -c d - > {}".format(nw_utils, input_file, nw_utils, output_file)
 	os.system(clean)
 
-def root_trees():
-	root = "Rscript root_trees.R"
-	os.system(root)
-
-	with open("clean_trees_rooted.nwk", "r") as f, open("clean_trees_rooted_final", "a") as f2:
-		for line in f:
-			f2.write(line.strip().replace(",franciscanus)", "")[1:] + "\n")
-
 def main():
 	subset_coverage_dict()
 
