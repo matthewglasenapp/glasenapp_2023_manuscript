@@ -2,11 +2,11 @@ import os
 from joblib import Parallel, delayed
 
 #regions_file = "protein_coding_genes.bed"
-regions_file = "unique_exons.bed"
+regions_file = "sorted_exons.bed"
 threads = 4
 
 def get_bam_file_paths():
-	get_files = 'find /hb/scratch/mglasena/data/dedup_mapped_bam_files/ -type f -name "*.bam*" | grep -v "bai" | grep -v "sbi" > bam_file_paths.txt'
+	get_files = 'find /hb/groups/pogson_group/dissertation/data/dedup_mapped_bam_files/ -type f -name "*.bam*" | grep -v "bai" | grep -v "sbi" > bam_file_paths.txt'
 	os.system(get_files)
 
 	with open("bam_file_paths.txt","r") as f:
@@ -18,8 +18,8 @@ def get_bam_file_paths():
 
 def run_mosdepth(bam_file):
 	prefix = bam_file.split("/")[-1].split("_dedup")[0]
-	#mosdepth = "mosdepth --by {} --no-per-base --thresholds 1,5,10,20,30,100 -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
-	mosdepth = "mosdepth --by {} --no-per-base -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
+	mosdepth = "mosdepth --by {} --no-per-base --thresholds 1,10,20 -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
+	#mosdepth = "mosdepth --by {} --no-per-base -t {} --fast-mode {} {}".format(regions_file, threads, prefix, bam_file)
 	os.system(mosdepth)
 
 	#global_dist_file = prefix + ".mosdepth.global.dist.txt"
@@ -28,8 +28,7 @@ def run_mosdepth(bam_file):
 	#os.system(plot_dist)
 
 def main():
-	#bam_file_paths_list = get_bam_file_paths()
-	bam_file_paths_list = ["/hb/scratch/mglasena/data/dedup_mapped_bam_files/variegatus_SRR7207203_dedup_aligned_reads.bam"]
+	bam_file_paths_list = get_bam_file_paths()
 	Parallel(n_jobs=len(bam_file_paths_list))(delayed(run_mosdepth)(bam_file) for bam_file in bam_file_paths_list)
 
 if __name__ == "__main__":
