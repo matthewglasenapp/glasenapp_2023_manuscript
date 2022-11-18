@@ -516,7 +516,7 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def root_trees():
-	root = "Rscript root.R"
+	root = "Rscript root_trees.R"
 	os.system(root)
 
 	with open("clean_trees_rooted.nwk", "r") as f, open("clean_trees_rooted_final", "a") as f2:
@@ -568,12 +568,12 @@ def main():
 	#delete_redundant_isoforms()
 
 	#replace_missing_genotype_char()
-	run_iqtree()
-	remove_no_variant_and_rerun()
-	subset_boot_file()
+	#run_iqtree()
+	#remove_no_variant_and_rerun()
+	#subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
-	clean_gene_trees("ingle_locus_trees_boot_subset.nwk", "clean_trees.nwk")
+	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
+	#clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
 	root_trees()
 
 if __name__ == "__main__":
