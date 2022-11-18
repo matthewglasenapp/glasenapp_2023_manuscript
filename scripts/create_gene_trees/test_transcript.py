@@ -42,7 +42,6 @@ bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
 # Franciscanus outgroup
 subset_sample_list = ['droebachiensis_SRR5767286', 'fragilis_SRR5767279', 'franciscanus_SRR5767282', 'intermedius_SRR5767280', 'pallidus_SRR5767285', 'pulcherrimus_SRR5767283', 'purpuratus_SRR7211988']
 
-
 # Specify thresholds for filtering. 
 min_cov_threshold = 15
 
