@@ -5,6 +5,7 @@ import csv
 from joblib import Parallel, delayed
 import multiprocessing
 import subprocess
+import statistics
 
 num_cores = multiprocessing.cpu_count()
 
@@ -365,6 +366,39 @@ def write_passed_rna_dict_csv():
 
 	print("{} records written to passed_rna.csv".format(records_written))
 
+def get_passed_mRNA_length_stats():
+
+	passed_rnas = "passed_rnas.txt"
+	thresholds_file = "/hb/scratch/mglasena/mrna_cov/depressus_SRR5767284.thresholds.bed.gz"
+
+	transcript_length_dict = dict()
+
+	with gzip.open(thresholds_file, "rt") as f:
+		records = f.read().splitlines()[1:]
+		for item in records:
+			mRNA = item.split("\t")[0]
+			length = item.split("\t")[1]
+			transcript_length_dict[mRNA] = length
+
+	with open(passed_rnas, "r") as f:
+		rnas = f.read().splitlines()
+		for key in list(transcript_length_dict):
+			if not key in rnas:
+				del transcript_length_dict[key]
+
+	rna_length_lst = [int(value) for value in transcript_length_dict.values()]
+
+	with open("passed_mRNA_length_stats.txt", "a") as f:
+		f.writeline("Mean mRNA length: {}".format(str(statistics.mean(rna_length_lst))))
+		f.writeline("Median mRNA length: {}".format(str(statistics.median(rna_length_lst))))
+		f.writeline("Minimum mRNA length: {}".format(str(min(rna_length_lst))))
+		f.writeline("Number mRNA shorter than 2000 base pairs: {}".format(str(len([value for value in rna_length_lst if value <= 2000]))))
+
+	with open("passed_mRNA_length_dist.txt", "a") as f2:
+		for value in transcript_length_dict.values():
+			f2.write(value + "\n")
+
+
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
 	get_info_column = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
@@ -544,6 +578,7 @@ def main():
 	get_passed_rnas()
 	write_new_bed_file()
 	write_passed_rna_dict_csv()
+	get_passed_mRNA_length_stats()
 
 	#gene_ids = get_gene_ids()
 
