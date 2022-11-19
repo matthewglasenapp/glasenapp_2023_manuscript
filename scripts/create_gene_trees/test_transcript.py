@@ -424,7 +424,6 @@ def make_sco_gff(gene):
 def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
-	os.system("rm sco_gff.gff")
 
 # Vcf2fasta makes alignments for all isoforms of each gene. This function identifies the unwanted isoform alignment files and adds them to the records_to_delete list.
 def identify_redundant_isoforms():
@@ -459,6 +458,8 @@ def identify_redundant_isoforms():
 
 			else:
 				records_to_delete.append(key)
+
+	os.system("rm sco_gff.gff")
 
 # Delete redundant isoform alignment files 
 def delete_redundant_isoforms():
@@ -517,14 +518,37 @@ def remove_no_variant_no_parsimony():
 	os.system("rm no_parsimony.txt")
 	os.system("rm no_variant.txt")
 
-	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
-	os.system(run_iqtree)
-
 def run_iqtree(fasta_file):
 	fasta_alignment_directory = "vcf2fasta_CDS/"
 
-	run_iqtree = "iqtree2 -s {}{} -m MFP -b 100".format(fasta_alignment_directory, fasta_file)
+	run_iqtree = "iqtree2 -s {}{} -m MFP -b 100 --boot-trees".format(fasta_alignment_directory, fasta_file)
 	os.system(run_iqtree)
+
+def clean_up_iqtree_files():
+	delete_gz = 'find ./vcf2fasta_CDS/ -type f -name "*.gz" -delete'
+	delete_bionj = 'find ./vcf2fasta_CDS/ -type f -name "*.bionj" -delete'
+	delete_contree = 'find ./vcf2fasta_CDS/ -type f -name "*.contree" -delete'
+	delete_iqtree = 'find ./vcf2fasta_CDS/ -type f -name "*.iqtree" -delete'
+	delete_log = 'find ./vcf2fasta_CDS/ -type f -name "*.log" -delete'
+	delete_mldist = 'find ./vcf2fasta_CDS/ -type f -name "*.mldist" -delete'
+	os.system(delete_gz)
+	os.system(delete_bionj)
+	os.system(delete_contree)
+	os.system(delete_iqtree)
+	os.system(delete_log)
+	os.system(delete_mldist)
+
+	cat_treefiles = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -exec cat {} \\; > loci.treefile'
+	cat_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -exec cat {} \\; > loci.boottrees'
+	
+	os.system(cat_treefiles)
+	os.system(cat_boottrees)
+
+	delete_treefile = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -delete'
+	delete_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -delete'
+	
+	os.system(delete_treefile)
+	os.system(delete_boottrees)
 
 # Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
 def subset_boot_file():
@@ -607,14 +631,15 @@ def main():
 	replace_missing_genotype_char()
 	identify_no_variant_no_parsimony()
 	remove_no_variant_no_parsimony()
+	
 	fasta_file_list = os.listdir("vcf2fasta_CDS")
-	Parallel(n_jobs=num_cores)(delayed(iqtree)(fasta_file) for fasta_file in fasta_file_list)
+	Parallel(n_jobs=num_cores)(delayed(run_iqtree)(fasta_file) for fasta_file in fasta_file_list)
 
-	run_iqtree()
+	clean_up_iqtree_files()
 	#subset_boot_file()
-	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
-	#clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
+	edit_tree_files("loci.treefile","single_locus_trees.nwk")
+	edit_tree_files("loci.boottrees", "single_locus_trees_boot_subset.nwk")
+	clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
 	#root_trees()
 
 if __name__ == "__main__":
