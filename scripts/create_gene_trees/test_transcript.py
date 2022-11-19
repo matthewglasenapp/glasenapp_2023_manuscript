@@ -460,6 +460,7 @@ def identify_redundant_isoforms():
 				records_to_delete.append(key)
 
 	os.system("rm sco_gff.gff")
+	os.system("rm cds.gff")
 
 # Delete redundant isoform alignment files 
 def delete_redundant_isoforms():
@@ -517,11 +518,10 @@ def remove_no_variant_no_parsimony():
 
 	os.system("rm no_parsimony.txt")
 	os.system("rm no_variant.txt")
+	os.system("rm *loci*")
 
 def run_iqtree(fasta_file):
-	fasta_alignment_directory = "vcf2fasta_CDS/"
-
-	run_iqtree = "iqtree2 -s {}{} -m MFP -b 100 --boot-trees".format(fasta_alignment_directory, fasta_file)
+	run_iqtree = "iqtree2 -s vcf2fasta_CDS/{} -m MFP -b 100 --boot-trees".format(fasta_file)
 	os.system(run_iqtree)
 
 def clean_up_iqtree_files():
