@@ -10,7 +10,7 @@ import gzip
 import os
 
 # Specify directory containing mosdepth outputfiles (both regions.bed.gz and thresholds.bed.gz files)
-bed_file_dir = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_exons/"
+bed_file_dir = "/hb/scratch/mglasena/mosdepth/mosdepth_exons/"
 
 # Initialize dictionary for mRNA names and their average coverage.
 rna_dict_depth = dict()
