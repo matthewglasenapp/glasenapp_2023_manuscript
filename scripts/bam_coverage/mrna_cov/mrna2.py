@@ -29,9 +29,11 @@ def get_coverage_files_paths():
 	with open("regions_files", "r") as f1, open("thresholds_files","r") as f2:
 		file_list = zip(sorted(f1.read().splitlines()),sorted(f2.read().splitlines()))
 
+	os.system("rm regions_files")
+	os.system("rm thresholds_files")
 	return list(file_list)
 
-def get_mrna_cov():
+def get_mRNA_cov(regions_file, thresholds_file):
 	with gzip.open(regions_file, "rt") as f1, gzip.open(thresholds_file,"rt") as f2:
 		records = f1.read().splitlines()
 		thresholds = f2.read().splitlines()[1:]
@@ -39,7 +41,13 @@ def get_mrna_cov():
 		zipped_list = list(zip(records,thresholds))
 
 		for record in zipped_list:
-			(mrna, exon, length, coverage, num_1x, num_10x, num_20x) = (record[0].split("\t")[3].split("exon-")[1].split("-")[0], record[0].split("\t")[3], (float(record[0].split("\t")[2]) - float(record[0].split("\t")[1])), float(record[0].split("\t")[4]), int(record[1].split("\t")[4]), int(record[1].split("\t")[6]), int(record[1].split("\t")[7]))
+			(mrna, exon, length, coverage, num_1x, num_10x, num_20x) = (record[0].split("\t")[3].split("exon-")[1].split("-")[0], 
+				record[0].split("\t")[3], 
+				(float(record[0].split("\t")[2]) - float(record[0].split("\t")[1])), 
+				float(record[0].split("\t")[4]), 
+				int(record[1].split("\t")[4]), 
+				int(record[1].split("\t")[5]), 
+				int(record[1].split("\t")[6]))
 
 			if mrna in mrna_dict:
 				mrna_dict[mrna].append([exon, length, coverage, num_1x, num_10x, num_20x])
@@ -69,7 +77,7 @@ def write_results(out1, out2):
 def main():
 	#print(get_coverage_files_paths())
 
-	coverage_file_lst = [('/hb/scratch/mglasena/mosdepth/depressus_SRR5767284.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/depressus_SRR5767284.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/droebachiensis_SRR5767286.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/droebachiensis_SRR5767286.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/fragilis_SRR5767279.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/fragilis_SRR5767279.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/franciscanus_SRR5767282.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/franciscanus_SRR5767282.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/intermedius_SRR5767280.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/intermedius_SRR5767280.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/lividus_ERS2351987.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/lividus_ERS2351987.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/nudus_SRR5767281.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/nudus_SRR5767281.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pallidus_SRR5767285.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pallidus_SRR5767285.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pulcherrimus_DRR107784.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pulcherrimus_DRR107784.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pulcherrimus_SRR5767283.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pulcherrimus_SRR5767283.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/purpuratus_SRR6281818.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/purpuratus_SRR6281818.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/purpuratus_SRR7211988.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/purpuratus_SRR7211988.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/variegatus_SRR7207203.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/variegatus_SRR7207203.thresholds.bed.gz')]
+	coverage_file_list = [('/hb/scratch/mglasena/mosdepth/depressus_SRR5767284.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/depressus_SRR5767284.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/droebachiensis_SRR5767286.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/droebachiensis_SRR5767286.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/fragilis_SRR5767279.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/fragilis_SRR5767279.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/franciscanus_SRR5767282.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/franciscanus_SRR5767282.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/intermedius_SRR5767280.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/intermedius_SRR5767280.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/lividus_ERS2351987.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/lividus_ERS2351987.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/nudus_SRR5767281.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/nudus_SRR5767281.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pallidus_SRR5767285.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pallidus_SRR5767285.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pulcherrimus_DRR107784.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pulcherrimus_DRR107784.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/pulcherrimus_SRR5767283.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/pulcherrimus_SRR5767283.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/purpuratus_SRR6281818.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/purpuratus_SRR6281818.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/purpuratus_SRR7211988.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/purpuratus_SRR7211988.thresholds.bed.gz'), ('/hb/scratch/mglasena/mosdepth/variegatus_SRR7207203.regions.bed.gz', '/hb/scratch/mglasena/mosdepth/variegatus_SRR7207203.thresholds.bed.gz')]
 
 	array_id = os.environ["array_id"]
 	print("Array ID: {}".format(array_id))
@@ -89,10 +97,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
-
-
-
-
-

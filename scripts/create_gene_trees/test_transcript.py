@@ -30,10 +30,10 @@ vcf_file = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/3bp_filtere
 protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
 
 # Directory containing the output files from mrna.py
-bed_file_dir = "/hb/scratch/mglasena/mrna_cov_2/"
+bed_file_dir = "/hb/scratch/mglasena/mrna_cov/"
 
 # Sample bed file from the output of mrna.py
-bed_file = "/hb/scratch/mglasena/mrna_cov_2/pallidus_SRR5767285.regions.bed.gz"
+bed_file = "/hb/scratch/mglasena/mrna_cov/pallidus_SRR5767285.regions.bed.gz"
 
 # Specify species to include for ortholog finder. MUST BE ALPHABETICAL!
 # Strongylocentrotidae Subset
@@ -545,24 +545,24 @@ def main():
 	write_new_bed_file()
 	write_passed_rna_dict_csv()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
-	run_vcf2fasta()
+	#run_vcf2fasta()
 
-	identify_redundant_isoforms()
-	delete_redundant_isoforms()
+	#identify_redundant_isoforms()
+	#delete_redundant_isoforms()
 
-	replace_missing_genotype_char()
+	#replace_missing_genotype_char()
 	#run_iqtree()
 	#remove_no_variant_and_rerun()
 	#subset_boot_file()
