@@ -6,6 +6,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 import subprocess
 import statistics
+import multiprocessing
 
 num_cores = multiprocessing.cpu_count()
 
@@ -474,12 +475,13 @@ def replace_missing_genotype_char():
 	os.system(delete_bak_files)
 
 # Run iqturee on the fasta files of mRNAs that passed all filters
-def run_iqtree():
+def identify_no_variant_no_parsimony():
 	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T AUTO -B 1000 --boot-trees"
-	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8"
+	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8"
+	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m TESTONLY --prefix loci -T 8"
 	os.system(run_iqtree)
 
-def remove_no_variant_and_rerun():
+def remove_no_variant_no_parsimony():
 	no_parsimony_lst = []
 	no_variant_lst = []
 	
@@ -516,6 +518,12 @@ def remove_no_variant_and_rerun():
 	os.system("rm no_variant.txt")
 
 	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8 -B 1000 --boot-trees --redo"
+	os.system(run_iqtree)
+
+def run_iqtree(fasta_file):
+	fasta_alignment_directory = "vcf2fasta_CDS/"
+
+	run_iqtree = "iqtree2 -s {}{} -m MFP -b 100".format(fasta_alignment_directory, fasta_file)
 	os.system(run_iqtree)
 
 # Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
@@ -579,26 +587,30 @@ def main():
 	write_passed_rna_dict_csv()
 	get_passed_mRNA_length_stats()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#os.system("mkdir single_gene_gff_records/")
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	#os.system('rmdir single_gene_gff_records/')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
-	#run_vcf2fasta()
+	run_vcf2fasta()
 
-	#identify_redundant_isoforms()
-	#delete_redundant_isoforms()
+	identify_redundant_isoforms()
+	delete_redundant_isoforms()
 
-	#replace_missing_genotype_char()
-	#run_iqtree()
-	#remove_no_variant_and_rerun()
+	replace_missing_genotype_char()
+	identify_no_variant_no_parsimony()
+	remove_no_variant_no_parsimony()
+	fasta_file_list = os.listdir("vcf2fasta_CDS")
+	Parallel(n_jobs=num_cores)(delayed(iqtree)(fasta_file) for fasta_file in fasta_file_list)
+
+	run_iqtree()
 	#subset_boot_file()
 	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	#edit_tree_files("loci.ufboot_subset", "single_locus_trees_boot_subset.nwk")
