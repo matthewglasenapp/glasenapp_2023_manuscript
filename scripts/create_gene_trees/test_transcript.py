@@ -389,15 +389,14 @@ def get_passed_mRNA_length_stats():
 	rna_length_lst = [int(value) for value in transcript_length_dict.values()]
 
 	with open("passed_mRNA_length_stats.txt", "a") as f:
-		f.writeline("Mean mRNA length: {}".format(str(statistics.mean(rna_length_lst))))
-		f.writeline("Median mRNA length: {}".format(str(statistics.median(rna_length_lst))))
-		f.writeline("Minimum mRNA length: {}".format(str(min(rna_length_lst))))
-		f.writeline("Number mRNA shorter than 2000 base pairs: {}".format(str(len([value for value in rna_length_lst if value <= 2000]))))
+		f.write("Mean mRNA length: {}".format(str(statistics.mean(rna_length_lst))) + "\n")
+		f.write("Median mRNA length: {}".format(str(statistics.median(rna_length_lst))) + "\n")
+		f.write("Minimum mRNA length: {}".format(str(min(rna_length_lst))) + "\n")
+		f.write("Number mRNA shorter than 2000 base pairs: {}".format(str(len([value for value in rna_length_lst if value <= 2000]))) + "\n")
 
 	with open("passed_mRNA_length_dist.txt", "a") as f2:
 		for value in transcript_length_dict.values():
 			f2.write(value + "\n")
-
 
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
