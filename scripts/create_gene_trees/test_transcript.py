@@ -503,17 +503,12 @@ def remove_no_variant_no_parsimony():
 	os.mkdir('no_variant')
 	os.mkdir('no_parsimony')
 
-	print(no_parsimony_lst)
-	print(no_variant_lst)
-
 	for file in no_parsimony_lst:
 		move = "mv vcf2fasta_CDS/{} no_parsimony/".format(file)
-		print(move)
 		os.system(move)
 
 	for file in no_variant_lst:
 		move = "mv vcf2fasta_CDS/{} no_variant/".format(file)
-		print(move)
 		os.system(move)
 
 	os.system("rm no_parsimony.txt")
