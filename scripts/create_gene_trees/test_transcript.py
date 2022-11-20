@@ -521,7 +521,7 @@ def remove_no_variant_no_parsimony():
 	os.system("rm *loci*")
 
 def run_iqtree(fasta_file):
-	run_iqtree = "iqtree2 -s vcf2fasta_CDS/{} -m MFP -b 100 --boot-trees".format(fasta_file)
+	run_iqtree = "iqtree2 -s vcf2fasta_CDS/{} -m MFP -b 100 --boot-trees -T 2".format(fasta_file)
 	os.system(run_iqtree)
 
 def clean_up_iqtree_files():
@@ -584,63 +584,65 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_rna_dict()
+	#initialize_rna_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		try:
-			for sample in subset_sample_list:
-				if sample in regions_file and sample in thresholds_file:
-					fill_rna_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#try:
+			#for sample in subset_sample_list:
+				#if sample in regions_file and sample in thresholds_file:
+					#fill_rna_dict(regions_file, thresholds_file)
 		
-		except NameError:
-			fill_rna_dict(regions_file, thresholds_file)
+		#except NameError:
+			#fill_rna_dict(regions_file, thresholds_file)
 
-	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
+	#print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 
-	write_all_rna_dict_csv()
-	filter_rna_dict()
-	get_mrna_gff()
-	create_scaffold_dict()
-	check_proximity()
-	get_passed_rnas()
-	write_new_bed_file()
-	write_passed_rna_dict_csv()
-	get_passed_mRNA_length_stats()
+	#write_all_rna_dict_csv()
+	#filter_rna_dict()
+	#get_mrna_gff()
+	#create_scaffold_dict()
+	#check_proximity()
+	#get_passed_rnas()
+	#write_new_bed_file()
+	#write_passed_rna_dict_csv()
+	#get_passed_mRNA_length_stats()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
-	run_vcf2fasta()
+	#run_vcf2fasta()
 
-	identify_redundant_isoforms()
-	delete_redundant_isoforms()
+	#identify_redundant_isoforms()
+	#delete_redundant_isoforms()
 
-	replace_missing_genotype_char()
-	identify_no_variant_no_parsimony()
-	remove_no_variant_no_parsimony()
+	#replace_missing_genotype_char()
+	#identify_no_variant_no_parsimony()
+	#remove_no_variant_no_parsimony()
 	
-	fasta_file_list = os.listdir("vcf2fasta_CDS")
+	#fasta_file_list = os.listdir("vcf2fasta_CDS")[0:872]
+	#fasta_file_list = os.listdir("vcf2fasta_CDS")[872:1744]
+	fasta_file_list = os.listdir("vcf2fasta_CDS")[1744:2616]
 	Parallel(n_jobs=num_cores)(delayed(run_iqtree)(fasta_file) for fasta_file in fasta_file_list)
 
-	clean_up_iqtree_files()
+	#clean_up_iqtree_files()
 	#subset_boot_file()
-	edit_tree_files("loci.treefile","single_locus_trees.nwk")
-	edit_tree_files("loci.boottrees", "single_locus_trees_boot_subset.nwk")
-	clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
+	#edit_tree_files("loci.treefile","single_locus_trees.nwk")
+	#edit_tree_files("loci.boottrees", "single_locus_trees_boot_subset.nwk")
+	#clean_gene_trees("single_locus_trees_boot_subset.nwk", "clean_trees.nwk")
 	#root_trees()
 
 if __name__ == "__main__":
-	main()	
+	main()
