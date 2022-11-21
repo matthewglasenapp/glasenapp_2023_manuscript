@@ -399,6 +399,13 @@ def get_passed_mRNA_length_stats():
 		for value in transcript_length_dict.values():
 			f2.write(value + "\n")
 
+	with open("passed_mRNA_lengths.txt", "a") as f3:
+		for key,value in transcript_length_dict.items():
+			f3.write(key + "\t" + value + "\n")
+
+	os.system("cat passed_mRNA_lengths.txt | sort -k2,2n > passed_mrna_lengths.txt")
+	os.system("rm passed_mRNA_lengths.txt")
+
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
 	get_info_column = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
