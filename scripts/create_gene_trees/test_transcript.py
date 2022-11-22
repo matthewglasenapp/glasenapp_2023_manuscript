@@ -26,7 +26,7 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
 # Path to filtered multisample vcf file
-vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls_pf.g.vcf.gz"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/insertions_removed.g.vcf.gz"
 
 # Bed file containing a record for each protein coding gene in the S. purpuratus assembly. See the ncbi/ directory for scripts to generate this file
 protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
@@ -603,27 +603,27 @@ def main():
 	get_passed_rnas()
 	write_new_bed_file()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#os.system("mkdir single_gene_gff_records/")
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	#os.system('rmdir single_gene_gff_records/')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
-	#run_vcf2fasta()
+	run_vcf2fasta()
 
-	#remove_redundant_isoforms()
+	remove_redundant_isoforms()
 
-	#replace_missing_genotype_char()
-	#identify_no_variant_no_parsimony()
-	#remove_no_variant_no_parsimony()
-	#get_cds_lengths()
-	#write_passed_rna_dict_csv()
+	replace_missing_genotype_char()
+	identify_no_variant_no_parsimony()
+	remove_no_variant_no_parsimony()
+	get_cds_lengths()
+	write_passed_rna_dict_csv()
 
 	#fasta_file_list = []
 
