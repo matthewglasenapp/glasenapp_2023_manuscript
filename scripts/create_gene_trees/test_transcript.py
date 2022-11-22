@@ -367,8 +367,6 @@ def write_passed_rna_dict_csv():
 
 	print("{} records written to passed_rna.csv".format(records_written))
 
-
-
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
 	get_info_column = "awk '{ print $10 }' unlinked_loci.bed > gene_list"
