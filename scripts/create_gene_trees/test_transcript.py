@@ -26,7 +26,7 @@ reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_referen
 gff_file = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.gff"
 
 # Path to filtered multisample vcf file
-vcf_file = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/3bp_filtered_genotype_calls_pf.g.vcf.gz"
+vcf_file = "/hb/scratch/mglasena/data/genotypes/franciscanus/3bp_filtered_genotype_calls_pf.g.vcf.gz"
 
 # Bed file containing a record for each protein coding gene in the S. purpuratus assembly. See the ncbi/ directory for scripts to generate this file
 protein_coding_genes_bed_file = "/hb/home/mglasena/dissertation/data/mosdepth/mosdepth_genes/protein_coding_genes.bed"
@@ -367,44 +367,7 @@ def write_passed_rna_dict_csv():
 
 	print("{} records written to passed_rna.csv".format(records_written))
 
-def get_passed_mRNA_length_stats():
 
-	passed_rnas = "passed_rnas.txt"
-	thresholds_file = "/hb/scratch/mglasena/mrna_cov/depressus_SRR5767284.thresholds.bed.gz"
-
-	transcript_length_dict = dict()
-
-	with gzip.open(thresholds_file, "rt") as f:
-		records = f.read().splitlines()[1:]
-		for item in records:
-			mRNA = item.split("\t")[0]
-			length = item.split("\t")[1]
-			transcript_length_dict[mRNA] = length
-
-	with open(passed_rnas, "r") as f:
-		rnas = f.read().splitlines()
-		for key in list(transcript_length_dict):
-			if not key in rnas:
-				del transcript_length_dict[key]
-
-	rna_length_lst = [int(value) for value in transcript_length_dict.values()]
-
-	with open("passed_mRNA_length_stats.txt", "a") as f:
-		f.write("Mean mRNA length: {}".format(str(statistics.mean(rna_length_lst))) + "\n")
-		f.write("Median mRNA length: {}".format(str(statistics.median(rna_length_lst))) + "\n")
-		f.write("Minimum mRNA length: {}".format(str(min(rna_length_lst))) + "\n")
-		f.write("Number mRNA shorter than 2000 base pairs: {}".format(str(len([value for value in rna_length_lst if value <= 2000]))) + "\n")
-
-	with open("passed_mRNA_length_dist.txt", "a") as f2:
-		for value in transcript_length_dict.values():
-			f2.write(value + "\n")
-
-	with open("passed_mRNA_lengths.txt", "a") as f3:
-		for key,value in transcript_length_dict.items():
-			f3.write(key + "\t" + value + "\n")
-
-	os.system("cat passed_mRNA_lengths.txt | sort -k2,2n > passed_mrna_lengths.txt")
-	os.system("rm passed_mRNA_lengths.txt")
 
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
@@ -611,7 +574,6 @@ def main():
 	#get_passed_rnas()
 	#write_new_bed_file()
 	#write_passed_rna_dict_csv()
-	#get_passed_mRNA_length_stats()
 
 	#gene_ids = get_gene_ids()
 
