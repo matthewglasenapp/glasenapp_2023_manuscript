@@ -411,6 +411,7 @@ def remove_no_variant_no_parsimony():
 		for line in f:
 			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
 
+	# Fix bug here!
 	for file in no_variant_no_parsimony_lst:
 		cds = file.split(".fas")[0]
 		rna = cds_parent_rna_dict[cds]
