@@ -316,15 +316,7 @@ def get_passed_rnas():
 		if key in passed_rnas:
 			filtered_mrna_gene_dict[key] = value
 
-	print("{} mRNAs in passed_rnas list".format(len(passed_rnas)))
-	print("{} mRNAs in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
-
-	with open("passed_rnas.txt","a") as f:
-		for record in passed_rnas:
-			f.write(record + "\n")
-
-
-# Write new bed file ("unlinked_loci.bed") of parent genes with an mRNA transcript that passed all filters
+# Write new bed file ("unlinked_loci.bed") of parent genes with an mRNA transcript that passed all filters. This will be used to build the initial vcf2fasta alignments 
 def write_new_bed_file():
 	records_written = 0
 	records_written_lst = []
@@ -338,34 +330,6 @@ def write_new_bed_file():
 					f2.write(line)
 
 	print("{} records written to unlinked_loci.bed".format(records_written))
-
-# Write csv file of RNAs passing all filters and their coverage metrics
-def write_passed_rna_dict_csv():
-	csv_file = open("passed_rna.csv","w")
-	writer = csv.writer(csv_file)	
-	header = ["mRNA"]
-	records_written = 0 
-	
-	try:
-		for i in range(4):
-			for sample in subset_sample_list:
-				header.append(sample)
-	except NameError:
-		for i in range(4):
-			for key in mean_coverage_spur5_genes.keys():
-				header.append(key)
-	
-	writer.writerow(header)
-
-	for key,value in passed_rna_dict.items():
-		if key in filtered_mrna_gene_dict.keys():
-			row = [key] + value[0] + value[1] + value[2] + value[3]
-			records_written += 1
-			writer.writerow(row)
-
-	csv_file.close()
-
-	print("{} records written to passed_rna.csv".format(records_written))
 
 # Get list of parent gene identifiers for those genes that passed all filters. Example: Dbxref=GeneID:582406
 def get_gene_ids():
@@ -452,8 +416,7 @@ def identify_no_variant_no_parsimony():
 	os.system(run_iqtree)
 
 def remove_no_variant_no_parsimony():
-	no_parsimony_lst = []
-	no_variant_lst = []
+	no_variant_no_parsimony_lst = []
 	
 	get_no_parsimony = '''cat loci.log | grep "No parsimony" > no_parsimony.txt'''
 	get_no_variant = '''cat loci.log | grep "No variant" > no_variant.txt'''
@@ -463,25 +426,115 @@ def remove_no_variant_no_parsimony():
 
 	with open("no_parsimony.txt", "r") as f, open("no_variant.txt", "r") as f2:
 		for line in f:
-			no_parsimony_lst.append(line.split(" ")[6].strip())
+			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
 
 		for line in f2:
-			no_variant_lst.append(line.split(" ")[6].strip())
+			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
 
-	os.mkdir('no_variant')
-	os.mkdir('no_parsimony')
+	os.mkdir('no_variant_no_parsimony')
 
-	for file in no_parsimony_lst:
-		move = "mv vcf2fasta_CDS/{} no_parsimony/".format(file)
-		os.system(move)
-
-	for file in no_variant_lst:
-		move = "mv vcf2fasta_CDS/{} no_variant/".format(file)
+	for file in no_variant_no_parsimony_lst:
+		cds = file.split(".fas")[0]
+		rna = cds_parent_rna_dict[cds]
+		passed_rnas.pop(rna)
+		filtered_mrna_gene_dict.pop(rna)
+		cds_parent_rna_dict.pop(cds)
+		
+		move = "mv vcf2fasta_CDS/{} no_variant_no_parsimony/".format(file)
 		os.system(move)
 
 	os.system("rm no_parsimony.txt")
 	os.system("rm no_variant.txt")
 	os.system("rm *loci*")
+
+def get_cds_lengths():
+	get_file_lst = 'find ./vcf2fasta_CDS/ -type f -name "*.fas" > fasta_file_list'
+	os.system(get_file_lst)
+
+	cds_length_dict = dict()
+	not_multiple_of_three_counter = 0
+	not_multiple_of_three_lst = []
+	passed_cds_length_dict = dict()
+
+	with open("fasta_file_list", "r") as f:
+		files = f.read().splitlines()
+
+	for file in files:
+		cds = file.split(".fas")[0]
+		length = len(open(file,"r").read().splitlines()[1])
+		cds_length_dict[cds] = length
+		
+	for key,value in cds_length_dict:
+		if value % 3 != 0:
+			not_multiple_of_three_counter += 1
+			not_multiple_of_three_lst.append(cds)
+		else:
+			passed_cds_length_dict[cds] = length
+
+	os.system("mkdir not_multiple_of_three")
+	for cds in not_multiple_of_three_lst:
+		rna = cds_parent_rna_dict[cds]
+		passed_rnas.pop(rna)
+		filtered_mrna_gene_dict.pop(rna)
+		cds_parent_rna_dict.pop(cds)
+		move = "mv vcf2fasta_CDS/{}.fas not_multiple_of_three/".format(cds)
+		os.system(move)
+
+	print("Number of concatenated CDS records: {}".format(len(cds_length_dict)))
+	print("Number of concatenated CDS records that are not a multiple of 3: {}".format(not_multiple_of_three_counter))
+	os.system("rm fasta_file_list")
+
+	with open("passed_cds_length_stats.txt", "a") as f:
+		f.write("Mean cds length: {}".format(str(statistics.mean(passed_cds_length_dict.values()))) + "\n")
+		f.write("Median cds length: {}".format(str(statistics.median(passed_cds_length_dict.values()))) + "\n")
+		f.write("Minimum cds length: {}".format(str(min(passed_cds_length_dict.values()))) + "\n")
+		f.write("Number cds shorter than 2000 base pairs: {}".format(str(len([value for value in passed_cds_length_dict.values() if value <= 2000]))) + "\n")
+
+	with open("passed_cds_length_dist.txt", "a") as f2:
+		for value in passed_cds_length_dict.values():
+			f2.write(value + "\n")
+
+	with open("passed_cds_lengths.txt", "a") as f3:
+		for key,value in passed_cds_length_dict.values():
+			f3.write(key + "\t" + value + "\n")
+
+	os.system("cat passed_cds_lengths.txt | sort -k2,2n > passed_CDS_lengths.txt")
+	os.system("rm passed_cds_lengths.txt")
+
+# Write csv file of RNAs passing all filters and their coverage metrics
+def write_passed_rna_dict_csv():
+	csv_file = open("passed_rna.csv","w")
+	writer = csv.writer(csv_file)	
+	header = ["mRNA"]
+	records_written = 0 
+	
+	try:
+		for i in range(4):
+			for sample in subset_sample_list:
+				header.append(sample)
+	except NameError:
+		for i in range(4):
+			for key in mean_coverage_spur5_genes.keys():
+				header.append(key)
+	
+	writer.writerow(header)
+
+	for key,value in passed_rna_dict.items():
+		if key in filtered_mrna_gene_dict.keys():
+			row = [key] + value[0] + value[1] + value[2] + value[3]
+			records_written += 1
+			writer.writerow(row)
+
+	csv_file.close()
+
+	print("{} records written to passed_rna.csv".format(records_written))
+
+	print("{} mRNAs in passed_rnas list".format(len(passed_rnas)))
+	print("{} mRNAs in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
+
+	with open("passed_rnas.txt","a") as f:
+		for record in passed_rnas:
+			f.write(record + "\n")
 
 def run_iqtree(fasta_file):
 	run_iqtree = "iqtree2 -s vcf2fasta_CDS/{} -m MFP -b 100 --boot-trees -T 2".format(fasta_file)
