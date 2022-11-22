@@ -372,8 +372,8 @@ def remove_redundant_isoforms():
 			parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
 			cds_parent_rna_dict[cds_name] = parent_rna_name
 
-	with open("passed_rnas.txt","r") as f2:
-		passed_rnas_lst = f2.read().splitlines()
+
+	passed_rnas_lst = filtered_mrna_gene_dict.keys()
 
 	for key,value in cds_parent_rna_dict.items():
 		if not value in passed_rnas_lst:
@@ -584,38 +584,38 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_rna_dict()
+	#initialize_rna_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		for sample in subset_sample_list:
-			if sample in regions_file and sample in thresholds_file:
-				fill_rna_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#for sample in subset_sample_list:
+			#if sample in regions_file and sample in thresholds_file:
+				#fill_rna_dict(regions_file, thresholds_file)
 
-	write_all_rna_dict_csv()
-	filter_rna_dict()
-	get_mrna_gff()
-	create_scaffold_dict()
-	check_proximity()
-	get_passed_rnas()
-	write_new_bed_file()
+	#write_all_rna_dict_csv()
+	#filter_rna_dict()
+	#get_mrna_gff()
+	#create_scaffold_dict()
+	#check_proximity()
+	#get_passed_rnas()
+	#write_new_bed_file()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
-	run_vcf2fasta()
+	#run_vcf2fasta()
 
 	remove_redundant_isoforms()
 
