@@ -115,18 +115,15 @@ filtered_mrna_gene_dict = dict()
 # Initialize dictionary mapping CDS names to parent mRNA names for CDS of genes that had an mRNA pass previous filters. 
 cds_parent_rna_dict = dict()
 
-# List of redundant isoforms to delete following vcf2fasta
-records_to_delete = []
-
 # Populate subset_mean_coverage_spur5_exons variable with the samples included in the subset_sample_list variable
 def subset_coverage_dict():
-	try:
-		for sample in subset_sample_list:
-			subset_mean_coverage_spur5_exons[sample] = mean_coverage_spur5_exons[sample]
+	#try:
+	for sample in subset_sample_list:
+		subset_mean_coverage_spur5_exons[sample] = mean_coverage_spur5_exons[sample]
 	
-	except:
-		for key in mean_coverage_spur5_exons:
-			subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
+	#except:
+		#for key in mean_coverage_spur5_exons:
+			#subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
 
 # Get zipped list of regions and thresholds files for each species 
 def get_zipped_bed_file_list():
@@ -185,14 +182,14 @@ def write_all_rna_dict_csv():
 	header = ["mRNA"]
 	
 	# Create header row for csv file
-	try:
-		for i in range(4):
-			for sample in subset_sample_list:
-				header.append(sample)
-	except NameError:
-		for i in range(4):
-			for key in mean_coverage_spur5_genes.keys():
-				header.append(key)
+	#try:
+	for i in range(4):
+		for sample in subset_sample_list:
+			header.append(sample)
+	#except NameError:
+		#for i in range(4):
+			#for key in mean_coverage_spur5_genes.keys():
+				#header.append(key)
 	
 	writer.writerow(header)
 
@@ -200,11 +197,11 @@ def write_all_rna_dict_csv():
 	counter = 0
 	for key,value in rna_dict.items():
 		row = [key] + value[0] + value[1] + value[2] + value[3]
-		counter += 1
 		writer.writerow(row)
+		counter += 1
 
-	print("{} mRNA records written to all_rna.csv".format(counter))
 	csv_file.close()
+	print("{} mRNA records written to all_rna.csv".format(counter))
 
 # Filter rna_dict by coverage metrics. Add mRNA's passing filter to passed_rna_dict
 def filter_rna_dict():
@@ -236,32 +233,30 @@ def get_mrna_gff():
 def create_scaffold_dict():
 	
 	# Creates mapping of rna: parent_gene for mRNAs in passed_rna_dict 
+	mt_rna_counter = 0
+	record_counter = 0
+
 	with open("mrna_records.txt", "r") as f:
 		for line in f:
-			scaffold = line.split("\t")[0]
-			start = line.split("\t")[3]
-			stop = line.split("\t")[4]
 			rna = line.split("\t")[8].split(";")[0].split("rna-")[1]
-			parent_gene = line.split("\t")[8].split(";")[1].split("gene-")[1]
-			
-			mt_rna_counter = 0 
 			if rna in passed_rna_dict.keys():
+				scaffold = line.split("\t")[0]
+				start = line.split("\t")[3]
+				stop = line.split("\t")[4]
+				parent_gene = line.split("\t")[8].split(";")[1].split("gene-")[1]
 				
-				if scaffold != "NC_001453.1":
-					mrna_gene_dict[rna] = parent_gene
-				
-				else:
+				if scaffold == "NC_001453.1":
 					mt_rna_counter += 1
 
-				if scaffold_dict.get(scaffold):
-					scaffold_dict[scaffold].append([scaffold,rna,start,stop])
 				else:
-					scaffold_dict[scaffold] = [[scaffold,rna,start,stop]]
+					mrna_gene_dict[rna] = parent_gene
 
-	record_counter = 0
-	for value in scaffold_dict.values():
-		for item in value:
-			record_counter += 1
+					if scaffold_dict.get(scaffold):
+						scaffold_dict[scaffold].append([scaffold,rna,start,stop])
+					else:
+						scaffold_dict[scaffold] = [[scaffold,rna,start,stop]]
+
+					record_counter += 1
 
 	os.system("rm mrna_records.txt")
 	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
@@ -270,7 +265,7 @@ def create_scaffold_dict():
 # Filter mRNA records in scaffold_dict so that all remaining mRNAs are >= required_gap apart from each other
 def check_proximity():
 	filter_counter = 0
-	failed_rna_lst = []
+	#failed_rna_lst = []
 	
 	for rna_list in scaffold_dict.values():
 		first = True
@@ -357,8 +352,11 @@ def run_vcf2fasta():
 	run_vcf2fasta = "{} --fasta {} --vcf {} --gff sco_gff.gff --feat {} --blend".format(vcf2fasta, reference_genome, vcf_file, feature)
 	os.system(run_vcf2fasta)
 
-# Vcf2fasta makes alignments for all isoforms of each gene. This function identifies the unwanted isoform alignment files and adds them to the records_to_delete list.
-def identify_redundant_isoforms():
+# Vcf2fasta makes alignments for all isoforms of each gene. This function identifies the unwanted isoform alignment files and deletes them.
+def remove_redundant_isoforms():
+	# List of redundant isoforms to delete following vcf2fasta
+	records_to_delete = []
+
 	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
 	os.system(get_cds_gff)
 
@@ -368,34 +366,18 @@ def identify_redundant_isoforms():
 		for record in records:
 			cds_name = record.split("\t")[8].split(";")[0].split("cds-")[1]
 			parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
+			cds_parent_rna_dict[cds_name] = parent_rna_name
 
-			if cds_name in cds_parent_rna_dict:
-				if cds_parent_rna_dict[cds_name] == parent_rna_name:
-					continue
-			
-				else:
-					print(cds_name)
-					print(parent_rna_name)
-					break
-
-			else:
-				cds_parent_rna_dict[cds_name] = parent_rna_name
-
-	with open("passed_rnas.txt") as f2:
+	with open("passed_rnas.txt","r") as f2:
 		passed_rnas_lst = f2.read().splitlines()
 
-		for key,value in cds_parent_rna_dict.items():
-			if value in passed_rnas_lst:
-				continue
-
-			else:
-				records_to_delete.append(key)
+	for key,value in cds_parent_rna_dict.items():
+		if not value in passed_rnas_lst:
+			records_to_delete.append(key)
 
 	os.system("rm sco_gff.gff")
 	os.system("rm cds.gff")
 
-# Delete redundant isoform alignment files 
-def delete_redundant_isoforms():
 	for record in records_to_delete:
 		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
 		os.system(delete)
@@ -410,28 +392,20 @@ def replace_missing_genotype_char():
 
 # Run iqturee on the fasta files of mRNAs that passed all filters
 def identify_no_variant_no_parsimony():
-	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T AUTO -B 1000 --boot-trees"
-	#run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP --prefix loci -T 8"
 	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m TESTONLY --prefix loci -T 8"
 	os.system(run_iqtree)
 
 def remove_no_variant_no_parsimony():
+	os.mkdir('no_variant_no_parsimony')
 	no_variant_no_parsimony_lst = []
 	
-	get_no_parsimony = '''cat loci.log | grep "No parsimony" > no_parsimony.txt'''
-	get_no_variant = '''cat loci.log | grep "No variant" > no_variant.txt'''
+	get_no_variant_no_parsimony = '''cat loci.log | grep -E "No parsimony|No variant" > no_variant_no_parsimony.txt'''
 
-	os.system(get_no_parsimony)
-	os.system(get_no_variant)
+	os.system(get_no_variant_no_parsimony)
 
-	with open("no_parsimony.txt", "r") as f, open("no_variant.txt", "r") as f2:
+	with open("no_variant_no_parsimony", "r") as f:
 		for line in f:
 			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
-
-		for line in f2:
-			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
-
-	os.mkdir('no_variant_no_parsimony')
 
 	for file in no_variant_no_parsimony_lst:
 		cds = file.split(".fas")[0]
@@ -447,6 +421,11 @@ def remove_no_variant_no_parsimony():
 	os.system("rm no_variant.txt")
 	os.system("rm *loci*")
 
+	print("{} records had no variant sites or no parsimony informative sites and were removed".format(len(no_variant_no_parsimony_lst)))
+	print("{} records remaining in passed_rnas list".format(len(passed_rnas)))
+	print("{} records remaining in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
+	print("{} records remaining in cds_parent_rna_dict list".format(len(cds_parent_rna_dict)))
+
 def get_cds_lengths():
 	get_file_lst = 'find ./vcf2fasta_CDS/ -type f -name "*.fas" > fasta_file_list'
 	os.system(get_file_lst)
@@ -458,6 +437,8 @@ def get_cds_lengths():
 
 	with open("fasta_file_list", "r") as f:
 		files = f.read().splitlines()
+
+	os.system("rm fasta_file_list")
 
 	for file in files:
 		cds = file.split(".fas")[0]
@@ -482,8 +463,7 @@ def get_cds_lengths():
 
 	print("Number of concatenated CDS records: {}".format(len(cds_length_dict)))
 	print("Number of concatenated CDS records that are not a multiple of 3: {}".format(not_multiple_of_three_counter))
-	os.system("rm fasta_file_list")
-
+	
 	with open("passed_cds_length_stats.txt", "a") as f:
 		f.write("Mean cds length: {}".format(str(statistics.mean(passed_cds_length_dict.values()))) + "\n")
 		f.write("Median cds length: {}".format(str(statistics.median(passed_cds_length_dict.values()))) + "\n")
@@ -508,14 +488,14 @@ def write_passed_rna_dict_csv():
 	header = ["mRNA"]
 	records_written = 0 
 	
-	try:
-		for i in range(4):
-			for sample in subset_sample_list:
-				header.append(sample)
-	except NameError:
-		for i in range(4):
-			for key in mean_coverage_spur5_genes.keys():
-				header.append(key)
+	#try:
+	for i in range(4):
+		for sample in subset_sample_list:
+			header.append(sample)
+	#except NameError:
+		#for i in range(4):
+			#for key in mean_coverage_spur5_genes.keys():
+				#header.append(key)
 	
 	writer.writerow(header)
 
