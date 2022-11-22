@@ -117,13 +117,8 @@ cds_parent_rna_dict = dict()
 
 # Populate subset_mean_coverage_spur5_exons variable with the samples included in the subset_sample_list variable
 def subset_coverage_dict():
-	#try:
 	for sample in subset_sample_list:
 		subset_mean_coverage_spur5_exons[sample] = mean_coverage_spur5_exons[sample]
-	
-	#except:
-		#for key in mean_coverage_spur5_exons:
-			#subset_mean_coverage_spur5_exons[key] = mean_coverage_spur5_exons[key]
 
 # Get zipped list of regions and thresholds files for each species 
 def get_zipped_bed_file_list():
@@ -182,14 +177,9 @@ def write_all_rna_dict_csv():
 	header = ["mRNA"]
 	
 	# Create header row for csv file
-	#try:
 	for i in range(4):
 		for sample in subset_sample_list:
 			header.append(sample)
-	#except NameError:
-		#for i in range(4):
-			#for key in mean_coverage_spur5_genes.keys():
-				#header.append(key)
 	
 	writer.writerow(header)
 
@@ -201,11 +191,18 @@ def write_all_rna_dict_csv():
 		counter += 1
 
 	csv_file.close()
+	
+	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 	print("{} mRNA records written to all_rna.csv".format(counter))
 
 # Filter rna_dict by coverage metrics. Add mRNA's passing filter to passed_rna_dict
 def filter_rna_dict():
+	record_counter = 0
+	failed_counter = 0
+	passed_counter = 0
+
 	for key, value in rna_dict.items():
+		record_counter += 1
 		mean_depth_lst = [item for item in value[0]]
 		one_x_lst = [item for item in value[1]]
 		ten_x_lst = [item for item in value[2]]
@@ -221,8 +218,16 @@ def filter_rna_dict():
 				
 			if test_var == True:
 				passed_rna_dict[key] = value
+				passed_counter += 1 
+			else:
+				failed_counter += 1
+		else:
+			failed_counter += 1
 
-	print("{} mRNA records passed intial coverage depth filters".format(len(passed_rna_dict)))
+	print("{} mRNA records processed".format(record_counter))
+	print("{} mRNA records passed intial coverage depth filters".format(passed_counter))
+	print("{} mRNA records failed intial coverage depth filters".format(failed_counter))
+	print("{} mRNA records in passed_rna_dict".format(len(passed_rna_dict)))
 
 # Get file of mRNA records from gff3 file
 def get_mrna_gff():
@@ -260,12 +265,12 @@ def create_scaffold_dict():
 
 	os.system("rm mrna_records.txt")
 	print("{} mitochondrial mRNAs were removed".format(mt_rna_counter))
-	print("{} mRNAs added to scaffold_dict".format(record_counter))
+	print("{} mRNA records in scaffold_dict".format(record_counter))
+	print("{} mRNA records in mrna_gene_dict".format(len(mrna_gene_dict)))
 
 # Filter mRNA records in scaffold_dict so that all remaining mRNAs are >= required_gap apart from each other
 def check_proximity():
 	filter_counter = 0
-	#failed_rna_lst = []
 	
 	for rna_list in scaffold_dict.values():
 		first = True
@@ -282,16 +287,12 @@ def check_proximity():
 				continue
 			
 			elif int(start) < (last_stop + required_gap):
-
-				failed_rna = rna_list.pop(rna_counter)
-				#failed_rna_lst.append(failed_rna)
+				rna_list.pop(rna_counter)
 				filter_counter +=1 
 			
 			else:
 				last_stop = int(stop)
 				rna_counter +=1
-
-	#print(failed_rna_lst)
 	
 	record_counter = 0
 	for value in scaffold_dict.values():
@@ -299,6 +300,7 @@ def check_proximity():
 			record_counter += 1
 
 	print("{} mRNAs removed to satisfy gap filter".format(filter_counter))
+	print("{} mRNAs records remain in scaffold_dict".format(record_counter))
 	print("{} mRNAs passed both coverage depth and gap filters".format(record_counter))
 
 # Get list of passed mRNAs and create new filtered_mrna_gene_dict that only includes mRNAs that passed the gap filter. 
@@ -310,6 +312,8 @@ def get_passed_rnas():
 	for key,value in mrna_gene_dict.items():
 		if key in passed_rnas:
 			filtered_mrna_gene_dict[key] = value
+
+	print("{} mRNA records in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
 
 # Write new bed file ("unlinked_loci.bed") of parent genes with an mRNA transcript that passed all filters. This will be used to build the initial vcf2fasta alignments 
 def write_new_bed_file():
@@ -587,15 +591,9 @@ def main():
 	initialize_rna_dict()
 
 	for regions_file, thresholds_file in bed_file_list:
-		#try:
 		for sample in subset_sample_list:
 			if sample in regions_file and sample in thresholds_file:
 				fill_rna_dict(regions_file, thresholds_file)
-		
-		#except NameError:
-			#fill_rna_dict(regions_file, thresholds_file)
-
-	print("There were {} mRNA records pre-filter".format(len(rna_dict)))
 
 	write_all_rna_dict_csv()
 	filter_rna_dict()
@@ -605,17 +603,17 @@ def main():
 	get_passed_rnas()
 	write_new_bed_file()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
 	#run_vcf2fasta()
 
