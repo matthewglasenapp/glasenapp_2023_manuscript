@@ -367,11 +367,12 @@ def remove_redundant_isoforms():
 	with open("cds.gff", "r") as f:
 		records = f.read().splitlines()
 
-		for record in records:
-			cds_name = record.split("\t")[8].split(";")[0].split("cds-")[1]
-			parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
-			cds_parent_rna_dict[cds_name] = parent_rna_name
+	for record in records:
+		cds_name = record.split("\t")[8].split(";")[0].split("cds-")[1]
+		parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
+		cds_parent_rna_dict[cds_name] = parent_rna_name
 
+	print(cds_parent_rna_dict)
 
 	passed_rnas_lst = list(filtered_mrna_gene_dict.keys())
 
@@ -379,7 +380,7 @@ def remove_redundant_isoforms():
 		if not value in passed_rnas_lst:
 			records_to_delete.append(key)
 
-	os.system("rm sco_gff.gff")
+	#os.system("rm sco_gff.gff")
 	os.system("rm cds.gff")
 
 	for record in records_to_delete:
@@ -411,6 +412,7 @@ def remove_no_variant_no_parsimony():
 		for line in f:
 			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
 
+	print(cds_parent_rna_dict)
 	# Fix bug here!
 	for file in no_variant_no_parsimony_lst:
 		cds = file.split(".fas")[0]
@@ -603,24 +605,24 @@ def main():
 	#get_passed_rnas()
 	#write_new_bed_file()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#os.system("mkdir single_gene_gff_records/")
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	#os.system('rmdir single_gene_gff_records/')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
 	#run_vcf2fasta()
 
-	#remove_redundant_isoforms()
+	remove_redundant_isoforms()
 
-	#replace_missing_genotype_char()
-	#identify_no_variant_no_parsimony()
+	replace_missing_genotype_char()
+	identify_no_variant_no_parsimony()
 	remove_no_variant_no_parsimony()
 	get_cds_lengths()
 	write_passed_rna_dict_csv()
