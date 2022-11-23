@@ -364,28 +364,25 @@ def remove_redundant_isoforms():
 	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
 	os.system(get_cds_gff)
 
-	with open("cds.gff", "r") as f:
-		records = f.read().splitlines()
+	records = open("cds.gff","r").read().splitlines()
 
 	for record in records:
 		cds_name = record.split("\t")[8].split(";")[0].split("cds-")[1]
 		parent_rna_name = record.split("\t")[8].split(";")[1].split("rna-")[1]
 		cds_parent_rna_dict[cds_name] = parent_rna_name
-
-	print(cds_parent_rna_dict)
-
+	
 	passed_rnas_lst = list(filtered_mrna_gene_dict.keys())
 
 	for key,value in cds_parent_rna_dict.items():
 		if not value in passed_rnas_lst:
 			records_to_delete.append(key)
 
-	#os.system("rm sco_gff.gff")
-	os.system("rm cds.gff")
-
 	for record in records_to_delete:
 		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
 		os.system(delete)
+
+	#os.system("rm sco_gff.gff")
+	#os.system("rm cds.gff")
 
 # Iqtree does not tolerate the '*'' symbol. Replace '*' with 'N'
 def replace_missing_genotype_char():
@@ -411,9 +408,7 @@ def remove_no_variant_no_parsimony():
 	with open("no_variant_no_parsimony.txt", "r") as f:
 		for line in f:
 			no_variant_no_parsimony_lst.append(line.split(" ")[6].strip())
-
-	print(cds_parent_rna_dict)
-	# Fix bug here!
+	
 	for file in no_variant_no_parsimony_lst:
 		cds = file.split(".fas")[0]
 		rna = cds_parent_rna_dict[cds]
@@ -586,43 +581,43 @@ def clean_gene_trees(input_file, output_file):
 	os.system(clean)
 
 def main():
-	#subset_coverage_dict()
+	subset_coverage_dict()
 
-	#bed_file_list = get_zipped_bed_file_list()
+	bed_file_list = get_zipped_bed_file_list()
 	
-	#initialize_rna_dict()
+	initialize_rna_dict()
 
-	#for regions_file, thresholds_file in bed_file_list:
-		#for sample in subset_sample_list:
-			#if sample in regions_file and sample in thresholds_file:
-				#fill_rna_dict(regions_file, thresholds_file)
+	for regions_file, thresholds_file in bed_file_list:
+		for sample in subset_sample_list:
+			if sample in regions_file and sample in thresholds_file:
+				fill_rna_dict(regions_file, thresholds_file)
 
-	#write_all_rna_dict_csv()
-	#filter_rna_dict()
-	#get_mrna_gff()
-	#create_scaffold_dict()
-	#check_proximity()
-	#get_passed_rnas()
+	write_all_rna_dict_csv()
+	filter_rna_dict()
+	get_mrna_gff()
+	create_scaffold_dict()
+	check_proximity()
+	get_passed_rnas()
 	#write_new_bed_file()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
 	#run_vcf2fasta()
 
-	remove_redundant_isoforms()
+	#remove_redundant_isoforms()
 
-	replace_missing_genotype_char()
-	identify_no_variant_no_parsimony()
+	#replace_missing_genotype_char()
+	#identify_no_variant_no_parsimony()
 	remove_no_variant_no_parsimony()
 	get_cds_lengths()
 	write_passed_rna_dict_csv()
