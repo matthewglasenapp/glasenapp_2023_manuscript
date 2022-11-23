@@ -362,7 +362,7 @@ def remove_redundant_isoforms():
 	records_to_delete = []
 
 	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
-	#os.system(get_cds_gff)
+	os.system(get_cds_gff)
 
 	records = open("cds.gff","r").read().splitlines()
 
@@ -377,12 +377,13 @@ def remove_redundant_isoforms():
 		if not value in passed_rnas_lst:
 			records_to_delete.append(key)
 
-	#for record in records_to_delete:
-		#delete = "rm vcf2fasta_CDS/{}.fas".format(record)
-		#os.system(delete)
+	for record in records_to_delete:
+		cds_parent_rna_dict.pop(record)
+		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
+		os.system(delete)
 
-	#os.system("rm sco_gff.gff")
-	#os.system("rm cds.gff")
+	os.system("rm sco_gff.gff")
+	os.system("rm cds.gff")
 
 # Iqtree does not tolerate the '*'' symbol. Replace '*' with 'N'
 def replace_missing_genotype_char():
@@ -412,20 +413,21 @@ def remove_no_variant_no_parsimony():
 	for file in no_variant_no_parsimony_lst:
 		cds = file.split(".fas")[0]
 		rna = cds_parent_rna_dict[cds]
-		passed_rnas.pop(rna)
+		passed_rnas.remove(rna)
 		filtered_mrna_gene_dict.pop(rna)
 		cds_parent_rna_dict.pop(cds)
+
 		
 		move = "mv vcf2fasta_CDS/{} no_variant_no_parsimony/".format(file)
 		os.system(move)
 
-	#os.system("rm no_variant_no_parsimony.txt")
-	#os.system("rm *loci*")
+	os.system("rm no_variant_no_parsimony.txt")
+	os.system("rm *loci*")
 
 	print("{} records had no variant sites or no parsimony informative sites and were removed".format(len(no_variant_no_parsimony_lst)))
 	print("{} records remaining in passed_rnas list".format(len(passed_rnas)))
 	print("{} records remaining in filtered_mrna_gene_dict".format(len(filtered_mrna_gene_dict)))
-	print("{} records remaining in cds_parent_rna_dict list".format(len(cds_parent_rna_dict)))
+	print("{} records remaining in cds_parent_rna_dict".format(len(cds_parent_rna_dict)))
 
 def get_cds_lengths():
 	get_file_lst = 'find ./vcf2fasta_CDS/ -type f -name "*.fas" > fasta_file_list'
@@ -436,27 +438,27 @@ def get_cds_lengths():
 	not_multiple_of_three_lst = []
 	passed_cds_length_dict = dict()
 
-	with open("fasta_file_list", "r") as f:
-		files = f.read().splitlines()
+	
+	files = open("fasta_file_list", "r").read().splitlines()
 
 	os.system("rm fasta_file_list")
 
 	for file in files:
-		cds = file.split(".fas")[0]
+		cds = file.split("/")[-1].split(".fas")[0]
 		length = len(open(file,"r").read().splitlines()[1])
 		cds_length_dict[cds] = length
-		
-	for key,value in cds_length_dict:
+
+	for key,value in cds_length_dict.items():
 		if value % 3 != 0:
 			not_multiple_of_three_counter += 1
-			not_multiple_of_three_lst.append(cds)
+			not_multiple_of_three_lst.append(key)
 		else:
-			passed_cds_length_dict[cds] = length
+			passed_cds_length_dict[key] = length
 
 	os.system("mkdir not_multiple_of_three")
 	for cds in not_multiple_of_three_lst:
 		rna = cds_parent_rna_dict[cds]
-		passed_rnas.pop(rna)
+		passed_rnas.remove(rna)
 		filtered_mrna_gene_dict.pop(rna)
 		cds_parent_rna_dict.pop(cds)
 		move = "mv vcf2fasta_CDS/{}.fas not_multiple_of_three/".format(cds)
@@ -473,11 +475,11 @@ def get_cds_lengths():
 
 	with open("passed_cds_length_dist.txt", "a") as f2:
 		for value in passed_cds_length_dict.values():
-			f2.write(value + "\n")
+			f2.write(str(value) + "\n")
 
 	with open("passed_cds_lengths.txt", "a") as f3:
-		for key,value in passed_cds_length_dict.values():
-			f3.write(key + "\t" + value + "\n")
+		for key,value in passed_cds_length_dict.items():
+			f3.write(key + "\t" + str(value) + "\n")
 
 	os.system("cat passed_cds_lengths.txt | sort -k2,2n > passed_CDS_lengths.txt")
 	os.system("rm passed_cds_lengths.txt")
@@ -489,14 +491,9 @@ def write_passed_rna_dict_csv():
 	header = ["mRNA"]
 	records_written = 0 
 	
-	#try:
 	for i in range(4):
 		for sample in subset_sample_list:
 			header.append(sample)
-	#except NameError:
-		#for i in range(4):
-			#for key in mean_coverage_spur5_genes.keys():
-				#header.append(key)
 	
 	writer.writerow(header)
 
@@ -592,31 +589,31 @@ def main():
 			if sample in regions_file and sample in thresholds_file:
 				fill_rna_dict(regions_file, thresholds_file)
 
-	#write_all_rna_dict_csv()
+	write_all_rna_dict_csv()
 	filter_rna_dict()
 	get_mrna_gff()
 	create_scaffold_dict()
 	check_proximity()
 	get_passed_rnas()
-	#write_new_bed_file()
+	write_new_bed_file()
 
-	#gene_ids = get_gene_ids()
+	gene_ids = get_gene_ids()
 
-	#os.system("mkdir single_gene_gff_records/")
-	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	os.system("mkdir single_gene_gff_records/")
+	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	#os.system('rmdir single_gene_gff_records/')
+	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	os.system('rmdir single_gene_gff_records/')
 
-	#run_vcf2fasta()
+	run_vcf2fasta()
 
 	remove_redundant_isoforms()
 
-	#replace_missing_genotype_char()
+	replace_missing_genotype_char()
 	identify_no_variant_no_parsimony()
 	remove_no_variant_no_parsimony()
 	get_cds_lengths()
