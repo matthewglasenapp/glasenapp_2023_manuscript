@@ -362,7 +362,7 @@ def remove_redundant_isoforms():
 	records_to_delete = []
 
 	get_cds_gff = '''awk '$3 == "CDS"' sco_gff.gff > cds.gff'''
-	os.system(get_cds_gff)
+	#os.system(get_cds_gff)
 
 	records = open("cds.gff","r").read().splitlines()
 
@@ -377,9 +377,9 @@ def remove_redundant_isoforms():
 		if not value in passed_rnas_lst:
 			records_to_delete.append(key)
 
-	for record in records_to_delete:
-		delete = "rm vcf2fasta_CDS/{}.fas".format(record)
-		os.system(delete)
+	#for record in records_to_delete:
+		#delete = "rm vcf2fasta_CDS/{}.fas".format(record)
+		#os.system(delete)
 
 	#os.system("rm sco_gff.gff")
 	#os.system("rm cds.gff")
@@ -419,8 +419,8 @@ def remove_no_variant_no_parsimony():
 		move = "mv vcf2fasta_CDS/{} no_variant_no_parsimony/".format(file)
 		os.system(move)
 
-	os.system("rm no_variant_no_parsimony.txt")
-	os.system("rm *loci*")
+	#os.system("rm no_variant_no_parsimony.txt")
+	#os.system("rm *loci*")
 
 	print("{} records had no variant sites or no parsimony informative sites and were removed".format(len(no_variant_no_parsimony_lst)))
 	print("{} records remaining in passed_rnas list".format(len(passed_rnas)))
@@ -592,7 +592,7 @@ def main():
 			if sample in regions_file and sample in thresholds_file:
 				fill_rna_dict(regions_file, thresholds_file)
 
-	write_all_rna_dict_csv()
+	#write_all_rna_dict_csv()
 	filter_rna_dict()
 	get_mrna_gff()
 	create_scaffold_dict()
@@ -614,10 +614,10 @@ def main():
 
 	#run_vcf2fasta()
 
-	#remove_redundant_isoforms()
+	remove_redundant_isoforms()
 
 	#replace_missing_genotype_char()
-	#identify_no_variant_no_parsimony()
+	identify_no_variant_no_parsimony()
 	remove_no_variant_no_parsimony()
 	get_cds_lengths()
 	write_passed_rna_dict_csv()
