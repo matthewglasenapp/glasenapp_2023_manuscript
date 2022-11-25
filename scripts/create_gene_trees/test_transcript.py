@@ -438,7 +438,6 @@ def get_cds_lengths():
 	not_multiple_of_three_lst = []
 	passed_cds_length_dict = dict()
 
-	
 	files = open("fasta_file_list", "r").read().splitlines()
 
 	os.system("rm fasta_file_list")
@@ -453,7 +452,7 @@ def get_cds_lengths():
 			not_multiple_of_three_counter += 1
 			not_multiple_of_three_lst.append(key)
 		else:
-			passed_cds_length_dict[key] = length
+			passed_cds_length_dict[key] = value
 
 	os.system("mkdir not_multiple_of_three")
 	for cds in not_multiple_of_three_lst:
