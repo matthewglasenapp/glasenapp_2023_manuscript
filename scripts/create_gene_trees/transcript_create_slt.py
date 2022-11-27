@@ -543,21 +543,6 @@ def clean_up_iqtree_files():
 	#os.system(delete_treefile)
 	#os.system(delete_boottrees)
 
-# Subset the --boot-trees file produced by iqtree. Currently, -b does not work with -S. -B requires >= 1000. I only want 100 boot trees per locus though. 
-def subset_boot_file():
-	line_counter = 0 
-
-	with open("loci.ufboot_subset","a") as f:
-		for line in open("loci.ufboot","r"):
-			if ((line_counter + 1000) % 1000) == 0:
-				count = 0
-			
-			if count <= 99:
-				f.write(line)
-				count += 1 
-			
-			line_counter += 1
-
 # Edit tree files to show species names instead of sample names. 
 def edit_tree_files(input_file, output_file):
 	with open(input_file, "r") as f:
@@ -572,8 +557,10 @@ def edit_tree_files(input_file, output_file):
 			f2.write(tree + "\n")
 
 # Clean trees to remove branch lengths and bootstrap support values. Arrange identical topolgoies to have the same textual representation
-def clean_gene_trees(input_file, output_file):
-	clean = "{}nw_topology -I {} | {}nw_order -c d - > {}".format(nw_utils, input_file, nw_utils, output_file)
+# nw_topology creates cladogram. Option -I gets rid of branc lengths. 
+# nw_order orders the tree so that trees with identical topologies will have identical newick strings. Ooption -c d reorders the tree in such a way as to remove the ladder. 
+def clean_gene_trees(input_file, output_file, outgroup):
+	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - > {}".format(nw_utils, outgroup, input_file, nw_utils, nw_utils, output_file)
 	os.system(clean)
 
 def main():
@@ -626,12 +613,10 @@ def main():
 	#Parallel(n_jobs=num_cores)(delayed(run_iqtree)(fasta_file) for fasta_file in fasta_file_list)
 
 	clean_up_iqtree_files()
-	#subset_boot_file()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	edit_tree_files("loci.boottrees", "single_locus_trees_boot.nwk")
-	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
-	clean_gene_trees("single_locus_trees_boot.nwk", "clean_trees_boot.nwk")
-	#root_trees()
+	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk", "franciscanus")
+	clean_gene_trees("single_locus_trees_boot.nwk", "clean_trees_boot.nwk", "franciscanus")
 
 if __name__ == "__main__":
 	main()
