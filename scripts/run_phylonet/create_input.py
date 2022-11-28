@@ -14,8 +14,8 @@ print(number_loci)
 
 # Taxa expected to be present in each single locus tree
 #set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
-#set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
-set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "franciscanus"}
+set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
+#set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "franciscanus"}
 
 def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
@@ -69,10 +69,10 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         f2.write(line6 + "\n")
 
 def main():
-    create_input_file("retic_0", "InferNetwork_ML", "0", "100", "20", "1")
-    create_input_file("retic_1", "InferNetwork_ML", "1", "100", "20", "2")
-    create_input_file("retic_2", "InferNetwork_ML", "2", "100", "20", "2")
-    create_input_file("retic_3", "InferNetwork_ML", "3", "100", "20", "2")
+    create_input_file("retic_0", "InferNetwork_ML", "0", "10", "20", "1")
+    create_input_file("retic_1", "InferNetwork_ML", "1", "10", "20", "5")
+    create_input_file("retic_2", "InferNetwork_ML", "2", "10", "20", "5")
+    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "20", "5")
 
 if __name__ == "__main__":
     main()

@@ -531,11 +531,11 @@ def clean_up_iqtree_files():
 	#os.system(delete_log)
 	#os.system(delete_mldist)
 
-	cat_treefiles = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -exec cat {} \\; > loci.treefile'
-	cat_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -exec cat {} \\; > loci.boottrees'
+	#cat_treefiles = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -exec cat {} \\; > loci.treefile'
+	#cat_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -exec cat {} \\; > loci.boottrees'
 	
-	os.system(cat_treefiles)
-	os.system(cat_boottrees)
+	#os.system(cat_treefiles)
+	#os.system(cat_boottrees)
 
 	#delete_treefile = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -delete'
 	#delete_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -delete'
@@ -560,7 +560,7 @@ def edit_tree_files(input_file, output_file):
 # nw_topology creates cladogram. Option -I gets rid of branc lengths. 
 # nw_order orders the tree so that trees with identical topologies will have identical newick strings. Ooption -c d reorders the tree in such a way as to remove the ladder. 
 def clean_gene_trees(input_file, output_file, outgroup):
-	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - > {}".format(nw_utils, outgroup, input_file, nw_utils, nw_utils, output_file)
+	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - > {}".format(nw_utils, input_file, outgroup, nw_utils, nw_utils, output_file)
 	os.system(clean)
 
 def main():
@@ -609,10 +609,10 @@ def main():
 
 	#fasta_file_list = fasta_files[0:741]
 	#fasta_file_list = fasta_files[741:1482]
-	#fasta_file_list = fasta_files[1482:2223]
+	#fasta_file_list = fasta_files[1482:2224]
 	#Parallel(n_jobs=num_cores)(delayed(run_iqtree)(fasta_file) for fasta_file in fasta_file_list)
 
-	clean_up_iqtree_files()
+	#clean_up_iqtree_files()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	edit_tree_files("loci.boottrees", "single_locus_trees_boot.nwk")
 	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk", "franciscanus")
