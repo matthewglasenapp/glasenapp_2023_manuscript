@@ -59,7 +59,8 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line5 = "NETWORK net = (pulcherrimus,(purpuratus,(intermedius,(pallidus,(droebachiensis,fragilis)))));"
         line6 = "END;"
         line7 = "BEGIN PHYLONET;"
-        line8 = '{} {} {} -x {} -pl {} -n {} -s net -di;'.format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
+        #line8 = '{} {} {} -x {} -pl {} -s net -di;'.format(program, gt_string, num_reticulations, runs, processors)
+        line8 = '{} (all) {} -x {} -pl {} -s net -di;'.format(program, num_reticulations, runs, processors)
         line9 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
@@ -77,7 +78,7 @@ def main():
     create_input_file("retic_0", "InferNetwork_ML", "0", "10", "20", "1")
     create_input_file("retic_1", "InferNetwork_ML", "1", "10", "20", "5")
     create_input_file("retic_2", "InferNetwork_ML", "2", "10", "20", "5")
-    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "20", "5")
+    create_input_file("retic_3", "InferNetwork_ML_Bootstrap", "3", "10", "20", "5")
 
 if __name__ == "__main__":
     main()
