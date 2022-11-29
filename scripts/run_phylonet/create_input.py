@@ -55,10 +55,12 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line1 = "#NEXUS"
         line2 = "BEGIN TREES;"
         line3 = "END;"
-        line4 = "Begin PHYLONET;"
-        line5 = "{} {} {} -x {} -pl {} -n {} -di;".format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
-        #line5 = "{} (all) {} -x {} -pl {} -n {} -di;".format(program, num_reticulations, runs, processors, num_net_returned)
+        line4 = "BEGIN NETWORKS;"
+        line5 = "NETWORK net = (pulcherrimus,(purpuratus,(intermedius,(pallidus,(droebachiensis,fragilis)))));"
         line6 = "END;"
+        line7 = "BEGIN PHYLONET;"
+        line8 = '{} {} {} -x {} -pl {} -n {} -s net -di;'.format(program, gt_string, num_reticulations, runs, processors, num_net_returned)
+        line9 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
         for tree in filtered_gene_tree_lst:
@@ -66,7 +68,10 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         f2.write(line3 + "\n" + "\n")
         f2.write(line4 + "\n")
         f2.write(line5 + "\n")
-        f2.write(line6 + "\n")
+        f2.write(line6 + "\n" + "\n")
+        f2.write(line7 + "\n")
+        f2.write(line8 + "\n")
+        f2.write(line9 + "\n")
 
 def main():
     create_input_file("retic_0", "InferNetwork_ML", "0", "10", "20", "1")
