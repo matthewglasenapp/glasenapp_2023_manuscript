@@ -560,7 +560,7 @@ def edit_tree_files(input_file, output_file):
 # nw_topology creates cladogram. Option -I gets rid of branc lengths. 
 # nw_order orders the tree so that trees with identical topologies will have identical newick strings. Ooption -c d reorders the tree in such a way as to remove the ladder. 
 def clean_gene_trees(input_file, output_file, outgroup):
-	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - > {}".format(nw_utils, input_file, outgroup, nw_utils, nw_utils, output_file)
+	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - | {}nw_prune - franciscanus > {}".format(nw_utils, input_file, outgroup, nw_utils, nw_utils, nw_utils, output_file)
 	os.system(clean)
 
 def main():
