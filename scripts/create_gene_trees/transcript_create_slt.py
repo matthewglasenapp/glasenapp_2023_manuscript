@@ -531,6 +531,7 @@ def clean_up_iqtree_files():
 	#os.system(delete_log)
 	#os.system(delete_mldist)
 
+	# awk 1 *.treefile > loci.treefile
 	#cat_treefiles = 'find ./vcf2fasta_CDS/ -type f -name "*.treefile" -exec cat {} \\; > loci.treefile'
 	#cat_boottrees = 'find ./vcf2fasta_CDS/ -type f -name "*.boottrees" -exec cat {} \\; > loci.boottrees'
 	
