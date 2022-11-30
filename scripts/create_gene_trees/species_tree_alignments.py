@@ -513,7 +513,7 @@ def write_passed_rna_dict_csv():
 		for record in passed_rnas:
 			f.write(record + "\n")
 
-def run_iqtree(fasta_file):
+def run_iqtree():
 	run_iqtree = "iqtree2 -S vcf2fasta_CDS/ -m MFP -T 8"
 	os.system(run_iqtree)
 
@@ -564,46 +564,46 @@ def clean_gene_trees(input_file, output_file, outgroup):
 	os.system(clean)
 
 def main():
-	subset_coverage_dict()
+	#subset_coverage_dict()
 
-	bed_file_list = get_zipped_bed_file_list()
+	#bed_file_list = get_zipped_bed_file_list()
 	
-	initialize_rna_dict()
+	#initialize_rna_dict()
 
-	for regions_file, thresholds_file in bed_file_list:
-		for sample in subset_sample_list:
-			if sample in regions_file and sample in thresholds_file:
-				fill_rna_dict(regions_file, thresholds_file)
+	#for regions_file, thresholds_file in bed_file_list:
+		#for sample in subset_sample_list:
+			#if sample in regions_file and sample in thresholds_file:
+				#fill_rna_dict(regions_file, thresholds_file)
 
-	write_all_rna_dict_csv()
-	filter_rna_dict()
-	get_mrna_gff()
-	create_scaffold_dict()
-	check_proximity()
-	get_passed_rnas()
-	write_new_bed_file()
+	#write_all_rna_dict_csv()
+	#filter_rna_dict()
+	#get_mrna_gff()
+	#create_scaffold_dict()
+	#check_proximity()
+	#get_passed_rnas()
+	#write_new_bed_file()
 
-	gene_ids = get_gene_ids()
+	#gene_ids = get_gene_ids()
 
-	os.system("mkdir single_gene_gff_records/")
-	Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
+	#os.system("mkdir single_gene_gff_records/")
+	#Parallel(n_jobs=num_cores)(delayed(make_sco_gff)(gene) for gene in gene_ids)
 	
 	# Concatenate all single gene gff records into "sco_gff.gff" file
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -exec cat {} \\; > sco_gff.gff')
 	
 	# Delete the single gene records
-	os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
-	os.system('rmdir single_gene_gff_records/')
+	#os.system('find ./single_gene_gff_records/ -type f -name "*.record" -delete')
+	#os.system('rmdir single_gene_gff_records/')
 
-	run_vcf2fasta()
+	#run_vcf2fasta()
 
-	remove_redundant_isoforms()
+	#remove_redundant_isoforms()
 
-	replace_missing_genotype_char()
-	identify_no_variant_no_parsimony()
-	remove_no_variant_no_parsimony()
-	get_cds_lengths()
-	write_passed_rna_dict_csv()
+	#replace_missing_genotype_char()
+	#identify_no_variant_no_parsimony()
+	#remove_no_variant_no_parsimony()
+	#get_cds_lengths()
+	#write_passed_rna_dict_csv()
 
 	run_iqtree()
 

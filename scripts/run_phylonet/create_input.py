@@ -70,7 +70,7 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line6 = "END;"
         line7 = "BEGIN PHYLONET;"
         #line8 = '{} {} {} -x {} -pl {} -s net -po -di;'.format(program, gt_string, num_reticulations, runs, processors)
-        line8 = '{} (all) {} -x {} -pl {} -s net -di;'.format(program, num_reticulations, runs, processors)
+        line8 = '{} (all) {} -x {} -pl {} -s net -o -di;'.format(program, num_reticulations, runs, processors)
         line9 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
