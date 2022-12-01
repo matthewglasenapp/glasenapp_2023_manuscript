@@ -559,8 +559,8 @@ def edit_tree_files(input_file, output_file):
 # Clean trees to remove branch lengths and bootstrap support values. Arrange identical topolgoies to have the same textual representation
 # nw_topology creates cladogram. Option -I gets rid of branc lengths. 
 # nw_order orders the tree so that trees with identical topologies will have identical newick strings. Ooption -c d reorders the tree in such a way as to remove the ladder. 
-def clean_gene_trees(input_file, output_file, outgroup):
-	clean = "{}nw_reroot {} {} | {}nw_topology -I - | {}nw_order -c d - | {}nw_prune - franciscanus > {}".format(nw_utils, input_file, outgroup, nw_utils, nw_utils, nw_utils, output_file)
+def clean_gene_trees(input_file, output_file):
+	clean = "{}nw_topology -I {} | {}nw_order -c d - > {}".format(nw_utils, input_file, nw_utils, output_file)
 	os.system(clean)
 
 def main():
@@ -610,7 +610,7 @@ def main():
 	#clean_up_iqtree_files()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
 	#edit_tree_files("loci.boottrees", "single_locus_trees_boot.nwk")
-	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk", "franciscanus")
+	clean_gene_trees("single_locus_trees.nwk", "clean_trees.nwk")
 	#clean_gene_trees("single_locus_trees_boot.nwk", "clean_trees_boot.nwk", "franciscanus")
 
 if __name__ == "__main__":
