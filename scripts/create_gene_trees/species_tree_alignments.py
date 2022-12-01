@@ -605,7 +605,7 @@ def main():
 	#get_cds_lengths()
 	#write_passed_rna_dict_csv()
 
-	run_iqtree()
+	#run_iqtree()
 
 	#clean_up_iqtree_files()
 	edit_tree_files("loci.treefile","single_locus_trees.nwk")
