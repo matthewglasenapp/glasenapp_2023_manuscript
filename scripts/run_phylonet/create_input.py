@@ -36,6 +36,14 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
     
     reject_file.close()
 
+    ###### For InferNetwork_ML_CV, need gene tree count as an integer of 10. Randomly pop 4 gene trees!
+    print(len(filtered_gene_tree_lst))
+    number_gene_trees_to_remove = 4
+    for i in range(0,number_gene_trees_to_remove):
+        index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
+        filtered_gene_tree_lst.pop(index_to_remove)
+    print(len(filtered_gene_tree_lst))
+
     for count, tree in enumerate(filtered_gene_tree_lst):
         line = "Tree gt" + str(count) + "  = " + tree
         filtered_gene_tree_lst[count] = line
@@ -52,15 +60,6 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
 
         gt_string += new_string
 
-
-    ###### For InferNetwork_ML_CV, need gene tree count as an integer of 10. Randomly pop 4 gene trees!
-    print(len(filtered_gene_tree_lst))
-    number_gene_trees_to_remove = 4
-    for i in range(0,number_gene_trees_to_remove):
-        index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
-        filtered_gene_tree_lst.pop(index_to_remove)
-    print(len(filtered_gene_tree_lst))
-
     with open(output_file,'a') as f2:
         line1 = "#NEXUS"
         line2 = "BEGIN TREES;"
@@ -70,7 +69,7 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line6 = "END;"
         line7 = "BEGIN PHYLONET;"
         #line8 = '{} {} {} -x {} -pl {} -s net -po -di;'.format(program, gt_string, num_reticulations, runs, processors)
-        line8 = '{} (all) {} -x {} -pl {} -s net -o -di;'.format(program, num_reticulations, runs, processors)
+        line8 = '{} (all) {} -x {} -pl {} -s net -di;'.format(program, num_reticulations, runs, processors)
         line9 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
