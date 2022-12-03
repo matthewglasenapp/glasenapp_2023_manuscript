@@ -37,12 +37,12 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
     reject_file.close()
 
     ###### For InferNetwork_ML_CV, need gene tree count as an integer of 10. Randomly pop 4 gene trees!
-    #print(len(filtered_gene_tree_lst))
-    #number_gene_trees_to_remove = 4
-    #for i in range(0,number_gene_trees_to_remove):
-        #index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
-        #filtered_gene_tree_lst.pop(index_to_remove)
-    #print(len(filtered_gene_tree_lst))
+    print(len(filtered_gene_tree_lst))
+    number_gene_trees_to_remove = 4
+    for i in range(0,number_gene_trees_to_remove):
+        index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
+        filtered_gene_tree_lst.pop(index_to_remove)
+    print(len(filtered_gene_tree_lst))
 
     for count, tree in enumerate(filtered_gene_tree_lst):
         line = "Tree gt" + str(count) + "  = " + tree
