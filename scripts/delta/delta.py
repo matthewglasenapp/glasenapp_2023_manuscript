@@ -11,13 +11,13 @@ num_cores = multiprocessing.cpu_count()
 # Number of bootstrap replicates
 num_replicates = 10000
 
-root_dir = "/Users/matt/desktop/test/"
+root_dir = "/Users/matt/Documents/Github/dissertation/scripts/delta/"
  
 bootstrap_dir = root_dir + "bootstrap/"
 make_bootstrap_dir = "mkdir -p {}".format(bootstrap_dir)
 os.system(make_bootstrap_dir)
 
-tree_file = "clean_trees.nwk"
+tree_file = "dep-franc"
 species_1 = "depressus"
 species_2 = "franciscanus"
 species_3 = "nudus"
