@@ -2,14 +2,13 @@ import os
 import multiprocessing
 from joblib import Parallel, delayed
 
-num_jobs = 1
-memory = 125
+memory = 15
 
-phylonet_hmm_path = "/hb/groups/pogson_group/dissertation/software/phylonet_hmm/PHiMM.jar"
+phylonet_hmm_path = "/hb/groups/pogson_group/dissertation/software/phylonet/PhyloNetv3_8_2.jar"
 
-input_file_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/hmm_nexus_files"
+input_file_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/hmm_nexus_files"
 
-root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/"
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/"
 hmm_dir = root_dir + "hmm/"
 os.mkdir(hmm_dir)
 
@@ -27,13 +26,14 @@ def run_hmm(scaffold):
 	os.system(run_hmm)
 
 def main():
-	os.chdir(hmm_dir)
-
+	array_id = os.environ["array_id"]
+	print("Array ID: {}".format(array_id))
 	scaffold_input_nexus_file_path_list = get_scaffold_input_nexus_file_path_list()
-	
-	#Parallel(n_jobs=num_jobs)(delayed(run_hmm)(scaffold_input_nexus_file) for scaffold_input_nexus_file in scaffold_input_nexus_file_path_list)
-	for file in scaffold_input_nexus_file_path_list:
-		run_hmm(file)
+	scaffold = scaffold_input_nexus_file_path_list[int(array_id)]
+	print("Scaffold: {}".format(scaffold))
+
+	os.chdir(hmm_dir)
+	run_hmm(scaffold)
 
 if __name__ == "__main__":
         main()

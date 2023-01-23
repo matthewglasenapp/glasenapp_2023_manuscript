@@ -3,7 +3,7 @@ import subprocess
 import multiprocessing
 from joblib import Parallel, delayed
 
-num_cores = multiprocessing.cpu_count()
+num_jobs = 21
 
 # Get separate multi-sample vcf file for each scaffold. Get a file with the coordinate for each SNV site applied to the matrix.
 
@@ -12,17 +12,20 @@ num_cores = multiprocessing.cpu_count()
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
 # File with scaffold names, one per line
-scaffold_list_file = "bindin"
+scaffold_list_file = "/hb/home/mglasena/dissertation/scripts/phylonet_hmm/scaffolds.txt"
 
-filtered_vcf = "/hb/scratch/mglasena/data/genotypes/bindin_network/3bp_filtered_genotype_calls.g.vcf.gz"
+filtered_vcf = "/hb/scratch/mglasena/data/genotypes/phylonet_hmm/dro-pal/3bp_filtered_genotype_calls_pf.g.vcf.gz"
 
 # Path to vcf2phylip program
 vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
 
-root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/"
-os.mkdir(root_dir)
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/"
 
-outgroup_sample_name = "SPUR.00"
+os.mkdir(root_dir + "hmm_input/")
+output_dir = root_dir + "hmm_input/vcf_by_scaffold/"
+os.mkdir(output_dir)
+
+outgroup_sample_name = "QB3KMK016"
 number_species = "4"
 
 def get_scaffold_list():
@@ -32,11 +35,8 @@ def get_scaffold_list():
 
 # Get a vcf file for each scaffold 
 def subset_vcf_by_scaffold(scaffold):
-	os.mkdir(root_dir + "hmm_input/")
 	output_dir = root_dir + "hmm_input/vcf_by_scaffold/"
-	os.mkdir(output_dir)
 	subset_vcf_by_scaffold = "gatk SelectVariants -R {} -V {} --select-type-to-include SNP --select-type-to-exclude MNP --select-type-to-exclude INDEL --select-type-to-exclude SYMBOLIC --select-type-to-exclude MIXED -O {}{}.vcf.gz -L {} --select-type-to-exclude NO_VARIATION --exclude-filtered true --exclude-non-variants true".format(reference_genome, filtered_vcf, output_dir, scaffold, scaffold)
-	
 	os.system(subset_vcf_by_scaffold)
 
 # Run vcf2phylip on each individual scaffold
@@ -68,11 +68,11 @@ def reformat_coordinate_files(scaffold):
 def main():
 	scaffold_list = get_scaffold_list()
 	
-	Parallel(n_jobs=num_cores)(delayed(subset_vcf_by_scaffold)(scaffold) for scaffold in scaffold_list)
+	Parallel(n_jobs=num_jobs)(delayed(subset_vcf_by_scaffold)(scaffold) for scaffold in scaffold_list)
 
-	Parallel(n_jobs=num_cores)(delayed(convert_vcf_to_nexus)(scaffold) for scaffold in scaffold_list)
+	Parallel(n_jobs=num_jobs)(delayed(convert_vcf_to_nexus)(scaffold) for scaffold in scaffold_list)
 	
-	Parallel(n_jobs=num_cores)(delayed(reformat_coordinate_files)(scaffold) for scaffold in scaffold_list)
+	Parallel(n_jobs=num_jobs)(delayed(reformat_coordinate_files)(scaffold) for scaffold in scaffold_list)
 
 if __name__ == "__main__":
         main()
