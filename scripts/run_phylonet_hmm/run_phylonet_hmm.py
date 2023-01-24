@@ -6,16 +6,12 @@ memory = 15
 
 phylonet_hmm_path = "/hb/groups/pogson_group/dissertation/software/phylonet/PhyloNetv3_8_2.jar"
 
-input_file_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/hmm_nexus_files"
+input_file_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/hmm_nexus_files/"
 
 root_dir = "/hb/scratch/mglasena/phylonet_hmm/"
 hmm_dir = root_dir + "hmm/"
-os.mkdir(hmm_dir)
 
 def get_scaffold_input_nexus_file_path_list():
-	create_scaffold_input_nexus_file_paths_file = 'find {} "$(pwd)" -name "*.nexus" -type f > scaffold_input_nexus_file_paths_file'.format(input_file_dir)
-	os.system(create_scaffold_input_nexus_file_paths_file)
-
 	with open("scaffold_input_nexus_file_paths_file", "r") as f:
 		scaffold_input_nexus_file_path_list = f.read().splitlines()
 	

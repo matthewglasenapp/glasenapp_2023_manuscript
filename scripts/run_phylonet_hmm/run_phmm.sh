@@ -9,7 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=3
 #SBATCH --mem=15GB
-#SBATCH --array=[0-22]
+#SBATCH --array=[0-20]
 #SBATCH --time=7-0
 
 module load python-3.6.5
