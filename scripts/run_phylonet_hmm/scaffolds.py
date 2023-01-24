@@ -21,8 +21,8 @@ vcf2phylip_path = "/hb/groups/pogson_group/dissertation/software/vcf2phylip/"
 
 root_dir = "/hb/scratch/mglasena/phylonet_hmm/"
 
-#os.mkdir(root_dir + "hmm_input/")
-#os.mkdir(root_dir + "hmm_input/vcf_by_scaffold/")
+os.mkdir(root_dir + "hmm_input/")
+os.mkdir(root_dir + "hmm_input/vcf_by_scaffold/")
 os.mkdir(root_dir + "hmm_input/scaffold_nexus_alignments/")
 
 outgroup_sample_name = "QB3KMK016"
@@ -41,13 +41,11 @@ def subset_vcf_by_scaffold(scaffold):
 
 # Run vcf2phylip on each individual scaffold
 def convert_vcf_to_nexus(scaffold):
-	print("Converting {}".format(scaffold))
 	input_dir = root_dir + "hmm_input/vcf_by_scaffold/" 
 	output_dir = root_dir + "hmm_input/scaffold_nexus_alignments/" + scaffold + "/"
 	run_vcf2phylip = "python3 {}vcf2phylip.py -w --input {}{}.vcf.gz --min-samples-locus {} -p -n -r --outgroup {} --output-folder {} --output-prefix {}".format(vcf2phylip_path, input_dir, scaffold, number_species, outgroup_sample_name, output_dir, scaffold)
 	
 	os.system(run_vcf2phylip)
-	print("End of convert of {}".format(scaffold))
 
 # Reformat vcf2phylip used sites output file for compatibility with phylonet_hmm output. 
 def reformat_coordinate_files(scaffold):
@@ -70,7 +68,7 @@ def reformat_coordinate_files(scaffold):
 def main():
 	scaffold_list = get_scaffold_list()
 	
-	#Parallel(n_jobs=num_jobs)(delayed(subset_vcf_by_scaffold)(scaffold) for scaffold in scaffold_list)
+	Parallel(n_jobs=num_jobs)(delayed(subset_vcf_by_scaffold)(scaffold) for scaffold in scaffold_list)
 
 	Parallel(n_jobs=num_jobs)(delayed(convert_vcf_to_nexus)(scaffold) for scaffold in scaffold_list)
 	
