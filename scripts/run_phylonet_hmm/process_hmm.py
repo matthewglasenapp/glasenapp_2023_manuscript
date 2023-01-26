@@ -8,12 +8,10 @@ import statistics
 import csv
 
 # Directory where vcf2phylip was run
-#original_vcf2phylip_dir = "/hb/groups/pogson_group/vcf2phylip/vcf2phylip_4way/"
-original_vcf2phylip_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm_input/"
+original_vcf2phylip_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm_input/"
 
 # Root directory where phylonet_hmm was run
-#root_dir = "/hb/groups/pogson_group/phylonet/4way_100runs/"
-root_dir = "/hb/scratch/mglasena/test_phylonet_hmm/hmm/"
+root_dir = "/hb/scratch/mglasena/phylonet_hmm/hmm/"
 
 # Tsv file with scaffold names and length in base pairs
 scaffold_info_file = "scaffolds.tsv"
@@ -34,10 +32,10 @@ def create_scaffold_dict():
 def get_file_paths_pairs_list():
 	
 	# Create file of paths of global coordinate files for each scaffold. Save this file as "coorindate_file list" 
-	os.system('find ' + original_vcf2phylip_dir + ' "$(pwd)" -name "coordinates" -type f > coordinate_file_list')
+	os.system('find ' + original_vcf2phylip_dir + ' -name "coordinates" -type f > coordinate_file_list')
 		
 	# Create file of paths of rawOutput.json files for each scaffold produced by phylonet_hmm. We only want the rawOutput.json file from the "bestrun" folder. Save this file as output_file_list in hmm directory
-	os.system('find ' + root_dir + ' "$(pwd)" -name "rawOutput.json" -type f | grep "best" > output_file_list')
+	os.system('find ' + root_dir + ' -name "rawOutput.json" -type f | grep "best" > output_file_list')
 	
 	# Get zipped list matching rawOutput.json file path to global coordinate file path for each scaffold. [[Scaffold_1_rawOutput.json path, Scaffold_1_coordinates], []]
 	with open("output_file_list","r") as f1:
