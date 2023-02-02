@@ -17,10 +17,13 @@ bootstrap_dir = root_dir + "bootstrap/"
 make_bootstrap_dir = "mkdir -p {}".format(bootstrap_dir)
 os.system(make_bootstrap_dir)
 
-tree_file = "dep-franc"
-species_1 = "depressus"
-species_2 = "franciscanus"
-species_3 = "nudus"
+### For the rooted_tripet ((P1,P2),P3), species_1 is P3, species_2 is P2 (hypothesized introgresser), species_3 is P1
+### Testing for enrichment of trees grouping species_1 and species_2 together (P3 and P2)
+
+tree_file = "int-pal"
+species_1 = "intermedius"
+species_2 = "pallidus"
+species_3 = "droebachiensis"
 
 def get_tree_list(file):
 	return open(file,"r").read().splitlines()
