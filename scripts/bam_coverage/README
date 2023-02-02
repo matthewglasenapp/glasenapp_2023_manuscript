@@ -1,0 +1,5 @@
+The script flagstat.py runs samtools flagstat on all bam files in a specified directory in parallel. In this script, secondary alignments (not primary alignment) are exluded using "-F 256." The script flagstat.sh runs flagstat.py as a batch job on UCSC hummingbird.
+
+The script run_mosdepth.py runs the mosdepth (https://github.com/brentp/mosdepth) program on all bam files in a specified directory in parallel. Mosdepth estimates sequencing coverage depth and breadth metrics. Mosdepth can estimate coverage by region given a regions file. The file protein_coding_genes.bed contains all protein-coding genes in the S. purpuratus reference genome assembly. The script run_mosdepth.sh runs run_mosdepth.py as a batch job on UCSC hummingbird. 
+
+The folder mrna_cov contains scripts for estimating coverage depth metrics for mRNA models using the mosdepth raw output. 

@@ -1,0 +1,1 @@
+The script dsuite.sh runs the program Dsuite (https://github.com/millanek/Dsuite) to estimate Patterson's D statistics. In dsuite.py, you need to specify the input vcf file, the list of samples to use (SETS.txt), and optionally, the species tree relationships if known (tree.nwk). The output will be printed to the directory of SETS.txt and tree.nwk.

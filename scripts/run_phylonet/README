@@ -1,0 +1,1 @@
+The script create_input.py creates the input nexus files for analysis with PhyloNet InferNetwork_ML. The script run_phylonet.sh runs PhyloNet InferNetwork_ML on a specified nexus input file. 

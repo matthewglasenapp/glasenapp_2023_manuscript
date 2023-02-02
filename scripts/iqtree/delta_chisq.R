@@ -1,5 +1,0 @@
-#help("chisq.test")
-#chisq.test(c(4472,3671))
-obs <- c(4472,3671)
-exp <- c(0.5,0.5)
-chisq.test(obs,p=exp)

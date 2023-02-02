@@ -2,9 +2,8 @@
 1. Picard FastqToSam
 2. Picard MarkIlluminaAdapters
 3. Picard SamToFastq | bwa mem | gatk MergeBamAlignment
-4. gatk MarkDuplicatesSpark
+4. gatk MarkDuplicates
 5. gatk HaplotypeCaller
-6. bcftools norm
 7. gatk IndexFeatureFile
 
 fasterq-dump is not included. This script assumes there is a directiory with the raw fastq files for samples. Intermediate files are deleted. The final result is a vcf file.

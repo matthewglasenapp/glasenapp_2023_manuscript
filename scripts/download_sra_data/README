@@ -1,0 +1,3 @@
+The script fasterq_dump.py downloads a list of NCBI SRA accessions. The script fasterq_dump.sh runs fasterq.py as a batch job on hummingbird. 
+
+the script check_for_multiplex.py checks that sequencing reads in fastq files come from a single flowcell lane. This is important because reads originating from different sequencing lanes should be pre-processed separately according to GATK Best Practices. The script check_for_multiplex.sh runs check_for_multiplex.py on UCSC Hummingbird

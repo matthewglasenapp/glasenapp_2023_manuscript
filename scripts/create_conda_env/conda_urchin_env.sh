@@ -1,4 +1,4 @@
-# Create conda environment for analysis
+# Create conda environment on UCSC hummingbird for genomic analyses
 
 module load miniconda3.9
 
