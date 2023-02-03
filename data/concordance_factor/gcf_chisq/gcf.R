@@ -2,8 +2,6 @@ library(tidyverse)
 
 # Code taken from Lanfear Lab http://www.robertlanfear.com/blog/files/concordance_factors.html
 
-setwd(getwd())
-
 d = read.delim("gcf.stat", header = T, comment.char='#')
 #d = read.delim("scf.stat", header = T, comment.char='#')
 
