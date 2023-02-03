@@ -28,7 +28,7 @@ figure <- ggtree(rooted_tree, ladderize=FALSE) + geom_tiplab(size=6) + geom_clad
 
 figure
 
-ggsave(plot = figure, "test_tree.svg", width=169, height = 150, units = "mm")
+ggsave(plot = figure, "test_tree.pdf", width=169, height = 150, units = "mm")
 
 # Highlighting clades
 #+ geom_hilight(node=11, fill="purple", alpha=.4) + geom_hilight(node=16, fill="red", alpha=.4)
