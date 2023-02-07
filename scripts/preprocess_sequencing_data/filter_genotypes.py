@@ -2,27 +2,23 @@ import os
 
 reference_genome = "/hb/groups/pogson_group/dissertation/data/purpuratus_reference/GCF_000002235.5_Spur_5.0_genomic.fna"
 
-# Raw genotype calls file
+# Raw genotype calls file. Leave this commented out. 
 #genotype_calls = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls.g.vcf.gz"
 
 genotype_calls_split_multiallelics = "/hb/groups/pogson_group/dissertation/data/raw_vcf_files/genotype_calls_split_multiallelics.g.vcf.gz"
 
-output_directory = "/hb/scratch/mglasena/data/genotypes/delta/int-pal/"
+output_directory = "/hb/scratch/mglasena/data/genotypes/strongylocentrotidae/"
 
 samples_to_include = {
-#"fragilis_SRR5767279" : "QB3KMK013",
-#"nudus_SRR5767281" : "QB3KMK011",
+"fragilis_SRR5767279" : "QB3KMK013",
+"nudus_SRR5767281" : "QB3KMK011",
 "franciscanus_SRR5767282" : "QB3KMK010",
-#"depressus_SRR5767284" : "QB3KMK015",
+"depressus_SRR5767284" : "QB3KMK015",
 "pallidus_SRR5767285" : "QB3KMK002",
 "droebachiensis_SRR5767286" : "QB3KMK014",
-#"purpuratus_SRR6281818" : "S.purpuratus#1",
-#"lividus_ERS2351987" : "4",
-#"pulcherrimus_SRR5767283" : "QB3KMK016",
+"pulcherrimus_SRR5767283" : "QB3KMK016",
 "intermedius_SRR5767280" : "QB3KMK012",
-#"purpuratus_SRR7211988" : "SPUR.00",
-#"pulcherrimus_DRR107784" : "SAMD00098133",
-#"variegatus_SRR7207203" : "LVAR.00"
+"purpuratus_SRR7211988" : "SPUR.00",
 }
 
 # Only run once to get split multiallelic file!
@@ -75,7 +71,6 @@ def merge_vcfs():
 # Set individual genotypes with low quality or read depth to missing: -S . -e 'FMT/DP<3 | FMT/GQ<20'
 # Filter SNPs within 3 base pairs of indel: --SnpGap 3
 # Remove monomorphic SNPs where no alternative alleles are called for any of the samples: -e 'AC==0'
-# Remove insertions from vcf file:
 # Join multiallelics
 def bcftools_filter():
 	input_file = output_directory + "filtered_genotype_calls.g.vcf.gz"
@@ -104,16 +99,17 @@ def vcf_stats(input_file):
 	os.system("rm samples_file.txt")
 
 def main():
+	# Leave commented out unless running for the first time
 	#split_multiallelics()
 	#index_vcf(output_directory + "genotype_calls_split_multiallelics.g.vcf.gz")
+	
 	separate_SNP_INDEL()
 	filter_variants()
 	merge_vcfs()
 	bcftools_filter()
 	index_vcf(output_directory + "3bp_filtered_genotype_calls.g.vcf.gz")
 	select_passed_variants()
-	#vcf_stats(output_directory + "insertions_removed.g.vcf.gz")
-	#index_vcf(output_directory + "insertions_removed.g.vcf.gz")
+	vcf_stats(output_directory + "3bp_filtered_genotype_calls_pf.g.vcf.gz")
 
 if __name__ == "__main__":
 	main()

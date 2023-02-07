@@ -70,12 +70,9 @@ dict = {
 #"SRR5767284" : ["SRR5767284","depressus","QB3KMK015","SAMN07269098","VJCQB3KMK015","HS3:171:d0le4acxx:2","d0le4acxx:2"],
 #"SRR5767285" : ["SRR5767285","pallidus","QB3KMK002","SAMN07269097","VJCQB3KMK002","HS1_0066:8","HS1_0066:8"],
 #"SRR5767286" : ["SRR5767286","droebachiensis","QB3KMK014","SAMN07269096","VJCQB3KMK014","HS3:171:d0le4acxx:1","d0le4acxx:1"],
-#"SRR6281818" : ["SRR6281818","purpuratus","S.purpuratus#1","SAMN08013506","A630_1","SRR6281818","SRR6281818"],
 #"SRR5767283" : ["SRR5767283","pulcherrimus","QB3KMK016","SAMN07269099","VJCQB3KMK016","HS3:171:d0le4acxx:3","d0le4acxx:3"],
 #"SRR5767280" : ["SRR5767280","intermedius","QB3KMK012","SAMN07269102","VJCQB3KMK012","HS2:148:C0EN2ACXX:3","C0EN2ACXX:3"],
 #"SRR7211988" : ["SRR7211988","purpuratus","SPUR.00","SAMN00829422","CIT_GEC_SP_1",["HISEQ:348:H2YWCBCXX:1","HISEQ:348:H2YWCBCXX:2"],["H2YWCBCXX:1","H2YWCBCXX:2"]],
-#"DRR107784" : ["DRR107784", "pulcherrimus", "SAMD00098133","SAMD00098133","DRR107784", ["HWI-ST462R:262:C1J2AACXX:5", "HWI-1KL134:197:C1JJYACXX:4", "HWI-ST462R:262:C1J2AACXX:4", "HWI-1KL134:198:C1MA0ACXX:8"], ["C1J2AACXX:5", "C1JJYACXX:4", "C1J2AACXX:4", "C1MA0ACXX:8"]],
-#"SRR7207203" : ["SRR7207203", "variegatus", "LVAR.00", "SAMN00205415","CIT_GEC_LV_1",["HISEQ:352:H3LK7BCXX:1", "HISEQ:352:H3LK7BCXX:2"],["H3LK7BCXX:1", "H3LK7BCXX:2"]]
 }
 
 class Accessions:
@@ -235,25 +232,12 @@ class Accessions:
 		flagstat = "samtools flagstat -@ {} -O tsv {} > {}".format(max_threads, input_file, output_file)
 		os.system(flagstat)
 
-		#threads = 4
-		#regions_file = "regions.bed"
-		#prefix = self.species + "_" + self.accession
-		#mosdepth = "mosdepth --by {} --no-per-base -t {} --fast-mode {} {}".format(regions_file, threads, prefix, input_file)
-		#os.system(mosdepth)
-
-		#infile = prefix + ".mosdepth.global.dist.txt"
-		#outfile = prefix + ".dist.html"
-		#plot_dist = "python3 plot-dist.py --output {} {}".format(outfile, infile)
-		#os.system(plot_dist)
-
 	def call_variants(self):
 		print("gatk HaplotypeCaller. Calling variants.")
 
 		input_file = dedup_bam_dir + self.species + "_" + self.accession + "_dedup_aligned_reads.bam"
 		output_file = vcf_dir + self.species + "_" + self.accession + ".g.vcf.gz"
 		
-		# Old Command
-		#haplotype_caller = 'gatk HaplotypeCaller -R {} -I {} --native-pair-hmm-threads 6 -O {} -ERC GVCF'.format(reference_genome, input_file, output_file)
 		haplotype_caller = 'gatk --java-options "-Djava.io.tmpdir={}{}_{} -Xms20G -Xmx20G -XX:ParallelGCThreads=2" HaplotypeCaller -R {} -I {} -O {} -ERC GVCF'.format(temporary_directory, self.species, self.accession, reference_genome, input_file, output_file)
 		os.system(haplotype_caller)
 
@@ -265,18 +249,18 @@ class Accessions:
 		print("Done calling variants!")
 
 def main():
-	#array_id = os.environ["array_id"]
+	array_id = os.environ["array_id"]
 	array_id = 0
-	#print("Array ID: {}".format(array_id))
+	print("Array ID: {}".format(array_id))
 	accession_list = list(dict)
 	accession_id = accession_list[int(array_id)]
 	accession = Accessions(accession_id,dict[accession_id][1],dict[accession_id][2],dict[accession_id][3],dict[accession_id][4],dict[accession_id][5],dict[accession_id][6])
 
-	#accession.convert_fastq_to_unmapped_bam()
+	accession.convert_fastq_to_unmapped_bam()
 	
-	#accession.mark_illumina_adapters()
-	#accession.align_to_reference()
-	#accession.mark_duplicates()
+	accession.mark_illumina_adapters()
+	accession.align_to_reference()
+	accession.mark_duplicates()
 	accession.get_alignment_stats()
 	accession.call_variants()
 

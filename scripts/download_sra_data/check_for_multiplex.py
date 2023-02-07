@@ -5,32 +5,29 @@ Check that sequencing reads in fastq files come from a single flowcell lane.
 from joblib import Parallel, delayed
 import gzip
 
-# ERR5621404 and SRR6281818 were skipped because they do not inlcude any metadata, only read number and length. 
 file_list = [
 "/hb/scratch/mglasena/short_read_data/SRR7207203_1.fastq.gz",
 "/hb/scratch/mglasena/short_read_data/SRR7207203_2.fastq.gz"
-#"/hb/home/mglasena/short_read_data/DRR107784_1.fastq.gz", 
-#"/hb/home/mglasena/short_read_data/DRR107784_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767279_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767279_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767280_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767280_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767281_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767281_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767282_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767282_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767283_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767283_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767284_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767284_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767285_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767285_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767286_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767286_2.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:1_1.fastq.gz", 
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:1_2.fastq.gz",
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:2_1.fastq.gz",
-#"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:2_2.fastq.gz"
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767279_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767279_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767280_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767280_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767281_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767281_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767282_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767282_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767283_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767283_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767284_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767284_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767285_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767285_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767286_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR5767286_2.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:1_1.fastq.gz", 
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:1_2.fastq.gz",
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:2_1.fastq.gz",
+"/hb/groups/pogson_group/dissertation/data/raw_sequencing_reads/SRR7211988_H2YWCBCXX:2_2.fastq.gz"
 ]
 
 def check_fastq_file(file):

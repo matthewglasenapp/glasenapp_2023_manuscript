@@ -11,7 +11,6 @@ conda install -c bioconda bwa-mem2
 conda install -c bioconda mosdepth
 conda install -c bioconda gatk4
 
-
 # Common conda commands
 # conda info --envs
 # conda remove --name env --all

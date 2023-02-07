@@ -14,9 +14,7 @@ number_loci = int(int(subprocess.check_output("cat clean_single_locus_trees.nwk 
 print(number_loci)
 
 # Taxa expected to be present in each single locus tree
-#set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus_SRR7211988","pulcherrimus_SRR5767283","nudus","franciscanus","depressus","purpuratus_SRR6281818","pulcherrimus_DRR107784"}
 set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus"}
-#set = {"droebachiensis","fragilis","pallidus","intermedius","purpuratus","pulcherrimus", "franciscanus"}
 
 def create_input_file(output_file, program, num_reticulations, runs, processors, num_net_returned):
     with open(raw_gene_trees, "r") as f:
@@ -37,12 +35,13 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
     reject_file.close()
 
     ###### For InferNetwork_ML_CV, need gene tree count as an integer of 10. Randomly pop 4 gene trees!
-    print(len(filtered_gene_tree_lst))
-    number_gene_trees_to_remove = 4
-    for i in range(0,number_gene_trees_to_remove):
-        index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
-        filtered_gene_tree_lst.pop(index_to_remove)
-    print(len(filtered_gene_tree_lst))
+    # Leave commented if not using InferNetwork_ML_CV
+    #print(len(filtered_gene_tree_lst))
+    #number_gene_trees_to_remove = 4
+    #for i in range(0,number_gene_trees_to_remove):
+        #index_to_remove = random.randint(0,len(filtered_gene_tree_lst)-1)
+        #filtered_gene_tree_lst.pop(index_to_remove)
+    #print(len(filtered_gene_tree_lst))
 
     for count, tree in enumerate(filtered_gene_tree_lst):
         line = "Tree gt" + str(count) + "  = " + tree
@@ -68,8 +67,13 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         line5 = "NETWORK net = (pulcherrimus,(purpuratus,(intermedius,(pallidus,(droebachiensis,fragilis)))));"
         line6 = "END;"
         line7 = "BEGIN PHYLONET;"
-        #line8 = '{} {} {} -x {} -pl {} -s net -po -di;'.format(program, gt_string, num_reticulations, runs, processors)
-        line8 = '{} (all) {} -x {} -pl {} -s net -di;'.format(program, num_reticulations, runs, processors)
+       
+        # Use this line if using boostrap replicates for gene trees
+        line8 = '{} {} {} -x {} -pl {} -s net -po -di;'.format(program, gt_string, num_reticulations, runs, processors)
+        
+        # Use this line if not using bootstrap replicates for gene trees
+        #line8 = '{} (all) {} -x {} -pl {} -s net -di;'.format(program, num_reticulations, runs, processors)
+        
         line9 = "END;"
         f2.write(line1 + "\n" + "\n")
         f2.write(line2 + "\n")
@@ -84,10 +88,10 @@ def create_input_file(output_file, program, num_reticulations, runs, processors,
         f2.write(line9 + "\n")
 
 def main():
-    #create_input_file("retic_0", "InferNetwork_ML", "0", "10", "20", "1")
-    #create_input_file("retic_1", "InferNetwork_ML", "1", "10", "20", "5")
-    #create_input_file("retic_2", "InferNetwork_ML", "2", "10", "20", "5")
-    create_input_file("retic_3", "InferNetwork_ML_CV", "3", "10", "20", "5")
+    create_input_file("retic_0", "InferNetwork_ML", "0", "10", "20", "1")
+    create_input_file("retic_1", "InferNetwork_ML", "1", "10", "20", "5")
+    create_input_file("retic_2", "InferNetwork_ML", "2", "10", "20", "5")
+    create_input_file("retic_3", "InferNetwork_ML", "3", "10", "20", "5")
 
 if __name__ == "__main__":
     main()

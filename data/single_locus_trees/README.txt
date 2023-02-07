@@ -1,0 +1,1 @@
+This directory contains the single locus tree files used in various analyses. The strongylocentrotidae/ directory contains the single locus tree file used in the concordance factor analysis. The s_clade directory contains the single locus tree file used in the PhyloNet analysis. The delta/ directory contains the single locus tree files used in the delta analyses. 

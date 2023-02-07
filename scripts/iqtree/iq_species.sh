@@ -12,4 +12,4 @@
 fasta_alignment_dir="/hb/scratch/mglasena/strongylocentrotidae/vcf2fasta_CDS/"
 iqtree="/hb/groups/pogson_group/dissertation/software/iqtree-2.2.2.2/bin/iqtree2"
 
-iqtree -p $fasta_alignment_dir -m MFP+MERGE -B 1000 --sampling GENESITE -T 8 --prefix rev_dna
+iqtree -p $fasta_alignment_dir -m MFP -B 1000 --sampling GENESITE -T 8 --prefix rev_dna

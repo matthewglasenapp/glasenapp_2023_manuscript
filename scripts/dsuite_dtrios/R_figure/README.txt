@@ -1,0 +1,1 @@
+The script dstat.R visualizes the results of the D statistic tests with M. nudus as the outgroup. The script plots the data in d.csv, which was manually reformatted from the Dsuite raw output. 

@@ -1,0 +1,1 @@
+This directory contains the input and output from the PhyloNet InferNetwork_ML analysis. The input/ directory contains the input nexus files. The output/ directory contains the raw output from the InferNetwork_ML command. 

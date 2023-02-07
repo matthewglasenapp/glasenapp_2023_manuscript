@@ -1,0 +1,1 @@
+The script gcf.R tests for significant differences in the counts of the two discordant NNI genealogies for each branch in the species/reference tree. 
