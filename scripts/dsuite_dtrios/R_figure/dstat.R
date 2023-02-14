@@ -3,7 +3,7 @@ library(scales)
 library(svglite)
 library(ggExtra)
 
-setwd("/Users/matt/Documents/dissertation/dissertation_data/abba_baba/R_figure/")
+setwd("/Users/matt/Documents/GitHub/glasenapp_2023_manuscript/scripts/dsuite_dtrios/R_figure")
 
 data = read.csv("/Users/matt/Documents/dissertation/dissertation_data/abba_baba/R_figure/d.csv")
 
@@ -14,7 +14,7 @@ ggplot(data, aes(taxa, d, color=Significance)) +
   geom_errorbar(aes(ymin=d-error, ymax=d+error)) + 
   coord_flip() +
   scale_y_continuous(labels = label_number(accuracy = 0.001)) +
-  labs(title="D Statistic Results",
+  labs(
        x="Taxa Triplet (P1,P2),P3",
        y="D Statistic") + 
   scale_color_manual(values=c("light blue", "dark blue")) + 
@@ -24,7 +24,6 @@ ggplot(data, aes(taxa, d, color=Significance)) +
   theme_linedraw(base_line_size = 2) + 
   removeGrid(x = TRUE, y = FALSE) + 
   theme(
-    plot.title = element_text(size=18, face="bold", hjust = 0.5),
     axis.title.x = element_text(size=12, face="bold"),
     axis.title.y = element_text(size=12, face="bold"),
     axis.text.x = element_text(size=10),
