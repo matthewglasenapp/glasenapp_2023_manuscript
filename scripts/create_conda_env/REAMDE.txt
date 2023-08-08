@@ -1,0 +1,1 @@
+Create a conda environment for analysis and install bcftools, bwa-mem2, mosdepth, and gatk4 using bioconda.
